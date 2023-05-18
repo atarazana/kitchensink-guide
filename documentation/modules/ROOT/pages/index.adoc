@@ -1,20 +1,19 @@
-= Welcome to Template Tutorial
+= Welcome to Kitchensink Guide
 :page-layout: home
 :!sectids:
 
 [.text-center.strong]
-== Publish Services to Kubernetes
+== Deploying JBoss EAP applications on OpenShift
 
-A Kubernetes tutorial to show how you can deploy a Java service to a Kubernetes cluster as it was a child game.
+A guide to the different existing methods for deploying a JBoss EAP application on OpenShift.
 
-[.tiles.browse]
-== Browse modules
+Benefits of deploying JBoss EAP applications on OpenShift:
 
-[.tile]
-.xref:01-setup.adoc[Get Started]
-* xref:01-setup.adoc#minikube[Minikube]
+* We deploy an immutable container image
 
-[.tile]
-.xref:02-deploy.adoc[Deploying]
-* xref:02-deploy.adoc#package[Package the Application]
-* xref:02-deploy.adoc#deploy[Deploy the Application]
+** What we test in DEV and PRE environments is deployed in production.
+** Reducing risk and simplifying deployment.
+
+* The image building process with ``S2I`` allows the customization of the default standalone file in a simple way and without the need to replace it.
+
+* Image building and deployment is an easily automated process as we will see later.

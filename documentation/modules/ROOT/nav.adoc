@@ -1,7 +1,31 @@
 * xref:01-setup.adoc[1. Setup]
 ** xref:01-setup.adoc#prerequisite[Prerequisites]
-** xref:01-setup.adoc#minikube[Setup Minikube]
+** xref:01-setup.adoc#openshift[Setup OpenShift 4]
+ifeval::["{use-quay-io}" == "true"]
+** xref:01-setup.adoc#container-registry-account[Container Registry Account]
+endif::[]
+** xref:01-setup.adoc#download-tutorial[Get tutorial sources]
 
-* xref:02-deploy.adoc[2. Deploy Service]
-** xref:02-deploy.adoc#package[Build Service]
-** xref:02-deploy.adoc#deploy[Deploy Dervice]
+* xref:02-s2i.adoc[2. Deploy JBoss EAP Application with S2I]
+** xref:02-s2i.adoc#overview[Overview]
+** xref:02-s2i.adoc#deploy[Deploying a JBOSS EAP 7.2 application manually]
+** xref:02-s2i.adoc#redeploy[Redeploying a JBOSS EAP application]
+
+* xref:03-argo.adoc[3. Deploy JBoss EAP Application with ArgoCD]
+** xref:03-argo.adoc#overview[Simplification, git-based automation]
+** xref:03-argo.adoc#deploy[Deploy Kitchensink app with ArgoCD]
+
+* xref:04-applicationset.adoc[4. ArgoCD + ApplicationSet]
+** xref:04-applicationset.adoc#overview[Overview]
+** xref:04-applicationset.adoc#deploy[Deploy Kitchensink app with ArgoCD + ApplicationSet]
+
+* xref:05-kustomize.adoc[5. ArgoCD + Kustomize]
+
+* xref:06-helm.adoc[6. ArgoCD + Helm]
+
+* xref:07-helm-kustomized.adoc[7. ArgoCD + Helm + Kustomize]
+** xref:07-helm-kustomized.adoc#overview[Overview]
+** xref:07-helm-kustomized.adoc#deploy[Deploy Kitchensink app with ArgoCD + Kustomize + Helm]
+** xref:07-helm-kustomized.adoc#benefits[Benefits of the GitOps/ArgoCD model]
+
+* xref:08-cicd.adoc[8. CI/CD Pipelines]

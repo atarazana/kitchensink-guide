@@ -1,0 +1,75 @@
+Please open a browser and go to https://quay.io then click on *SIGN IN*.
+
+image::create-quay-account-01.png[SIGN IN]
+
+Now click on *Register for a Red Hat account*.
+
+image::create-quay-account-02.png[SIGN IN]
+
+Please, choose a login name and fill in all the mandatory fields, then click *NEXT*.
+
+image::create-quay-account-03.png[SIGN IN]
+
+As you did before, fill in all the mandatory fields, then click *NEXT*.
+
+image::create-quay-account-04.png[SIGN IN]
+
+You aren't a robot, are you? Then please check to continue.
+
+image::create-quay-account-05.png[SIGN IN]
+
+If your Red Hat account user name is also a valid Quay username please confirm it, otherwise choose a different one not already taken.
+
+image::create-quay-account-06.png[SIGN IN]
+
+No need to fill in any more fields just skip it.
+
+image::create-quay-account-07.png[SIGN IN]
+
+Finally you have your Quay account. We have to create a bot account so that we don't expose our password, to do so, please click on your account user name as in the next picture.
+
+image::create-quay-account-08.png[SIGN IN]
+
+Now click on the robot icon on the left side.
+
+image::create-quay-account-09.png[SIGN IN]
+
+Click on *Create Robot Account*.
+
+image::create-quay-account-10.png[SIGN IN]
+
+Now, provide a username and a description, *cicd* sounds like a good name, doesn't it?
+
+image::create-quay-account-11.png[SIGN IN]
+
+Ok, we have our bot account, now we need to create empty repositories for our gramola microservices. Click on *Create New Repository* and follow instructions to create `gramola-events` repository.
+
+image::create-quay-account-12.png[SIGN IN]
+
+Let's name our new repository as *gramola-events*, make it *public* and *empty*.
+
+image::create-quay-account-13.png[SIGN IN]
+
+Please do the same, this time with this name: *gramola-gateway*.
+
+image::create-quay-account-14.png[SIGN IN]
+
+Now that we have created our empty image repositories we have to give permissions on them to the bot account. Please navigate to *Account Settings*.
+
+image::create-quay-account-15.png[SIGN IN]
+
+Then go to the robot accounts area, click on robot icon on the left. You should see something like this. To give permissions on our repositories click on the *"No repositories"* link.
+
+image::create-quay-account-16.png[SIGN IN]
+
+Give *WRITE* permissions to *gramola-events* and *gramola-gateway* repositories and click on *Update permissions*.
+
+image::create-quay-account-17.png[SIGN IN]
+
+In the next chapters you will need to use the username and token of your bot account, let's have a look to those values so that you know how to get them later. Click on *Options->View Credentials*.
+
+image::create-quay-account-18.png[SIGN IN]
+
+As you can see the username is composed: *[USER NAME]+[BOT ACCOUNT NAME]*.
+
+image::create-quay-account-19.png[SIGN IN]

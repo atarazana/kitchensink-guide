@@ -1,11 +1,10 @@
 {
-  "name": "rhs-openshift-admins-devops",
-  "description": "OpenShift Admins Devops Course Documentation Site",
-  "homepage": "https://redhat-scholars.github.io/openshift-admins-devops",
+  "name": "kitchensink-guide",
+  "description": "A guide to the different existing methods for deploying a JBoss EAP application on OpenShift.",
+  "homepage": "https://atarazana.github.io/kitchensink-guide",
   "author": {
-    "email": "kamesh.sampath@hotmail.com",
-    "name": "Kamesh Sampath",
-    "url": "https://twitter.com/@kamesh_sampath"
+    "name": "Atarazana",
+    "url": "https://github.com/atarazana"
   },
   "dependencies": {
     "@antora/cli": "^2.3.1",
@@ -28,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/redhat-scholars/openshift-admins-devops.git"
+    "url": "git+https://github.com/atarazana/kitchensink-guide.git"
   },
   "license": "Apache-2.0",
   "babel": {

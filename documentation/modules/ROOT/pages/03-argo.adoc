@@ -1,0 +1,151 @@
+= Deploy JBoss EAP Application with ArgoCD
+include::_attributes.adoc[]
+
+[#overview]
+== Simplification, git-based automation
+
+We have seen ways to deploy manually, but ...
+
+* How repeatable are these processes? 
+* Auditable? 
+* Simple at first, but what about in the long run?
+
+\... then GitOps to the rescue !!!
+
+.What is GitOps ?
+image::gitops.png[] 
+
+GitOps helps provide infrastructure as code using git repositories as the only source of truth.
+
+We are going to deploy the same application in different ways using ``ArgoCD``.
+
+[source, yaml,subs="+macros,+attributes"]
+----
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kitchensink-basic-app
+  namespace: openshift-gitops
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    kitchensink-root-app: 'true'
+spec:
+  destination:
+    name: in-cluster
+    namespace: demo-3
+  ignoreDifferences:
+    - group: apps.openshift.io
+      jqPathExpressions:
+        - '.spec.template.spec.containers[].image'
+      kind: DeploymentConfig
+  project: default
+  source:
+    path: basic/base
+    repoURL: 'https://github.com/atarazana/kitchensink-conf'
+    targetRevision: main
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+----
+
+The ``Application`` CRD is the Kubernetes resource object representing a deployed application instance in an environment.
+
+Let's explain the key parts:
+
+[sidebar]
+.destination
+--
+The cluster and the target namespace to deploy the application.
+
+[source, yaml]
+----
+ destination:
+   name: in-cluster
+   namespace: kitchensink-s2i
+----
+--
+
+[sidebar]
+.source
+--
+*Source* of truth, from which the deployment descriptors are obtained.
+
+[source, yaml]
+----
+  source:
+    path: basic/base
+    repoURL: 'https://github.com/atarazana/kitchensink-conf'
+    targetRevision: main
+----
+--
+
+[sidebar]
+.project
+--
+*Project*, allows you to define restrictions
+
+[source, yaml]
+----
+  project: default
+----
+--
+
+[sidebar]
+.syncPolicy
+--
+Synchronization settings
+
+[source, yaml]
+----
+  syncPolicy:
+    automated:
+      selfHeal: true
+----
+--
+
+[#deploy]
+== Deploy Kitchensink app with ArgoCD
+
+The first one from a folder containing some descriptors that we have obtained from the ``JBoss EAP 7.2`` template.
+
+Now, you have to run the next command that created the ``ApplicationSet`` object.
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+export USERNAME="{username}"
+cat <<EOF | oc apply -n {root-apps-namespace} -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kitchensink-basic-app-$\{USERNAME}
+  namespace: openshift-gitops
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    kitchensink-root-app: 'true'
+    username: $\{USERNAME}
+spec:
+  destination:
+    name: in-cluster
+    namespace: argo-$\{USERNAME}
+  ignoreDifferences:
+    - group: apps.openshift.io
+      jqPathExpressions:
+        - '.spec.template.spec.containers[].image'
+      kind: DeploymentConfig
+  project: default
+  source:
+    path: basic/base
+    repoURL: 'https://github.com/atarazana/kitchensink-conf'
+    targetRevision: main
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+EOF
+----

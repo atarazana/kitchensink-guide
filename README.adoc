@@ -1,1 +1,8 @@
-Check the build courseware https://redhat-scholars.github.io/build-course[documentation]  on how folder structure, how to use macros and other gotchas
+= Kitchensink Guide
+
+A guide to the different existing methods for deploying a JBoss EAP application on OpenShift.
+
+---
+Guide URL:
+
+https://atarazana.github.io/kitchensink-guide

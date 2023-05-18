@@ -4,26 +4,30 @@ include::_attributes.adoc[]
 [#prerequisite]
 == Prerequisite CLI tools
 
-include::https://raw.githubusercontent.com/redhat-developer-demos/rhd-tutorial-common/master/prerequisites-kubernetes.adoc[]
-|===
+include::partial$prerequisites.adoc[]
 
-include::https://raw.githubusercontent.com/redhat-developer-demos/rhd-tutorial-common/master/optional-requisites.adoc[]
-|===
 
-[#minikube]
-== Setup Kubernetes
+[#openshift]
+== Setup OpenShift 4
 
 :profile: my_profile
 
-include::https://raw.githubusercontent.com/redhat-developer-demos/rhd-tutorial-common/master/kubernetes-setup.adoc[]
+include::partial$openshift-setup.adoc[]
 
-And then you are ready for start using Kubernetes:
 
-image::kubelogo.png[]
+ifeval::["{use-quay-io}" == "true"]
+[#container-registry-account]
+== Container Registry Account
 
-[#downloadtutorial]
+include::partial$create-quay-account.adoc[]
+
+endif::[]
+
+[#download-tutorial]
 == Get tutorial sources
 
-:tutorial-url: https://github.com/redhat-developer-demos/rhd-tutorial-common.git
-:folder: my_folder
-include::https://raw.githubusercontent.com/redhat-developer-demos/rhd-tutorial-common/master/download-sources.adoc[]
+Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.
+
+:tutorial-url: https://github.com/atarazana/gramola.git
+:folder: gitops-guides
+include::partial$download-sources.adoc[]

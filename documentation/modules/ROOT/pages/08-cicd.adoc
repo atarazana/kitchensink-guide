@@ -1,0 +1,3 @@
+= CI/CD pipelines to close the circle
+include::_attributes.adoc[]
+

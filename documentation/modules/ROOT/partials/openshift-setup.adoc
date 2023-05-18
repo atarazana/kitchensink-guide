@@ -1,0 +1,20 @@
+To run this guide *you need to have at least one OpenShift cluster* provisioned *and be cluster admin*. For instance using https://try.openshift.com[try.openshift.com], or can use any existing OpenShift4 cluster(s). Once you have your cluster, you can download the latest OpenShift client (oc) from https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/[here] and add it to your path.
+
+You can check the OpenShift version using:
+
+[.console-input]
+[source,bash,subs="attributes+,+macros"]	
+----	
+oc version	
+----	
+
+The output should show oc version {oc-version}+:	
+
+[.console-output]
+[source,bash,subs="attributes+,+macros"]	
+----	
+Client Version: {oc-version}
+...
+----	
+
+Then login into the OpenShift cluster using `oc login`

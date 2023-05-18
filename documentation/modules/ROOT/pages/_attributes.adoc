@@ -1,2 +1,7 @@
 :experimental:
 :source-highlighter: highlightjs
+
+:username: %USERNAME%
+:password: %PASSWORD%
+
+:root-apps-namespace: openshift-gitops

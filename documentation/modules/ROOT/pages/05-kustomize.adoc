@@ -1,0 +1,61 @@
+= ArgoCD + Kustomize
+include::_attributes.adoc[]
+
+[#deploy]
+== Deploy Kitchensink app with ArgoCD + Kustomize
+
+Now we are going to deploy the same application in the same way, but instead of using descriptors directly we are going to customize them for the corresponding environment (overlay) with ``kustomize``.
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+export USERNAME="{username}"
+cat <<EOF | oc apply -n {root-apps-namespace} -f -
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kitchensink-kustomize-$\{USERNAME}
+  namespace: openshift-gitops
+  labels:
+    argocd-root-app: "true"
+    username: $\{USERNAME}
+spec:
+  generators:
+  - list:
+      elements:
+      - env: dev
+        ns: kustomize-dev-$\{USERNAME}
+        desc: "Kustomize Dev"
+      - env: test
+        ns: kustomize-test-$\{USERNAME}
+        desc: "Kustomize Test"
+  template:
+    metadata:
+      name: kitchensink-kustomize-app-{{ env }}-$\{USERNAME}
+      namespace: openshift-gitops
+      labels:
+        kitchensink-root-app: "true"
+        username: $\{USERNAME}
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+    spec:
+      destination:
+        namespace: '{{ ns }}'
+        name: in-cluster
+      ignoreDifferences:
+      - group: apps.openshift.io
+        kind: DeploymentConfig
+        jqPathExpressions:
+          - .spec.template.spec.containers[].image
+      project: default
+      syncPolicy:
+        automated:
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      source:
+        path: kustomize/{{ env }}
+        repoURL: "https://github.com/atarazana/kitchensink-conf"
+        targetRevision: main
+EOF
+----

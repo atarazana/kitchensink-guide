@@ -1,0 +1,111 @@
+= ArgoCD + Kustomize + Helm
+include::_attributes.adoc[]
+
+[#overview]
+== Overview
+
+Key points:
+
+* #Git# is the #source of truth#
+* We want to deploy on #different platforms and different environments#
+
+To accomplish this, we need to use ``helm`` and ``Kustomize``.
+
+.Difference between Template/Helm and Overlay/Kustomize
+[#img-helm_kustomize,link=https://jfrog.com/blog/power-up-helm-charts-using-kustomize-to-manage-kubernetes-deployments/]
+image::helm_kustomize.png[]
+
+[NOTE]
+====
+If you want to know more in detail the difference between ``Helm`` and ``Kustomize``, click on the image.
+====
+
+[#deploy]
+== Deploy Kitchensink app with ArgoCD + Kustomize + Helm
+
+Now we want to deploy a JBoss EAP application using the ``helm`` templates _kustomized_ for dev and test environments.
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+export USERNAME="{username}"
+cat <<EOF | oc apply -n {root-apps-namespace} -f -
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kitchensink-kustomized-helm-$\{USERNAME}
+  namespace: openshift-gitops
+  labels:
+    argocd-root-app: "true"
+    username: $\{USERNAME}
+spec:
+  generators:
+  - list:
+      elements:
+      - env: dev
+        ns: helm-kustomize-dev-$\{USERNAME}
+        desc: "Helm + Kustomize (Dev)"
+      - env: test
+        ns: helm-kustomize-test-$\{USERNAME}
+        desc: "Helm + Kustomize (Test)"
+  template:
+    metadata:
+      name: kitchensink-kustomized-helm-app-{{ env }}-$\{USERNAME}
+      namespace: openshift-gitops
+      labels:
+        kitchensink-root-app: "true"
+        username: $\{USERNAME}
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+    spec:
+      destination:
+        namespace: '{{ ns }}'
+        name: in-cluster
+      ignoreDifferences:
+      - group: apps.openshift.io
+        kind: DeploymentConfig
+        jqPathExpressions:
+          - .spec.template.spec.containers[].image
+      project: default
+      syncPolicy:
+        automated:
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      source:
+        path: advanced/overlays/{{ env }}
+        repoURL: "https://github.com/atarazana/kitchensink-conf"
+        targetRevision: main
+        plugin:
+          env:
+            - name: DEBUG
+              value: 'false'
+          name: kustomized-helm
+EOF
+----
+
+[sidebar]
+.plugin
+--
+Custom plugin, variables are passed to it as environment variables.
+
+[source, yaml]
+----
+...
+        plugin:
+          env:
+            - name: DEBUG
+              value: 'false'
+          name: kustomized-helm
+...
+----
+--
+
+[#benefits]
+== Benefits of the GitOps/ArgoCD model
+
+* It provides an infrastructure base as code for application deployment.
+* It is based on Git, so everything we know about git is reused.
+* Allows deployment in multiple clusters in a simple way.
+* Includes the concept of a generator that simplifies complex deployments: multiple departments, business units, etc.
+* Not only deploys, but also fixes (un)voluntary modifications in the deployment environments.
