@@ -3,9 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Welcome to Kitchensink Guide :: Kitchensink Guide</title>
-    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/index.html">
-    <link rel="next" href="01-setup.html">
+    <title>ArgoCD + ApplicationSet :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/04-applicationset.html">
+    <link rel="prev" href="03-argo.html">
+    <link rel="next" href="05-kustomize.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -112,15 +113,15 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="04-applicationset.html">4. ArgoCD + ApplicationSet</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="04-applicationset.html#overview">Overview</a>
+    <a class="nav-link" href="#overview">Overview</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="04-applicationset.html#deploy">Deploy Kitchensink app with ArgoCD + ApplicationSet</a>
+    <a class="nav-link" href="#deploy">Deploy Kitchensink app with ArgoCD + ApplicationSet</a>
   </li>
 </ul>
   </li>
@@ -178,50 +179,204 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Kitchensink Guide</a></li>
-    <li><a href="index.html">Welcome to Kitchensink Guide</a></li>
+    <li><a href="04-applicationset.html">4. ArgoCD + ApplicationSet</a></li>
   </ul>
 </nav>
   <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
 </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Welcome to Kitchensink Guide</h1>
-<div class="sect1 text-center strong">
-<h2>Deploying JBoss EAP applications on OpenShift</h2>
+<h1 class="page">ArgoCD + ApplicationSet</h1>
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A guide to the different existing methods for deploying a JBoss EAP application on OpenShift.</p>
+<p>Now we are going to deploy the same application in the same way, but in two namespaces at the same time.</p>
 </div>
 <div class="paragraph">
-<p>Benefits of deploying JBoss EAP applications on OpenShift:</p>
+<p>We will use an <code>ApplicationSet</code> for this.</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>We deploy an immutable container image</p>
-<div class="ulist">
-<ul>
-<li>
-<p>What we test in DEV and PRE environments is deployed in production.</p>
-</li>
-<li>
-<p>Reducing risk and simplifying deployment.</p>
-</li>
-</ul>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kitchensink-basic
+  namespace: openshift-gitops
+  labels:
+    argocd-root-app: "true"
+spec:
+  generators: <i class="conum" data-value="1"></i><b>(1)</b>
+  - list:
+      elements:
+      - env: demo-4a
+        desc: "Demo 4a"
+      - env: demo-4b
+        desc: "Demo 4b"
+  template:
+    metadata:
+      name: kitchensink-basic-app-{{ env }}
+      namespace: openshift-gitops
+      labels:
+        kitchensink-root-app: "true"
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+    spec:
+      destination:
+        namespace: '{{ env }}'
+        name: in-cluster
+      ignoreDifferences:
+      - group: apps.openshift.io
+        kind: DeploymentConfig
+        jqPathExpressions:
+          - .spec.template.spec.containers[].image
+      project: default
+      syncPolicy:
+        automated:
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      source: <i class="conum" data-value="2"></i><b>(2)</b>
+        path: basic/base
+        repoURL: "https://github.com/atarazana/kitchensink-conf"
+        targetRevision: main</code></pre>
 </div>
-</li>
-<li>
-<p>The image building process with <code>S2I</code> allows the customization of the default standalone file in a simple way and without the need to replace it.</p>
-</li>
-<li>
-<p>Image building and deployment is an easily automated process as we will see later.</p>
-</li>
-</ul>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>We introduce the concept of <code>generators</code>. One Application per element.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Being the source the same, what we will do is to deploy the same application in two different environments (in our case, 2 different projects/namespaces).</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The <code>ApplicationSet</code> controller is a Kubernetes controller that adds support for an ApplicationSet CustomResourceDefinition (CRD). This controller/CRD enables both automation and greater flexibility managing Argo CD Applications across a large number of clusters and within monorepos, plus it makes self-service usage possible on multitenant Kubernetes clusters.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s explain the key parts:</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">generators</div>
+<div class="paragraph">
+<p><strong>Generators</strong><sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>, definitions that allow you to generate objects defined with the <code>template</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  generators:
+  - list:
+      elements:
+      - env: kitchensink-dev
+      - env: kitchensink-test</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">template</div>
+<div class="paragraph">
+<p><strong>Template</strong> that uses the generator as a model to generate objects of type <code>Application</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  template:
+    metadata:
+      name: kitchensink-basic-app-{{ env }}
+      namespace: openshift-gitops
+      labels:
+        kitchensink-root-app: "true"
+      ...</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy Kitchensink app with ArgoCD + ApplicationSet</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You have to run the next command that created the <code>ApplicationSet</code> object that deploys Kitchensink app in <code>appset-a-%USERNAME%</code> and <code>appset-b-%USERNAME%</code> by using a list generator and deploys the descriptors stored in git.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export USERNAME="%USERNAME%"
+cat &lt;&lt;EOF | oc apply -n openshift-gitops -f -
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kitchensink-basic-${USERNAME}
+  namespace: openshift-gitops
+  labels:
+    argocd-root-app: "true"
+    username: ${USERNAME}
+spec:
+  generators:
+  - list:
+      elements:
+      - env: appset-a-${USERNAME}
+        desc: "ApplicationSet A"
+      - env: appset-b-${USERNAME}
+        desc: "ApplicationSet B"
+  template:
+    metadata:
+      name: kitchensink-basic-app-{{ env }}-${USERNAME}
+      namespace: openshift-gitops
+      labels:
+        kitchensink-root-app: "true"
+        username: ${USERNAME}
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+    spec:
+      destination:
+        namespace: '{{ env }}'
+        name: in-cluster
+      ignoreDifferences:
+      - group: apps.openshift.io
+        kind: DeploymentConfig
+        jqPathExpressions:
+          - .spec.template.spec.containers[].image
+      project: default
+      syncPolicy:
+        automated:
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      source:
+        path: basic/base
+        repoURL: "https://github.com/atarazana/kitchensink-conf"
+        targetRevision: main
+EOF</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. <a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/" class="bare">https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/</a>
 </div>
 </div>
 <nav class="pagination">
-  <span class="next"><a href="01-setup.html" class="query-params-link">1. Setup</a></span>
+  <span class="prev"><a href="03-argo.html" class="query-params-link">3. Deploy JBoss EAP Application with ArgoCD</a></span>
+  <span class="next"><a href="05-kustomize.html" class="query-params-link">5. ArgoCD + Kustomize</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

@@ -3,9 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Welcome to Kitchensink Guide :: Kitchensink Guide</title>
-    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/index.html">
-    <link rel="next" href="01-setup.html">
+    <title>Deploy JBoss EAP Application with S2I :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/02-s2i.html">
+    <link rel="prev" href="01-setup.html">
+    <link rel="next" href="03-argo.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -85,18 +86,18 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="02-s2i.html">2. Deploy JBoss EAP Application with S2I</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-s2i.html#overview">Overview</a>
+    <a class="nav-link" href="#overview">Overview</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
+    <a class="nav-link" href="#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
+    <a class="nav-link" href="#redeploy">Redeploying a JBOSS EAP application</a>
   </li>
 </ul>
   </li>
@@ -178,50 +179,174 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Kitchensink Guide</a></li>
-    <li><a href="index.html">Welcome to Kitchensink Guide</a></li>
+    <li><a href="02-s2i.html">2. Deploy JBoss EAP Application with S2I</a></li>
   </ul>
 </nav>
   <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
 </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Welcome to Kitchensink Guide</h1>
-<div class="sect1 text-center strong">
-<h2>Deploying JBoss EAP applications on OpenShift</h2>
+<h1 class="page">Deploy JBoss EAP Application with S2I</h1>
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A guide to the different existing methods for deploying a JBoss EAP application on OpenShift.</p>
+<p><a href="https://github.com/openshift/source-to-image">Source-to-Image (S2I)</a> is a framework that makes it easy to write images that take application source code as an input and produce a new image that runs the assembled application as output.</p>
 </div>
 <div class="paragraph">
-<p>Benefits of deploying JBoss EAP applications on OpenShift:</p>
+<p>The main advantage of using S2I for building reproducible container images is the ease of use for developers.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i.png" alt="s2i">
+</div>
+<div class="title">Figure 1. Source code deployment process</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploying a JBOSS EAP 7.2 application manually</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s deploy the Kitchensink stack !</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>First of all, create the project that will host the application:</p>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-project s2i-%USERNAME%</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Deploy the PostgreSQL database for the kitchensink app:</p>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-app --name=kitchensink-db \
+ -e POSTGRESQL_USER=luke \
+ -e POSTGRESQL_PASSWORD=secret \
+ -e POSTGRESQL_DATABASE=kitchensink centos/postgresql-10-centos7 \
+ --as-deployment-config=false
+
+oc label deployment/kitchensink-db app.kubernetes.io/part-of=kitchensink-app --overwrite=true &amp;&amp; \
+oc label deployment/kitchensink-db app.openshift.io/runtime=postgresql --overwrite=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code>oc label</code> commands adds decoration to our deployment (used for the <mark>Topology view</mark>):</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>We deploy an immutable container image</p>
-<div class="ulist">
-<ul>
-<li>
-<p>What we test in DEV and PRE environments is deployed in production.</p>
+<p><code>app.openshift.io/runtime</code>: Icon displayed in the node</p>
 </li>
 <li>
-<p>Reducing risk and simplifying deployment.</p>
+<p><code>app.kubernetes.io/part-of</code>: App grouping</p>
 </li>
 </ul>
 </div>
+</td>
+</tr>
+</table>
+</div>
 </li>
 <li>
-<p>The image building process with <code>S2I</code> allows the customization of the default standalone file in a simple way and without the need to replace it.</p>
+<p>Deploy the kitchensink app:</p>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-app --template=eap72-basic-s2i \
+-p APPLICATION_NAME=kitchensink \
+-p MAVEN_ARGS_APPEND="-Dcom.redhat.xpaas.repo.jbossorg" \
+-p SOURCE_REPOSITORY_URL=https://github.com/atarazana/kitchensink \
+-p SOURCE_REPOSITORY_REF=main \
+-p CONTEXT_DIR=.</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>In order to deploy the Kitchensink app, we use a template, <code>eap72-basic-s2i</code>.</p>
+</div>
+<div class="paragraph">
+<p>A template describes a set of objects that can be parameterized and processed to produce a list of objects for creation by OpenShift Container Platform. A template can be processed to create anything you have permission to create within a project, for example services, build configurations, and deployment configurations. A template can also define a set of labels to apply to every object defined in the template.</p>
+</div>
+<div class="paragraph">
+<p>You can create a list of objects from a template using the CLI or, if a template has been uploaded to your project or the global template library, using the web console.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </li>
 <li>
-<p>Image building and deployment is an easily automated process as we will see later.</p>
+<p>Adjust the context of the application and add <em>decoration</em> (labels and annotation):</p>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc set env dc/kitchensink DB_HOST=kitchensink-db DB_PORT=5432 DB_NAME=kitchensink DB_USERNAME=luke DB_PASSWORD=secret &amp;&amp; \
+oc set probe dc/kitchensink --readiness --initial-delay-seconds=90 --failure-threshold=5 &amp;&amp; \
+oc set probe dc/kitchensink --liveness --initial-delay-seconds=90 --failure-threshold=5
+
+oc label dc/kitchensink app.kubernetes.io/part-of=kitchensink-app --overwrite=true &amp;&amp; \
+oc label dc/kitchensink app.openshift.io/runtime=jboss --overwrite=true
+
+oc annotate dc/kitchensink \
+ app.openshift.io/connects-to='[{"apiVersion":"apps/v1","kind":"Deployment","name":"kitchensink-db"}]' \
+ --overwrite=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code>app.openshift.io/connects-to</code> annotation is used to connect the nodes.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </li>
-</ul>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="redeploy"><a class="anchor" href="#redeploy"></a>Redeploying a JBOSS EAP application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A quick way to test <em>minor</em> changes in our application, and always in a <mark>development environment</mark>, we can redeploy our app as follows:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc project s2i-%USERNAME%
+
+POD_NAME=$(oc get pod -l application=kitchensink -o json | jq -r .items[0].metadata.name)
+
+mvn package -Popenshift &amp;&amp; oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war</code></pre>
+</div>
 </div>
 </div>
 </div>
 <nav class="pagination">
-  <span class="next"><a href="01-setup.html" class="query-params-link">1. Setup</a></span>
+  <span class="prev"><a href="01-setup.html" class="query-params-link">1. Setup</a></span>
+  <span class="next"><a href="03-argo.html" class="query-params-link">3. Deploy JBoss EAP Application with ArgoCD</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
