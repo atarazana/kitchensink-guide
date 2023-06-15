@@ -26,10 +26,10 @@ spec:
     name: in-cluster
     namespace: helm-$\{USERNAME}
   ignoreDifferences:
-    - group: apps.openshift.io
+    - group: apps
+      kind: Deployment
       jqPathExpressions:
         - '.spec.template.spec.containers[].image'
-      kind: DeploymentConfig
   project: default
   source:
     helm:
@@ -37,7 +37,7 @@ spec:
         - name: baseNamespace
           value: helm-$\{USERNAME}
     path: advanced/helm_base
-    repoURL: 'https://github.com/atarazana/kitchensink-conf'
+    repoURL: "https://{gitea-host}/{username}/kitchensink-conf"
     targetRevision: main
   syncPolicy:
     automated:

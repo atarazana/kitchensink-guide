@@ -1,0 +1,76 @@
+
+[#create-ci-webhooks]
+== Create CI Webhooks
+
+[#kitchensink-ci-webhook]
+=== Kitchensink CI Webhook
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+KITCHENSINK_CI_EL_LISTENER_HOST=$(oc get route/el-kitchensink-ci-pl-push-{git-provider}-listener -n {cicd-namespace}-{username} -o jsonpath='{.status.ingress[0].host}')
+
+curl -k -X 'POST' "https://{gitea-host}/api/v1/repos/{username}/kitchensink/hooks" \
+  -H "accept: application/json" \
+  -H "Authorization: token ${GIT_PAT}" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "active": true,
+  "branch_filter": "*",
+  "config": {
+     "content_type": "json",
+     "url": "http://'"${KITCHENSINK_CI_EL_LISTENER_HOST}"'"
+  },
+  "events": [
+    "push" <1>
+  ],
+  "type": "gitea"
+}'
+----
+<1> Only `push` events
+
+Expected output:
+
+[.console-output]
+[source,json, subs="+macros,+attributes"]
+----
+{"id":1,"type":"gitea","config":{"content_type":"json","url":"http://"},"events":["push"],"active":true,"updated_at":"2021-11-12T10:14:15Z","created_at":"2021-11-12T10:14:15Z"}
+----
+
+[#create-cd-webhooks]
+== Create CD Webhooks
+
+[#kitchensink-cd-webhook]
+=== Kitchensink CD Webhook
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+KITCHENSINK_CD_EL_LISTENER_HOST=$(oc get route/el-kitchensink-cd-pl-pr-{git-provider}-listener -n {cicd-namespace}-{username} -o jsonpath='{.status.ingress[0].host}')
+
+curl -k -X 'POST' "https://{gitea-host}/api/v1/repos/{username}/kitchensink-conf/hooks" \
+  -H "accept: application/json" \
+  -H "Authorization: token ${GIT_PAT}" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "active": true,
+  "branch_filter": "*",
+  "config": {
+     "content_type": "json",
+     "url": "http://'"${KITCHENSINK_CD_EL_LISTENER_HOST}"'"
+  },
+  "events": [
+    "pull_request" <1>
+  ],
+  "type": "gitea"
+}'
+----
+<1> Only `pull_request` events
+
+Expected output:
+
+[.console-output]
+[source,json, subs="+macros,+attributes"]
+----
+{"id":3,"type":"gitea","config":{"content_type":"json","url":"http://"},"events":["pull_request","pull_request_assign","pull_request_label","pull_request_milestone","pull_request_comment","pull_request_review_approved","pull_request_review_rejected","pull_request_review_comment","pull_request_sync"],"active":true,"updated_at":"2021-11-12T10:16:31Z","created_at":"2021-11-12T10:16:31Z"}
+----

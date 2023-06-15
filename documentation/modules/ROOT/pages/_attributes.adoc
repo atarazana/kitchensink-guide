@@ -3,5 +3,35 @@
 
 :username: %USERNAME%
 :password: %PASSWORD%
+:static-password: openshift
+
+:base-domain: %BASE_SUBDOMAIN%
+:additional-base-domain: %ADDITIONAL_BASE_SUBDOMAIN%
+:api-domain: {base-domain}:6443
+:cluster-subdomain: apps.{base-domain}
+:additional-cluster-subdomain: apps.{additional-base-domain}
 
 :root-apps-namespace: openshift-gitops
+
+:cluster-subdomain: apps.{base-domain}
+
+:argocd-server: openshift-gitops-server-openshift-gitops.{cluster-subdomain}
+
+:quay-server: myregistry-quay-quay-system.{cluster-subdomain}
+:quay-namespace: quay-system
+
+:cicd-namespace: cicd-tekton
+
+:gitea-namespace: gitea-system
+
+:git-provider: gitea
+:gitea-host: repository-gitea-system.{cluster-subdomain}
+
+:argocd-server: openshift-gitops-server-openshift-gitops.{cluster-subdomain}
+
+:devspaces-server: devspaces.{cluster-subdomain}
+
+:openshift-console-host: console-openshift-console.{cluster-subdomain}
+
+:git-pat-secret-name: git-pat-secret
+:container-registry-secret-name: container-registry-secret

@@ -42,7 +42,7 @@ spec:
   project: default
   source:
     path: basic/base
-    repoURL: 'https://github.com/atarazana/kitchensink-conf'
+    repoURL: 'https://{gitea-host}/{username}/kitchensink-conf'
     targetRevision: main
   syncPolicy:
     automated:
@@ -140,7 +140,7 @@ spec:
   project: default
   source:
     path: basic/base
-    repoURL: 'https://github.com/atarazana/kitchensink-conf'
+    repoURL: 'https://{gitea-host}/{username}/kitchensink-conf'
     targetRevision: main
   syncPolicy:
     automated:

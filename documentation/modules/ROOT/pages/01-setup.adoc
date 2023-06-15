@@ -23,11 +23,67 @@ include::partial$create-quay-account.adoc[]
 
 endif::[]
 
-[#download-tutorial]
-== Get tutorial sources
+[#prepare-repositories]
+== Prepare Repositories
+
+include::partial$prepare-repositories.adoc[]
+
+[#clone-repos-locally]
+== Clone Repos Locally
 
 Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.
 
-:tutorial-url: https://github.com/atarazana/gramola.git
-:folder: gitops-guides
 include::partial$download-sources.adoc[]
+
+[#prepare-devfile]
+== Prepare Devfile
+
+Please copy and paste the following link and open it in a browser. It will take you to file `devfile.yaml` where you have to change the git url to match the one of the previously migrated repository of code. Use this credentials to log in.
+
+- *Username:* {username}
+- *Password:* {static-password}
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink/_edit/main/devfile.yaml#L12
+----
+
+Once there, you have to change this:
+
+[source,yaml,subs="attributes+,+macros"]
+----
+projects:
+  - git:
+      remotes:
+        origin: 'https://github.com/atarazana/kitchensink'
+    name: kintchensink
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+projects:
+  - git:
+      remotes:
+        origin: 'https://{gitea-host}/{username}/kitchensink'
+    name: kintchensink
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
+[#create-devspaces-workspace]
+== Create Your DevSpaces Workspace
+
+Please copy and paste the following link and open it in a browser. It will take you to a Red Hat DevSpaces deployment in the OpenShift cluster you're interacting with in this lab. Use this credentials to log in.
+
+- *Username:* {username}
+- *Password:* {password}
+
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{devspaces-server}/#/https://{gitea-host}/{username}/kitchensink/raw/main/devfile.yaml
+----

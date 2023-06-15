@@ -11,6 +11,32 @@ The main advantage of using S2I for building reproducible container images is th
 .Source code deployment process
 image::s2i.png[] 
 
+#TODO EXPLAIN THE S2I NITTY GRITTY!!!!!!#
+
+
+[#getting-started]
+== Let's get started
+
+Everything we do in this section requires that you have fulfilled the xref:01-setup.adoc#prerequisite[prerequisites] section and you're logged in your OpenShift cluster.
+
+[WARNING]
+====
+Log in *as normal user*, [.underline]#not as a cluster admin#.
+====
+
+So if not already logged in, please do it now.
+
+[CAUTION]
+====
+If you're using `DevSpaces` or the `web-terminal`, you don't need to log in, you're already logged in, try this command `oc whoami` and check that the response is: {username}.
+====
+
+[.console-input]
+[source,sh, subs="+macros,+attributes"]
+----
+oc login -u {username} -p {password} --server=https://api.{api-domain}
+----
+
 
 [#deploy]
 == Deploying a JBOSS EAP 7.2 application manually
@@ -56,7 +82,7 @@ The ``oc label`` commands adds decoration to our deployment (used for the #Topol
 oc new-app --template=eap72-basic-s2i \
 -p APPLICATION_NAME=kitchensink \
 -p MAVEN_ARGS_APPEND="-Dcom.redhat.xpaas.repo.jbossorg" \
--p SOURCE_REPOSITORY_URL=https://github.com/atarazana/kitchensink \
+-p SOURCE_REPOSITORY_URL="https://{gitea-host}/{username}/kitchensink" \
 -p SOURCE_REPOSITORY_REF=main \
 -p CONTEXT_DIR=.
 ----
@@ -95,7 +121,38 @@ The ``app.openshift.io/connects-to`` annotation is used to connect the nodes.
 [#redeploy]
 == Redeploying a JBOSS EAP application
 
-A quick way to test _minor_ changes in our application, and always in a #development environment#, we can redeploy our app as follows:
+Let's explore a quick way to test _minor_ changes in our application. In this case you will package your JBoss EAP application locally and later you will use ``oc cp`` to copy the WAR file directly to the deployment folder of JBoss EAP already running in OCP.
+
+[CAUTION]
+====
+Use this way of deployment only in a #development environment#, #*NEVER* in productive environments#.
+====
+
+Let's make a change in our application, open file `src/main/webapp/index.xhtml` and go to line 27 approx. and make a change. For instance change this:
+
+[source, bash,subs="+macros,+attributes"]
+----
+<div>
+    <p>You have successfully deployed the JBoss Application in OpenShift</p>
+</div>
+----
+
+With:
+
+[.console-input]
+[source, bash,subs="+macros,+attributes"]
+----
+<div>
+    <p>You have successfully deployed the JBoss Application in OpenShift !!!</p>
+</div
+----
+
+Then please, run these commands:
+
+[NOTE]
+====
+`oc cp` command doesn't show a progress bar and usually is quite fast, if there are no errors no messages will be surfaced, just proceed with the tests.
+====
 
 [.console-input]
 [source, bash,subs="+macros,+attributes"]
@@ -103,6 +160,17 @@ A quick way to test _minor_ changes in our application, and always in a #develop
 oc project s2i-{username}
 
 POD_NAME=$(oc get pod -l application=kitchensink -o json | jq -r .items[0].metadata.name)
+echo "POD_NAME=${POD_NAME}"
 
-mvn package -Popenshift && oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war
+mvn package -Popenshift
+
+oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war
+----
+
+Open this link to check if the change is already applied.
+
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://kitchensink-s2i-{username}.{cluster-subdomain}/index.jsf
 ----

@@ -1,0 +1,46 @@
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+  curl -k -X 'POST' \
+      "https://{gitea-host}/api/v1/repos/migrate" \
+      -H 'accept: application/json' \
+      -H  "Authorization: token ${GIT_PAT}" \
+      -H 'Content-Type: application/json' \
+      -d '{
+      "clone_addr": "https://github.com/atarazana/kitchensink.git",
+      "description": "kitchensink code",
+      "issues": false,
+      "labels": false,
+      "lfs": false,
+      "milestones": false,
+      "private": false,
+      "pull_requests": false,
+      "releases": false,
+      "repo_name": "kitchensink",
+      "repo_owner": "{username}",
+      "service": "git",
+      "wiki": false
+    }'
+
+  curl -k -X 'POST' \
+      "https://{gitea-host}/api/v1/repos/migrate" \
+      -H 'accept: application/json' \
+      -H  "Authorization: token ${GIT_PAT}" \
+      -H 'Content-Type: application/json' \
+      -d '{
+      "clone_addr": "https://github.com/atarazana/kitchensink-conf.git",
+      "description": "kitchensink configuration",
+      "issues": false,
+      "labels": false,
+      "lfs": false,
+      "milestones": false,
+      "private": false,
+      "pull_requests": false,
+      "releases": false,
+      "repo_name": "kitchensink-conf",
+      "repo_owner": "{username}",
+      "service": "git",
+      "wiki": false
+    }'
+----

@@ -1,0 +1,92 @@
+Everything we do in this section requires that you have fulfilled the xref:01-setup.adoc#prerequisite[prerequisites] section and you're logged in your OpenShift cluster.
+
+// [WARNING]
+// ====
+// . *EVEN* if you have two clusters and want to run the multicluster section... *log in the main one now* [.underline]#not in the secondary#.
+// . *AND* log in *as normal user*, not [.underline]#not as a cluster admin#.
+// ====
+
+So if not already logged in, please do it now.
+
+[CAUTION]
+====
+If you're using the web-terminal, you don't need to log in, you're already logged in, try this command `oc whoami` and check that the response is: {username}.
+
+If you receive this error:
+
+[.console-output]
+[source,sh, subs="+macros,+attributes"]
+----
+error: x509: “kube-apiserver-lb-signer” certificate is not trusted
+----
+
+Then add this flag to the `oc login` command: `--insecure-skip-tls-verify=true`
+====
+
+[.console-input]
+[source,sh, subs="+macros,+attributes"]
+----
+oc login -u {username} -p {password} --server=https://api.{api-domain}
+----
+
+[#source-of-truth]
+== Source Of Truth
+
+As we have already exposed in GitOps Git is the source of truth so we need one to start with... you may have your own but for the sake of homogeneity in this guide we're going to use a git server deployed in OpenShift.
+
+Why not relying on a preexisting git server somewhere you may ask? This is so, because in order to execute the pipelines section of this guide you have to fork some git repositories.
+
+[NOTE]
+====
+This is necessary because:
+
+- webhooks need to be created and obviously you need permissions on them
+- you want to make changes to the code and promote those changes across environments
+====
+
+These are the repositories you need to fork:
+
+- *Configuration Repo:* https://github.com/atarazana/kitchensink-conf.git
+- *Code Repo:* https://github.com/atarazana/kitchensink.git
+
+You could fork them in your preferred git server, but for the sake of simplicity your're going to use a git server (link:https://gitea.io[Gitea, window=_blank]) which should've been deployed in section xref:02-prepare-cluster.adoc#deploying-gitea[Deploying Gitea].
+
+[#explore-gitea-console]
+== Explore Gitea Console
+
+Before we continue with the migration of the git repositories of our application open the console and check that your credentials are valid and all looks good. 
+
+Copy the next url and open it in a new tab, please use these credentials:
+
+- *USERNAME:* {username}
+- *PASSWORD:* {static-password}
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/user/login
+----
+
+You should see something like this. Please enter your credentials and hit the green button.
+
+image::gitea-login.png[Gitea Login]
+
+[#create-git-pat]
+== Create Git PAT
+
+Let's create a *Personal Access Token* (PAT) in Gitea for user *{username}*.
+
+include::partial$gitea-create-pat.adoc[]
+
+[#migrate-repositories]
+== Migrate Repositories
+
+Now that user *{username}* has been created let's migrate `gramola` repositories into Gitea.
+
+include::partial$gitea-migrate-repos.adoc[]
+
+After successfully migrating all the repos you should see this in the Gitea console.
+
+CAUTION: Don't forget to refresh your browser.
+
+image::gitea-migrated-repos.png[Gitea Migrated Repos]

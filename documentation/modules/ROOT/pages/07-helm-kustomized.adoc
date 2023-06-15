@@ -20,6 +20,76 @@ image::helm_kustomize.png[]
 If you want to know more in detail the difference between ``Helm`` and ``Kustomize``, click on the image.
 ====
 
+[#preparation]
+== Preparation
+
+Again, you will deploy two environments (overlays in kustomize jargon) `dev` and `test` in two namespaces set by a list generator.
+
+. `dev` -> `helm-kustomize-dev-{username}`
+. `test` -> `helm-kustomize-test-{username}`
+
+Before you actually can deploy the application using kustomize you have to change the original target namespaces (`demo-5-dev` and `demo-5-test`) coming from the original repository you migrated from. In a nutshell you have to change:
+
+. `demo-7-dev` -> `helm-kustomize-dev-{username}`
+. `demo-7-test` -> `helm-kustomize-test-{username}`
+
+So, let's get started, please copy and paste the following link and open it in a browser. Use this credentials to log in.
+
+- *Username:* {username}
+- *Password:* {static-password}
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/advanced/overlays/dev/kustomization.yml#L5
+----
+
+Once there, you have to change this (around line 5):
+
+[source,yaml,subs="attributes+,+macros"]
+----
+namespace: demo-7-dev
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+namespace: helm-kustomize-dev-{username}
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
+
+Now it's the turn of the `test` namespace. Please open the next link.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/advanced/overlays/test/kustomization.yml#L5
+----
+
+Once there, you have to change this (around line 5):
+
+[source,yaml,subs="attributes+,+macros"]
+----
+namespace: demo-7-test
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+namespace: helm-kustomize-test-{username}
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
+[#deploy-app]
+== Deploy Using Kustomize and an ApplicationSet
+
 [#deploy]
 == Deploy Kitchensink app with ArgoCD + Kustomize + Helm
 
@@ -62,10 +132,10 @@ spec:
         namespace: '{{ ns }}'
         name: in-cluster
       ignoreDifferences:
-      - group: apps.openshift.io
-        kind: DeploymentConfig
-        jqPathExpressions:
-          - .spec.template.spec.containers[].image
+        - group: apps
+          kind: Deployment
+          jqPathExpressions:
+            - '.spec.template.spec.containers[].image'
       project: default
       syncPolicy:
         automated:
@@ -74,7 +144,7 @@ spec:
           - CreateNamespace=true
       source:
         path: advanced/overlays/{{ env }}
-        repoURL: "https://github.com/atarazana/kitchensink-conf"
+        repoURL: "https://{gitea-host}/{username}/kitchensink-conf"
         targetRevision: main
         plugin:
           env:

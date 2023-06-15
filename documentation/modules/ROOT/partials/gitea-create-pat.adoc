@@ -1,0 +1,12 @@
+CAUTION: You'll need this token later so don't forget to copy it somewhere just in case you close the terminal window.
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+GIT_PAT=$(curl -k -s -XPOST -H "Content-Type: application/json" \
+  -d '{"name":"cicd'"${RANDOM}"'","scopes": ["repo"]}' \
+  -u {username}:{static-password} \
+  https://{gitea-host}/api/v1/users/{username}/tokens | jq -r .sha1)
+echo "GIT_PAT=${GIT_PAT}"
+----
+

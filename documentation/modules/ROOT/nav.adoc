@@ -29,3 +29,5 @@ endif::[]
 ** xref:07-helm-kustomized.adoc#benefits[Benefits of the GitOps/ArgoCD model]
 
 * xref:08-cicd.adoc[8. CI/CD Pipelines]
+
+* xref:09-pipeline-webhooks.adoc[9. Pipeline Webhooks]

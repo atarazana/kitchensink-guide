@@ -1,0 +1,49 @@
+Let's have a look to the Gitea deployment object.
+
+[WARNING]
+====
+This command only works as expected once the Deployment object has been created by the operator, be patient and try again if you get.
+
+[source,sh]
+----
+Error from server (NotFound): deployments.apps "repository" not found
+----
+====
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+oc rollout status deploy/repository -n {gitea-namespace}
+----
+
+This is the normal state after being successfully rolled out.
+
+[.console-output]
+[source,bash, subs="+macros,+attributes"]
+----
+deployment "repository" successfully rolled out
+oc get deployment/repository -n {gitea-namespace}
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+repository   1/1     1            1           32m
+----
+
+Once Gitea has been rolled out, run this little smoke test.
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+curl -k -I https://{gitea-host}/
+----
+
+NOTE: You should get something like this. If you don't, be patient and run this command in 2 mins or so.
+
+[.console-output]
+[source,bash, subs="+macros,+attributes"]
+----
+HTTP/1.1 200 OK
+set-cookie: i_like_gitea=82e42fd387b6ea7a; Path=/; HttpOnly; SameSite=Lax
+date: Mon, 25 Oct 2021 08:06:22 GMT
+set-cookie: 5b3fc896c2f6eedc568a6b59cd1862ea=23d42cb20150039ef52136e8993c6865; path=/; HttpOnly; Secure; SameSite=None
+cache-control: private
+----
+

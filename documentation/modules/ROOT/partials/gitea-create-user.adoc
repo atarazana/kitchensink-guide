@@ -1,0 +1,28 @@
+NOTE: Ignore error "Internal Server Error" user {username} should have been created.
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+GITEA_INSTALL_TOKEN=$(curl -k -s -XPOST -H "Content-Type: application/json" \
+  -d '{"name":"install"}' \
+  -u {username}:{static-password} \
+  https://{gitea-host}/api/v1/users/{username}/tokens | jq -r .sha1)
+echo "GITEA_INSTALL_TOKEN=${GITEA_INSTALL_TOKEN}"
+
+curl -k -X 'POST' \
+    "https://{gitea-host}/api/v1/admin/users?access_token=${GITEA_INSTALL_TOKEN}" \
+    -H 'accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{
+          "email": "{username}@example.com",
+          "full_name": "User {username}",
+          "login_name": "{username}",
+          "must_change_password": false,
+          "password": "{static-password}",
+          "send_notify": true,
+          "source_id": 0,
+          "username": "{username}",
+          "visibility" : "public"
+    }'
+----
+

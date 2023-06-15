@@ -50,7 +50,7 @@ spec:
           - CreateNamespace=true
       source: <2>
         path: basic/base
-        repoURL: "https://github.com/atarazana/kitchensink-conf"
+        repoURL: "https://{gitea-host}/{username}/kitchensink-conf"
         targetRevision: main
 ----
 
@@ -151,7 +151,7 @@ spec:
           - CreateNamespace=true
       source:
         path: basic/base
-        repoURL: "https://github.com/atarazana/kitchensink-conf"
+        repoURL: "https://{gitea-host}/{username}/kitchensink-conf"
         targetRevision: main
 EOF
 ----

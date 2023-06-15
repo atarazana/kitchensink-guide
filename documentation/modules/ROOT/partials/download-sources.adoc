@@ -8,19 +8,15 @@ laptop::
 [.console-input]
 [source,bash,subs="attributes+,+macros"]
 ----
-git clone {tutorial-url} {folder}
+git clone https://{gitea-host}/{username}/kitchensink
+git clone https://{gitea-host}/{username}/kitchensink-conf
 ----
 
 [.console-input]
 [source,bash,subs="attributes+,+macros"]
 ----
-export TUTORIAL_HOME="$(pwd)/{folder}"
-----
-
-[.console-input]
-[source,bash,subs="attributes+,+macros"]
-----
-cd $TUTORIAL_HOME
+export CODE_HOME="$(pwd)/kitchensink"
+export CONF_HOME="$(pwd)/kitchensink-conf"
 ----
 --
 web-terminal::
@@ -29,19 +25,16 @@ web-terminal::
 [.console-input]
 [source,bash,subs="attributes+,+macros"]
 ----
-cd ~/scratch && git clone {tutorial-url} {folder}
+cd ~/scratch
+git clone  https://{gitea-host}/{username}/kitchensink
+git clone https://{gitea-host}/{username}/kitchensink-conf
 ----
 
 [.console-input]
 [source,bash,subs="attributes+,+macros"]
 ----
-export TUTORIAL_HOME="$(pwd)/{folder}"
-----
-
-[.console-input]
-[source,bash,subs="attributes+,+macros"]
-----
-cd $TUTORIAL_HOME
+export CODE_HOME="$(pwd)/kitchensink"
+export CONF_HOME="$(pwd)/kitchensink-conf"
 ----
 --
 ====
