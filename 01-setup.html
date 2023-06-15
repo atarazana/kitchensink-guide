@@ -149,6 +149,9 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="08-cicd.html">8. CI/CD Pipelines</a>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -273,7 +276,235 @@ Please have them installed and configured before you get started with any of the
 </div>
 </div>
 <div class="sect1">
-<h2 id="download-tutorial"><a class="anchor" href="#download-tutorial"></a>Get tutorial sources</h2>
+<h2 id="prepare-repositories"><a class="anchor" href="#prepare-repositories"></a>Prepare Repositories</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Everything we do in this section requires that you have fulfilled the <a href="#prerequisite">prerequisites</a> section and you&#8217;re logged in your OpenShift cluster.</p>
+</div>
+<div class="paragraph">
+<p>So if not already logged in, please do it now.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you&#8217;re using the web-terminal, you don&#8217;t need to log in, you&#8217;re already logged in, try this command <code>oc whoami</code> and check that the response is: %USERNAME%.</p>
+</div>
+<div class="paragraph">
+<p>If you receive this error:</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">error: x509: “kube-apiserver-lb-signer” certificate is not trusted</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then add this flag to the <code>oc login</code> command: <code>--insecure-skip-tls-verify=true</code></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">oc login -u %USERNAME% -p %PASSWORD% --server=https://api.%BASE_SUBDOMAIN%:6443</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="source-of-truth"><a class="anchor" href="#source-of-truth"></a>Source Of Truth</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As we have already exposed in GitOps Git is the source of truth so we need one to start with&#8230;&#8203; you may have your own but for the sake of homogeneity in this guide we&#8217;re going to use a git server deployed in OpenShift.</p>
+</div>
+<div class="paragraph">
+<p>Why not relying on a preexisting git server somewhere you may ask? This is so, because in order to execute the pipelines section of this guide you have to fork some git repositories.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This is necessary because:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>webhooks need to be created and obviously you need permissions on them</p>
+</li>
+<li>
+<p>you want to make changes to the code and promote those changes across environments</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>These are the repositories you need to fork:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Configuration Repo:</strong> <a href="https://github.com/atarazana/kitchensink-conf.git" class="bare">https://github.com/atarazana/kitchensink-conf.git</a></p>
+</li>
+<li>
+<p><strong>Code Repo:</strong> <a href="https://github.com/atarazana/kitchensink.git" class="bare">https://github.com/atarazana/kitchensink.git</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You could fork them in your preferred git server, but for the sake of simplicity your&#8217;re going to use a git server (<a href="https://gitea.io" target="_blank" rel="noopener">Gitea</a>) which should&#8217;ve been deployed in section <a href="#02-prepare-cluster.adoc#deploying-gitea" class="xref unresolved">Deploying Gitea</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="explore-gitea-console"><a class="anchor" href="#explore-gitea-console"></a>Explore Gitea Console</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before we continue with the migration of the git repositories of our application open the console and check that your credentials are valid and all looks good.</p>
+</div>
+<div class="paragraph">
+<p>Copy the next url and open it in a new tab, please use these credentials:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>USERNAME:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>PASSWORD:</strong> openshift</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/user/login</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see something like this. Please enter your credentials and hit the green button.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/gitea-login.png" alt="Gitea Login">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-git-pat"><a class="anchor" href="#create-git-pat"></a>Create Git PAT</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s create a <strong>Personal Access Token</strong> (PAT) in Gitea for user <strong>%USERNAME%</strong>.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+You&#8217;ll need this token later so don&#8217;t forget to copy it somewhere just in case you close the terminal window.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">GIT_PAT=$(curl -k -s -XPOST -H "Content-Type: application/json" \
+  -d '{"name":"cicd'"${RANDOM}"'","scopes": ["repo"]}' \
+  -u %USERNAME%:openshift \
+  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens</a> | jq -r .sha1)
+echo "GIT_PAT=${GIT_PAT}"</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="migrate-repositories"><a class="anchor" href="#migrate-repositories"></a>Migrate Repositories</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that user <strong>%USERNAME%</strong> has been created let&#8217;s migrate <code>gramola</code> repositories into Gitea.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">  curl -k -X 'POST' \
+      "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/repos/migrate" \
+      -H 'accept: application/json' \
+      -H  "Authorization: token ${GIT_PAT}" \
+      -H 'Content-Type: application/json' \
+      -d '{
+      "clone_addr": "https://github.com/atarazana/kitchensink.git",
+      "description": "kitchensink code",
+      "issues": false,
+      "labels": false,
+      "lfs": false,
+      "milestones": false,
+      "private": false,
+      "pull_requests": false,
+      "releases": false,
+      "repo_name": "kitchensink",
+      "repo_owner": "%USERNAME%",
+      "service": "git",
+      "wiki": false
+    }'
+
+  curl -k -X 'POST' \
+      "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/repos/migrate" \
+      -H 'accept: application/json' \
+      -H  "Authorization: token ${GIT_PAT}" \
+      -H 'Content-Type: application/json' \
+      -d '{
+      "clone_addr": "https://github.com/atarazana/kitchensink-conf.git",
+      "description": "kitchensink configuration",
+      "issues": false,
+      "labels": false,
+      "lfs": false,
+      "milestones": false,
+      "private": false,
+      "pull_requests": false,
+      "releases": false,
+      "repo_name": "kitchensink-conf",
+      "repo_owner": "%USERNAME%",
+      "service": "git",
+      "wiki": false
+    }'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After successfully migrating all the repos you should see this in the Gitea console.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+Don&#8217;t forget to refresh your browser.
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/gitea-migrated-repos.png" alt="Gitea Migrated Repos">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="clone-repos-locally"><a class="anchor" href="#clone-repos-locally"></a>Clone Repos Locally</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.</p>
@@ -296,37 +527,105 @@ Please have them installed and configured before you get started with any of the
 <div class="tab-pane" aria-labelledby="tabset1_laptop">
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://github.com/atarazana/gramola.git" class="bare">https://github.com/atarazana/gramola.git</a> gitops-guides</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink</a>
+git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf</a></code></pre>
 </div>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/gitops-guides"</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CODE_HOME="$(pwd)/kitchensink"
+export CONF_HOME="$(pwd)/kitchensink-conf"</code></pre>
 </div>
 </div>
 </div>
 <div class="tab-pane" aria-labelledby="tabset1_web-terminal">
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd ~/scratch &amp;&amp; git clone <a href="https://github.com/atarazana/gramola.git" class="bare">https://github.com/atarazana/gramola.git</a> gitops-guides</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd ~/scratch
+git clone  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink</a>
+git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf</a></code></pre>
 </div>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/gitops-guides"</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CODE_HOME="$(pwd)/kitchensink"
+export CONF_HOME="$(pwd)/kitchensink-conf"</code></pre>
 </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prepare-devfile"><a class="anchor" href="#prepare-devfile"></a>Prepare Devfile</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Please copy and paste the following link and open it in a browser. It will take you to file <code>devfile.yaml</code> where you have to change the git url to match the one of the previously migrated repository of code. Use this credentials to log in.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Username:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>Password:</strong> openshift</p>
+</li>
+</ul>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink/_edit/main/devfile.yaml#L12</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once there, you have to change this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">projects:
+  - git:
+      remotes:
+        origin: 'https://github.com/atarazana/kitchensink'
+    name: kintchensink</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">projects:
+  - git:
+      remotes:
+        origin: 'https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink'
+    name: kintchensink</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="create-devspaces-workspace"><a class="anchor" href="#create-devspaces-workspace"></a>Create Your DevSpaces Workspace</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Please copy and paste the following link and open it in a browser. It will take you to a Red Hat DevSpaces deployment in the OpenShift cluster you&#8217;re interacting with in this lab. Use this credentials to log in.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Username:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>Password:</strong> %PASSWORD%</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://devspaces.apps.%BASE_SUBDOMAIN%/#/https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink/raw/main/devfile.yaml</code></pre>
 </div>
 </div>
 </div>

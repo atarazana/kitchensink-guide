@@ -149,6 +149,9 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="08-cicd.html">8. CI/CD Pipelines</a>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -201,6 +204,53 @@
 <img src="_images/s2i.png" alt="s2i">
 </div>
 <div class="title">Figure 1. Source code deployment process</div>
+</div>
+<div class="paragraph">
+<p><mark>TODO EXPLAIN THE S2I NITTY GRITTY!!!!!!</mark></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started"><a class="anchor" href="#getting-started"></a>Let&#8217;s get started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Everything we do in this section requires that you have fulfilled the <a href="01-setup.html#prerequisite" class="xref page">prerequisites</a> section and you&#8217;re logged in your OpenShift cluster.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Log in <strong>as normal user</strong>, <span class="underline">not as a cluster admin</span>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>So if not already logged in, please do it now.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you&#8217;re using <code>DevSpaces</code> or the <code>web-terminal</code>, you don&#8217;t need to log in, you&#8217;re already logged in, try this command <code>oc whoami</code> and check that the response is: %USERNAME%.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">oc login -u %USERNAME% -p %PASSWORD% --server=https://api.%BASE_SUBDOMAIN%:6443</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -266,7 +316,7 @@ oc label deployment/kitchensink-db app.openshift.io/runtime=postgresql --overwri
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-app --template=eap72-basic-s2i \
 -p APPLICATION_NAME=kitchensink \
 -p MAVEN_ARGS_APPEND="-Dcom.redhat.xpaas.repo.jbossorg" \
--p SOURCE_REPOSITORY_URL=https://github.com/atarazana/kitchensink \
+-p SOURCE_REPOSITORY_URL="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink" \
 -p SOURCE_REPOSITORY_REF=main \
 -p CONTEXT_DIR=.</code></pre>
 </div>
@@ -331,15 +381,77 @@ oc annotate dc/kitchensink \
 <h2 id="redeploy"><a class="anchor" href="#redeploy"></a>Redeploying a JBOSS EAP application</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A quick way to test <em>minor</em> changes in our application, and always in a <mark>development environment</mark>, we can redeploy our app as follows:</p>
+<p>Let&#8217;s explore a quick way to test <em>minor</em> changes in our application. In this case you will package your JBoss EAP application locally and later you will use <code>oc cp</code> to copy the WAR file directly to the deployment folder of JBoss EAP already running in OCP.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Use this way of deployment only in a <mark>development environment</mark>, <mark><strong>NEVER</strong> in productive environments</mark>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s make a change in our application, open file <code>src/main/webapp/index.xhtml</code> and go to line 27 approx. and make a change. For instance change this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&lt;div&gt;
+    &lt;p&gt;You have successfully deployed the JBoss Application in OpenShift&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&lt;div&gt;
+    &lt;p&gt;You have successfully deployed the JBoss Application in OpenShift !!!&lt;/p&gt;
+&lt;/div</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then please, run these commands:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>oc cp</code> command doesn&#8217;t show a progress bar and usually is quite fast, if there are no errors no messages will be surfaced, just proceed with the tests.</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc project s2i-%USERNAME%
 
 POD_NAME=$(oc get pod -l application=kitchensink -o json | jq -r .items[0].metadata.name)
+echo "POD_NAME=${POD_NAME}"
 
-mvn package -Popenshift &amp;&amp; oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war</code></pre>
+mvn package -Popenshift
+
+oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Open this link to check if the change is already applied.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://kitchensink-s2i-%USERNAME%.apps.%BASE_SUBDOMAIN%/index.jsf</code></pre>
 </div>
 </div>
 </div>

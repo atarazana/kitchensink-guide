@@ -6,6 +6,7 @@
     <title>CI/CD pipelines to close the circle :: Kitchensink Guide</title>
     <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/08-cicd.html">
     <link rel="prev" href="07-helm-kustomized.html">
+    <link rel="next" href="09-pipeline-webhooks.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -148,6 +149,9 @@
   <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="08-cicd.html">8. CI/CD Pipelines</a>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -186,9 +190,433 @@
   <div class="content">
 <article class="doc">
 <h1 class="page">CI/CD pipelines to close the circle</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this chapter you&#8217;re going to deploy CI and CD pipelines that will help to automate the processes of continuos integration and delivery. It&#8217;s made of three sections, the first one deploys an ArgoCD Application that will create not only the pipelines but all the necessary elements the other two will guide you to generate the secrets necessary to connect to the git repos and the container image registry.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+It&#8217;s a best practice avoid storing secrets in a git repository even if it&#8217;s private. There are several ways to deal with secrets in this kind of scenarios but in this case we&#8217;re going to manage them manually for the sake of simplicity.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-root-account-in-quay"><a class="anchor" href="#create-root-account-in-quay"></a>Create a Robot Account in Quay</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Execute the next command to open Quay web console:</p>
+</div>
+<div class="paragraph">
+<p>Linux</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">xdg-open "https://$(oc get route/myregistry-quay -n quay-system -o jsonpath='{.spec.host}')"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>MacOS</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">open "https://$(oc get route/myregistry-quay -n quay-system -o jsonpath='{.spec.host}')"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Others, use the following command to get the server and point a browser to it using <code>https</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">oc get route/myregistry-quay -n quay-system -o jsonpath='{.spec.host}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Log in with user <code>%USERNAME%</code> and password <code>%PASSWORD%</code></p>
+</div>
+<div class="paragraph">
+<p>Now create repository <code>kitchensink</code>, public. Then create a robot account named <code>cicd</code> and give it <code>Read</code> access to <code>kitchensink</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploying-cicd-pipelines"><a class="anchor" href="#deploying-cicd-pipelines"></a>Deploying CICD Pipelines</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We are going to deploy another ArgoCD application, this time to deploy pipelines. But before we do we need to store some information in environment variables, namely:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>CONTAINER_REGISTRY_SERVER:</strong> myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%</p>
+</li>
+<li>
+<p><strong>CONTAINER_REGISTRY_ORG:</strong> %USERNAME%</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you want to use a different container repository you can, just change the values of the variables accordingly.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If you have your container registry account in <strong>quay.io</strong> then that&#8217;s the value you have to type for <strong>CONTAINER_REGISTRY_SERVER</strong>.</p>
+</li>
+<li>
+<p><strong>CONTAINER_REGISTRY_ORG</strong> should be your user account or organization.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_SERVER=myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%
+export CONTAINER_REGISTRY_ORG=%USERNAME%
+export USERNAME="%USERNAME%"
+export CICD_NAMESPACE="cicd-tekton-%USERNAME%"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we can create the root app in charge of deploying all the CICD related elements.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat &lt;&lt;EOF | oc apply -n openshift-gitops -f -
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kitchensink-cicd
+  namespace: openshift-gitops
+  labels:
+    kitchensink-cicd-appset: "true"
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: in-cluster
+        ns: "cicd-tekton-%USERNAME%"
+  template:
+    metadata:
+      name: kitchensink-cicd-%USERNAME%
+      namespace: openshift-gitops
+      labels:
+        kitchensink-cicd-app: "true"
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+    spec:
+      destination:
+        namespace: '{{ ns }}'
+        name: '{{ cluster }}'
+      project: default
+      syncPolicy:
+        automated:
+          selfHeal: true
+      source:
+        helm:
+          parameters:
+            - name: baseRepoUrl
+              value: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf"
+            - name: username
+              value: "%USERNAME%"
+            - name: gitRevision
+              value: "main"
+            - name: containerRegistryServer
+              value: myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%
+            - name: containerRegistryOrg
+              value: %USERNAME%
+            - name: gitSslVerify
+              value: "true"
+            - name: cicdNamespace
+              value: "cicd-tekton-%USERNAME%"
+        path: cicd
+        repoURL: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf"
+        targetRevision: main
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s go to ArgoCD console and see how it&#8217;s going on. Please copy the next link and open it in a new tab.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications?proj=&amp;sync=&amp;health=&amp;namespace=&amp;cluster=&amp;labels=kitchensink-cicd-app</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And go deeper by clicking on the <code>Application</code> object or using the next link.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications/kitchensink-cicd-%USERNAME%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also have a look to the pipelines created in the OpenShift web console.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/dev-pipelines/ns/cicd-tekton-%USERNAME%</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-git-secret"><a class="anchor" href="#create-git-secret"></a>Create Git Secret</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We are going to create secrets instead of storing them in the git repo, but before we do that let’s check that ArgoCD has created the namespace for us.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If the namespace is not there yet, you can check the sync status of the ArgoCD application with:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">argocd app list | grep kitchensink-cicd-%USERNAME%</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get project ${CICD_NAMESPACE}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see something like this:</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                 DISPLAY NAME   STATUS
+gramola-cicd-user1                  Active</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Fine, the namespace is in place, <strong>it&#8217;s time to create the git secret our pipelines will use when cloning and also while creating Pull Requests</strong> which are the fuel for the CD part of the pipelines to promote from one environment to the next.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export GIT_URL="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink"
+export GIT_USERNAME=%USERNAME%
+export GIT_PAT_SECRET_NAME=$(yq eval '.gitPatSecretName' ./cicd/values.yaml)
 
+cat &lt;&lt;EOF | oc apply -n cicd-tekton-%USERNAME% -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: git-pat-secret
+  namespace: cicd-tekton-%USERNAME%
+type: kubernetes.io/basic-auth
+stringData:
+  user.name: %USERNAME%
+  user.email: "%USERNAME%@example.com"
+  username: %USERNAME%
+  password: ${GIT_PAT}
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We need to annotate the secret so that it can actually be used by the pipeline.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc annotate -n cicd-tekton-%USERNAME% secret git-pat-secret \
+  "tekton.dev/git-0=https://repository-gitea-system.apps.%BASE_SUBDOMAIN%"</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-registry-secret"><a class="anchor" href="#create-registry-secret"></a>Create Registry Secret</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As we have explained before, in this section we will deploy both CI and CD pipelines for the microservices that compose Gramola. If you have just created a secret so that the CI and CD pipelines can create Pull Requests, this time you are going to create a secret with the credentials needed to push images to the container images registry.</p>
+</div>
+<div class="paragraph">
+<p>The next set of commands will ask you for the <strong>username</strong> and <strong>password</strong> of the container registry account you already had or created above in this chapter or in your own registry.</p>
+</div>
+<div class="paragraph">
+<p>If you have followed all the instructions then copy and paste the next command and run it. If you have chosen to use your own registry, change accordingly.</p>
+</div>
+<div class="paragraph">
+<p><strong>USERNAME</strong></p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_USERNAME="%USERNAME%+cicd"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>TOKEN</strong></p>
+</div>
+<div class="paragraph">
+<p>Please use the next link to open the details of your robot account.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%/user/%USERNAME%?tab=robots</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then click on the <code>%USERNAME%-cicd</code> link.</p>
+</div>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="quay-installed-view-credentials-robot-account-userX.png" alt="Robot Account Credentials">
+</div>
+</div>
+<div class="paragraph">
+<p>Then copy the token as in the next image.</p>
+</div>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="quay-installed-copy-credentials-robot-account-userX.png" alt="Robot Account Credentials">
+</div>
+</div>
+<div class="paragraph">
+<p>Then pasted when you run the following command.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">echo "CONTAINER_REGISTRY_PASSWORD: " &amp;&amp; read -s CONTAINER_REGISTRY_PASSWORD</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now that we have gather all the needed information let&#8217;s create the secret.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+As we did with the git secret we have to annotate it so that Tekton know it has to use this and no other.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_SECRET_NAME=container-registry-secret
+
+if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] &amp;&amp; [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
+    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
+else
+oc create -n cicd-tekton-%USERNAME% secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
+  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
+  --docker-username=$CONTAINER_REGISTRY_USERNAME \
+  --docker-password=$CONTAINER_REGISTRY_PASSWORD
+oc annotate -n ${CICD_NAMESPACE} secret ${CONTAINER_REGISTRY_SECRET_NAME} \
+  "tekton.dev/docker-0=https://${CONTAINER_REGISTRY_SERVER}"
+fi</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="grant-pull-permissions"><a class="anchor" href="#grant-pull-permissions"></a>Granting Pull Permissions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Additionally we have to create the same secret in <code>dev</code> and <code>test</code> and link it to the default <code>ServiceAccount</code> for pulling images from a private registry.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+If you don&#8217;t do this the deployment won&#8217;t be able to run because they lack permissions to pull the image from the private repository.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_SECRET_NAME=container-registry-secret
+
+if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] &amp;&amp; [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
+    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
+else
+oc create -n helm-kustomize-dev-%USERNAME% secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
+  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
+  --docker-username=$CONTAINER_REGISTRY_USERNAME \
+  --docker-password=$CONTAINER_REGISTRY_PASSWORD
+oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n helm-kustomize-dev-%USERNAME%
+oc create -n helm-kustomize-test-%USERNAME% secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
+  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
+  --docker-username=$CONTAINER_REGISTRY_USERNAME \
+  --docker-password=$CONTAINER_REGISTRY_PASSWORD
+oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n helm-kustomize-test-%USERNAME%
+fi</code></pre>
+</div>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<strong>If you have an additional cluster</strong> you <strong>HAVE</strong> to run the following command too.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export ADDITIONAL_API_SERVER_TOKEN=%ADDITIONAL_API_SERVER_TOKEN%
+export ADDITIONAL_API_SERVER_MANAGED=api.%ADDITIONAL_BASE_SUBDOMAIN%:6443
+oc login --token=${ADDITIONAL_API_SERVER_TOKEN} --server=https://${ADDITIONAL_API_SERVER_MANAGED} --insecure-skip-tls-verify=true
+
+export CONTAINER_REGISTRY_SECRET_NAME=$(yq eval '.containerRegistrySecretName' ./apps/cicd/values.yaml)
+
+if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] &amp;&amp; [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
+    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
+else
+oc create -n gramola-test-%USERNAME% secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
+  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
+  --docker-username=$CONTAINER_REGISTRY_USERNAME \
+  --docker-password=$CONTAINER_REGISTRY_PASSWORD
+oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n gramola-test-%USERNAME%
+fi
+
+oc login -u %USERNAME% -p %PASSWORD% --server=https://api.%BASE_SUBDOMAIN%:6443 --insecure-skip-tls-verify=true</code></pre>
+</div>
+</div>
+</div>
+</div>
 <nav class="pagination">
   <span class="prev"><a href="07-helm-kustomized.html" class="query-params-link">7. ArgoCD + Helm + Kustomize</a></span>
+  <span class="next"><a href="09-pipeline-webhooks.html" class="query-params-link">9. Pipeline Webhooks</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

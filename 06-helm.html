@@ -149,6 +149,9 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="08-cicd.html">8. CI/CD Pipelines</a>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -212,10 +215,10 @@ spec:
     name: in-cluster
     namespace: helm-${USERNAME}
   ignoreDifferences:
-    - group: apps.openshift.io
+    - group: apps
+      kind: Deployment
       jqPathExpressions:
         - '.spec.template.spec.containers[].image'
-      kind: DeploymentConfig
   project: default
   source:
     helm:
@@ -223,7 +226,7 @@ spec:
         - name: baseNamespace
           value: helm-${USERNAME}
     path: advanced/helm_base
-    repoURL: 'https://github.com/atarazana/kitchensink-conf'
+    repoURL: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf"
     targetRevision: main
   syncPolicy:
     automated:

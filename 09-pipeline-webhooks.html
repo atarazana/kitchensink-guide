@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Welcome to Kitchensink Guide :: Kitchensink Guide</title>
-    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/index.html">
-    <link rel="next" href="01-setup.html">
+    <title>Create Pipeline Webhooks :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/09-pipeline-webhooks.html">
+    <link rel="prev" href="08-cicd.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -148,7 +148,7 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="08-cicd.html">8. CI/CD Pipelines</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a>
   </li>
 </ul>
@@ -181,50 +181,129 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Kitchensink Guide</a></li>
-    <li><a href="index.html">Welcome to Kitchensink Guide</a></li>
+    <li><a href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a></li>
   </ul>
 </nav>
   <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
 </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Welcome to Kitchensink Guide</h1>
-<div class="sect1 text-center strong">
-<h2>Deploying JBoss EAP applications on OpenShift</h2>
+<h1 class="page">Create Pipeline Webhooks</h1>
+<div class="sect1">
+<h2 id="pipeline-webhooks"><a class="anchor" href="#pipeline-webhooks"></a>Pipeline Webhooks</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A guide to the different existing methods for deploying a JBoss EAP application on OpenShift.</p>
+<p>In the previous chapter we learn about <strong>EventListeners</strong>, <strong>TriggerBindings</strong>, etc. also the role played by webhooks. Don&#8217;t forget that webhooks are generic but the way you create them and also potentially the payload of events are specific to the git provider.</p>
 </div>
 <div class="paragraph">
-<p>Benefits of deploying JBoss EAP applications on OpenShift:</p>
+<p>In this guide you&#8217;re going to create the webhooks you need to trigger the CI and CD pipelines for both <strong>Events</strong> and <strong>Gateway</strong> microservices, namely:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>We deploy an immutable container image</p>
-<div class="ulist">
-<ul>
-<li>
-<p>What we test in DEV and PRE environments is deployed in production.</p>
+<p><strong>Kitchensink CI Push:</strong> this webhook will send events only when changes are pushed to the source code repository</p>
 </li>
 <li>
-<p>Reducing risk and simplifying deployment.</p>
+<p><strong>Kitchensink CD PullRequest:</strong> this webhook will send events only if a PullRequest is merged into the Gramola configuration repository</p>
 </li>
 </ul>
 </div>
-</li>
-<li>
-<p>The image building process with <code>S2I</code> allows the customization of the default standalone file in a simple way and without the need to replace it.</p>
-</li>
-<li>
-<p>Image building and deployment is an easily automated process as we will see later.</p>
-</li>
-</ul>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-ci-webhooks"><a class="anchor" href="#create-ci-webhooks"></a>Create CI Webhooks</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="kitchensink-ci-webhook"><a class="anchor" href="#kitchensink-ci-webhook"></a>Kitchensink CI Webhook</h3>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">KITCHENSINK_CI_EL_LISTENER_HOST=$(oc get route/el-kitchensink-ci-pl-push-gitea-listener -n cicd-tekton-%USERNAME% -o jsonpath='{.status.ingress[0].host}')
+
+curl -k -X 'POST' "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/repos/%USERNAME%/kitchensink/hooks" \
+  -H "accept: application/json" \
+  -H "Authorization: token ${GIT_PAT}" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "active": true,
+  "branch_filter": "*",
+  "config": {
+     "content_type": "json",
+     "url": "http://'"${KITCHENSINK_CI_EL_LISTENER_HOST}"'"
+  },
+  "events": [
+    "push" <i class="conum" data-value="1"></i><b>(1)</b>
+  ],
+  "type": "gitea"
+}'</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Only <code>push</code> events</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Expected output:</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"id":1,"type":"gitea","config":{"content_type":"json","url":"<a href="http://"},"events":">"push"</a>,"active":true,"updated_at":"2021-11-12T10:14:15Z","created_at":"2021-11-12T10:14:15Z"}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-cd-webhooks"><a class="anchor" href="#create-cd-webhooks"></a>Create CD Webhooks</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="kitchensink-cd-webhook"><a class="anchor" href="#kitchensink-cd-webhook"></a>Kitchensink CD Webhook</h3>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">KITCHENSINK_CD_EL_LISTENER_HOST=$(oc get route/el-kitchensink-cd-pl-pr-gitea-listener -n cicd-tekton-%USERNAME% -o jsonpath='{.status.ingress[0].host}')
+
+curl -k -X 'POST' "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/repos/%USERNAME%/kitchensink-conf/hooks" \
+  -H "accept: application/json" \
+  -H "Authorization: token ${GIT_PAT}" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "active": true,
+  "branch_filter": "*",
+  "config": {
+     "content_type": "json",
+     "url": "http://'"${KITCHENSINK_CD_EL_LISTENER_HOST}"'"
+  },
+  "events": [
+    "pull_request" <i class="conum" data-value="1"></i><b>(1)</b>
+  ],
+  "type": "gitea"
+}'</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Only <code>pull_request</code> events</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Expected output:</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"id":3,"type":"gitea","config":{"content_type":"json","url":"<a href="http://"},"events":">"pull_request","pull_request_assign","pull_request_label","pull_request_milestone","pull_request_comment","pull_request_review_approved","pull_request_review_rejected","pull_request_review_comment","pull_request_sync"</a>,"active":true,"updated_at":"2021-11-12T10:16:31Z","created_at":"2021-11-12T10:16:31Z"}</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 <nav class="pagination">
-  <span class="next"><a href="01-setup.html" class="query-params-link">1. Setup</a></span>
+  <span class="prev"><a href="08-cicd.html" class="query-params-link">8. CI/CD Pipelines</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
