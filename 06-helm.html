@@ -214,11 +214,6 @@ spec:
   destination:
     name: in-cluster
     namespace: helm-${USERNAME}
-  ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      jqPathExpressions:
-        - '.spec.template.spec.containers[].image'
   project: default
   source:
     helm:

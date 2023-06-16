@@ -210,93 +210,10 @@ It&#8217;s a best practice avoid storing secrets in a git repository even if it&
 </div>
 </div>
 <div class="sect1">
-<h2 id="create-root-account-in-quay"><a class="anchor" href="#create-root-account-in-quay"></a>Create a Robot Account in Quay</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Execute the next command to open Quay web console:</p>
-</div>
-<div class="paragraph">
-<p>Linux</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">xdg-open "https://$(oc get route/myregistry-quay -n quay-system -o jsonpath='{.spec.host}')"</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>MacOS</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">open "https://$(oc get route/myregistry-quay -n quay-system -o jsonpath='{.spec.host}')"</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Others, use the following command to get the server and point a browser to it using <code>https</code>.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">oc get route/myregistry-quay -n quay-system -o jsonpath='{.spec.host}'</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Log in with user <code>%USERNAME%</code> and password <code>%PASSWORD%</code></p>
-</div>
-<div class="paragraph">
-<p>Now create repository <code>kitchensink</code>, public. Then create a robot account named <code>cicd</code> and give it <code>Read</code> access to <code>kitchensink</code>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="deploying-cicd-pipelines"><a class="anchor" href="#deploying-cicd-pipelines"></a>Deploying CICD Pipelines</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We are going to deploy another ArgoCD application, this time to deploy pipelines. But before we do we need to store some information in environment variables, namely:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>CONTAINER_REGISTRY_SERVER:</strong> myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%</p>
-</li>
-<li>
-<p><strong>CONTAINER_REGISTRY_ORG:</strong> %USERNAME%</p>
-</li>
-</ul>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>If you want to use a different container repository you can, just change the values of the variables accordingly.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>If you have your container registry account in <strong>quay.io</strong> then that&#8217;s the value you have to type for <strong>CONTAINER_REGISTRY_SERVER</strong>.</p>
-</li>
-<li>
-<p><strong>CONTAINER_REGISTRY_ORG</strong> should be your user account or organization.</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_SERVER=myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%
-export CONTAINER_REGISTRY_ORG=%USERNAME%
-export USERNAME="%USERNAME%"
-export CICD_NAMESPACE="cicd-tekton-%USERNAME%"</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Now we can create the root app in charge of deploying all the CICD related elements.</p>
+<p>We are going to deploy another ArgoCD application, this time to deploy pipelines. Please run this command which will create an ApplicationSet to deploy our CICD pipelines.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
@@ -304,7 +221,7 @@ export CICD_NAMESPACE="cicd-tekton-%USERNAME%"</code></pre>
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: kitchensink-cicd
+  name: kitchensink-cicd-%USERNAME%
   namespace: openshift-gitops
   labels:
     kitchensink-cicd-appset: "true"
@@ -333,20 +250,28 @@ spec:
       source:
         helm:
           parameters:
-            - name: baseRepoUrl
+            - name: kitchensinkRepoUrl
+              value: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink"
+            - name: kitchensinkRevision
+              value: "main"
+            - name: kitchensinkConfRepoUrl
               value: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf"
+            - name: kitchensinkConfRevision
+              value: "main"
             - name: username
               value: "%USERNAME%"
-            - name: gitRevision
-              value: "main"
-            - name: containerRegistryServer
-              value: myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%
-            - name: containerRegistryOrg
-              value: %USERNAME%
             - name: gitSslVerify
               value: "true"
             - name: cicdNamespace
               value: "cicd-tekton-%USERNAME%"
+            - name: overlayDevNamespace
+              value: "helm-kustomize-dev-%USERNAME%"
+            - name: overlayTestNamespace
+              value: "helm-kustomize-test-%USERNAME%"
+            - name: containerRegistryServer
+              value: myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%
+            - name: containerRegistryOrg
+              value: %USERNAME%
         path: cicd
         repoURL: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf"
         targetRevision: main
@@ -449,94 +374,6 @@ EOF</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc annotate -n cicd-tekton-%USERNAME% secret git-pat-secret \
   "tekton.dev/git-0=https://repository-gitea-system.apps.%BASE_SUBDOMAIN%"</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="create-registry-secret"><a class="anchor" href="#create-registry-secret"></a>Create Registry Secret</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>As we have explained before, in this section we will deploy both CI and CD pipelines for the microservices that compose Gramola. If you have just created a secret so that the CI and CD pipelines can create Pull Requests, this time you are going to create a secret with the credentials needed to push images to the container images registry.</p>
-</div>
-<div class="paragraph">
-<p>The next set of commands will ask you for the <strong>username</strong> and <strong>password</strong> of the container registry account you already had or created above in this chapter or in your own registry.</p>
-</div>
-<div class="paragraph">
-<p>If you have followed all the instructions then copy and paste the next command and run it. If you have chosen to use your own registry, change accordingly.</p>
-</div>
-<div class="paragraph">
-<p><strong>USERNAME</strong></p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_USERNAME="%USERNAME%+cicd"</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>TOKEN</strong></p>
-</div>
-<div class="paragraph">
-<p>Please use the next link to open the details of your robot account.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%/user/%USERNAME%?tab=robots</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Then click on the <code>%USERNAME%-cicd</code> link.</p>
-</div>
-<div class="imageblock unresolved">
-<div class="content">
-<img src="quay-installed-view-credentials-robot-account-userX.png" alt="Robot Account Credentials">
-</div>
-</div>
-<div class="paragraph">
-<p>Then copy the token as in the next image.</p>
-</div>
-<div class="imageblock unresolved">
-<div class="content">
-<img src="quay-installed-copy-credentials-robot-account-userX.png" alt="Robot Account Credentials">
-</div>
-</div>
-<div class="paragraph">
-<p>Then pasted when you run the following command.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">echo "CONTAINER_REGISTRY_PASSWORD: " &amp;&amp; read -s CONTAINER_REGISTRY_PASSWORD</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Now that we have gather all the needed information let&#8217;s create the secret.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-As we did with the git secret we have to annotate it so that Tekton know it has to use this and no other.
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_SECRET_NAME=container-registry-secret
-
-if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] &amp;&amp; [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
-    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
-else
-oc create -n cicd-tekton-%USERNAME% secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
-  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
-  --docker-username=$CONTAINER_REGISTRY_USERNAME \
-  --docker-password=$CONTAINER_REGISTRY_PASSWORD
-oc annotate -n ${CICD_NAMESPACE} secret ${CONTAINER_REGISTRY_SECRET_NAME} \
-  "tekton.dev/docker-0=https://${CONTAINER_REGISTRY_SERVER}"
-fi</code></pre>
 </div>
 </div>
 </div>
