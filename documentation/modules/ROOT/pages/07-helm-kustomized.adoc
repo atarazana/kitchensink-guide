@@ -131,11 +131,6 @@ spec:
       destination:
         namespace: '{{ ns }}'
         name: in-cluster
-      ignoreDifferences:
-        - group: apps
-          kind: Deployment
-          jqPathExpressions:
-            - '.spec.template.spec.containers[].image'
       project: default
       syncPolicy:
         automated:
