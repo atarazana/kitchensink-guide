@@ -248,7 +248,7 @@
 </ol>
 </div>
 <div class="paragraph">
-<p>Before you actually can deploy the application using kustomize you have to change the original target namespaces (<code>demo-5-dev</code> and <code>demo-5-test</code>) coming from the original repository you migrated from. In a nutshell you have to change:</p>
+<p>Before you actually can deploy the application using kustomize you have to change the original target namespaces (<code>demo-7-dev</code> and <code>demo-7-test</code>) coming from the original repository you migrated from. In a nutshell you have to change:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -295,6 +295,26 @@
 </div>
 </div>
 <div class="paragraph">
+<p>Now you have to also change this around line 20:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/kitchensink-cicd/kitchensink
+    newTag: latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/cicd-tekton-%USERNAME%/kitchensink
+    newTag: latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
 </div>
 <div class="paragraph">
@@ -322,6 +342,26 @@
 </div>
 </div>
 <div class="paragraph">
+<p>Now you have to also change this around line 20:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/kitchensink-cicd/kitchensink
+    newTag: latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/cicd-tekton-%USERNAME%/kitchensink
+    newTag: latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
 </div>
 </div>
@@ -340,33 +380,32 @@
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export USERNAME="%USERNAME%"
-cat &lt;&lt;EOF | oc apply -n openshift-gitops -f -
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat &lt;&lt;EOF | oc apply -n openshift-gitops -f -
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: kitchensink-kustomized-helm-${USERNAME}
+  name: kitchensink-kustomized-helm-%USERNAME%
   namespace: openshift-gitops
   labels:
     argocd-root-app: "true"
-    username: ${USERNAME}
+    username: %USERNAME%
 spec:
   generators:
   - list:
       elements:
       - env: dev
-        ns: helm-kustomize-dev-${USERNAME}
+        ns: helm-kustomize-dev-%USERNAME%
         desc: "Helm + Kustomize (Dev)"
       - env: test
-        ns: helm-kustomize-test-${USERNAME}
+        ns: helm-kustomize-test-%USERNAME%
         desc: "Helm + Kustomize (Test)"
   template:
     metadata:
-      name: kitchensink-kustomized-helm-app-{{ env }}-${USERNAME}
+      name: kitchensink-kustomized-helm-app-{{ env }}-%USERNAME%
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"
-        username: ${USERNAME}
+        username: %USERNAME%
       finalizers:
       - resources-finalizer.argocd.argoproj.io
     spec:

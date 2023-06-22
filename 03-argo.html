@@ -348,15 +348,15 @@ metadata:
     username: ${USERNAME}
 spec:
   destination:
-    name: in-cluster
-    namespace: argo-${USERNAME}
-  ignoreDifferences:
+    name: in-cluster <i class="conum" data-value="2"></i><b>(2)</b>
+    namespace: argo-${USERNAME} <i class="conum" data-value="1"></i><b>(1)</b>
+  ignoreDifferences: <i class="conum" data-value="4"></i><b>(4)</b>
     - group: apps.openshift.io
       jqPathExpressions:
         - '.spec.template.spec.containers[].image'
       kind: DeploymentConfig
   project: default
-  source:
+  source: <i class="conum" data-value="3"></i><b>(3)</b>
     path: basic/base
     repoURL: 'https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf'
     targetRevision: main
@@ -367,6 +367,61 @@ spec:
       - CreateNamespace=true
 EOF</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Destination namespace</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Destination cluster</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Source <mark>TODO</mark></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Ignore differences <mark>TODO</mark></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Open the next link to see how the Application object you just created is seen in ArgoCD UI.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Click on the <code>LOG IN VIA OPENSHIFT</code> button and use the credentials you&#8217;ve used before:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argo-01.png" alt="Login">
+</div>
+</div>
+<div class="paragraph">
+<p>After logging in successfully and agreed to <code>Allow selected permissions</code> you will land in the <code>Applications</code> area and see the application you&#8217;ve just created.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argo-02.png" alt="Apps">
+</div>
+</div>
+<div class="paragraph">
+<p>To see the progress of deployment you should go to namespace <code>argo-%USERNAME%</code> in the OpenShift web console or just copy the following link.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/argo-%USERNAME%?view=graph</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You have created</p>
 </div>
 </div>
 </div>

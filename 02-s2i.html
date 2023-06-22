@@ -258,7 +258,24 @@
 <h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploying a JBOSS EAP 7.2 application manually</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Let&#8217;s deploy the Kitchensink stack !</p>
+<p>Let&#8217;s deploy the Kitchensink App!</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This template deploys our application using a <code>DeploymentConfig</code> instead of the kubernetes <code>Deployment</code> object, starting in chapter <code>ArgoCD + Helm</code> you will see that we&#8217;ve moved from <code>DeploymentConfig</code> to <code>Deployment</code>.</p>
+</div>
+<div class="paragraph">
+<p><mark>TODO</mark></p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -268,6 +285,25 @@
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-project s2i-%USERNAME%</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Please open the next link to watch the progress of the chapter.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/s2i-%USERNAME%?view=graph</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </li>
 <li>
@@ -375,6 +411,30 @@ oc annotate dc/kitchensink \
 </li>
 </ol>
 </div>
+<div class="paragraph">
+<p>Open the next link and click on the <code>in progress</code> icon to see the log of the building process.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/s2i-%USERNAME%?view=graph</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-01.png" alt="Build Config link">
+</div>
+</div>
+<div class="paragraph">
+<p>Eventually you will see a trace like this &#8658; <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; Running install.sh &lt;&lt;&lt;&lt;&lt;&lt;</code>. This is a sign that the S2I building process has detected our script to prepare the image as desired.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-02.png" alt="Build Log">
+</div>
+</div>
+<div class="paragraph">
+<p><mark>Explain this better and according to the explanations given before in this chapter</mark></p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -452,6 +512,14 @@ oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war</code></pre>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://kitchensink-s2i-%USERNAME%.apps.%BASE_SUBDOMAIN%/index.jsf</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see something like this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-03.png" alt="After hot reload">
 </div>
 </div>
 </div>

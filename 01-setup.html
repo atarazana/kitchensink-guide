@@ -276,6 +276,46 @@ Please have them installed and configured before you get started with any of the
 </div>
 </div>
 <div class="sect1">
+<h2 id="which-terminal"><a class="anchor" href="#which-terminal"></a>Which Terminal</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Throughout the lab you will have to run commands in a terminal, you can choose to run everything in your computer or in a web-terminal and web-ide. Whichever decision is fine but you have to honor that decision for the whole lab or redo some commands if you change, in this case&#8230;&#8203; you will be on your own.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>If you choose to use web-terminal, stick to that decision throughout the whole guide.</strong></p>
+</div>
+<div class="paragraph">
+<p>Next, <strong>open the following link</strong>, <strong>create a new project</strong> called: <code>terminal-%USERNAME%</code> and <strong>click on <code>Start</code></strong>. If credentials are required use these:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>USERNAME:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>PASSWORD:</strong> %PASSWORD%</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/terminal</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="prepare-repositories"><a class="anchor" href="#prepare-repositories"></a>Prepare Repositories</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -292,7 +332,7 @@ Please have them installed and configured before you get started with any of the
 </td>
 <td class="content">
 <div class="paragraph">
-<p>If you&#8217;re using the web-terminal, you don&#8217;t need to log in, you&#8217;re already logged in, try this command <code>oc whoami</code> and check that the response is: %USERNAME%.</p>
+<p>If you&#8217;re using the <code>web-terminal</code> or <code>DevSpaces, you don&#8217;t need to log in, you&#8217;re already logged in, try this command `oc whoami</code> and check that the response is: %USERNAME%.</p>
 </div>
 <div class="paragraph">
 <p>If you receive this error:</p>
@@ -317,13 +357,10 @@ Please have them installed and configured before you get started with any of the
 </div>
 </div>
 <div class="sect1">
-<h2 id="source-of-truth"><a class="anchor" href="#source-of-truth"></a>Source Of Truth</h2>
+<h2 id="git-repositories"><a class="anchor" href="#git-repositories"></a>Git Repositories</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>As we have already exposed in GitOps Git is the source of truth so we need one to start with&#8230;&#8203; you may have your own but for the sake of homogeneity in this guide we&#8217;re going to use a git server deployed in OpenShift.</p>
-</div>
-<div class="paragraph">
-<p>Why not relying on a preexisting git server somewhere you may ask? This is so, because in order to execute the pipelines section of this guide you have to fork some git repositories.</p>
+<p>As explained before you will deploy the same application in different ways, using different tools. You will need to make some changes so the first thing you will do is migrate the code and also the configuration to your Gitea account that has been provisioned as part of the set up of the lab.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -350,7 +387,7 @@ Please have them installed and configured before you get started with any of the
 </table>
 </div>
 <div class="paragraph">
-<p>These are the repositories you need to fork:</p>
+<p>These are the repositories you will migrate:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -361,9 +398,6 @@ Please have them installed and configured before you get started with any of the
 <p><strong>Code Repo:</strong> <a href="https://github.com/atarazana/kitchensink.git" class="bare">https://github.com/atarazana/kitchensink.git</a></p>
 </li>
 </ul>
-</div>
-<div class="paragraph">
-<p>You could fork them in your preferred git server, but for the sake of simplicity your&#8217;re going to use a git server (<a href="https://gitea.io" target="_blank" rel="noopener">Gitea</a>) which should&#8217;ve been deployed in section <a href="#02-prepare-cluster.adoc#deploying-gitea" class="xref unresolved">Deploying Gitea</a>.</p>
 </div>
 </div>
 </div>
@@ -414,7 +448,9 @@ Please have them installed and configured before you get started with any of the
 <i class="fa icon-caution" title="Caution"></i>
 </td>
 <td class="content">
-You&#8217;ll need this token later so don&#8217;t forget to copy it somewhere just in case you close the terminal window.
+<div class="paragraph">
+<p>You&#8217;ll need this token later you can copy it somewhere just in case you close the terminal window or run this command again and generate a new token.</p>
+</div>
 </td>
 </tr>
 </table>
@@ -434,7 +470,7 @@ echo "GIT_PAT=${GIT_PAT}"</code></pre>
 <h2 id="migrate-repositories"><a class="anchor" href="#migrate-repositories"></a>Migrate Repositories</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Now that user <strong>%USERNAME%</strong> has been created let&#8217;s migrate <code>gramola</code> repositories into Gitea.</p>
+<p>Now that user <strong>%USERNAME%</strong> has been created let&#8217;s migrate our repositories into Gitea.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
@@ -512,19 +548,6 @@ Don&#8217;t forget to refresh your browser.
 <div class="paragraph">
 <p>Before we start setting up the environment, let’s clone the tutorial sources and set the <code>TUTORIAL_HOME</code> environment variable to point to the root directory of the tutorial:</p>
 </div>
-<div class="tabset is-loading">
-<div class="ulist tabs">
-<ul>
-<li>
-<p><a id="tabset1_laptop"></a>laptop</p>
-</li>
-<li>
-<p><a id="tabset1_web-terminal"></a>web-terminal</p>
-</li>
-</ul>
-</div>
-<div class="content">
-<div class="tab-pane" aria-labelledby="tabset1_laptop">
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink</a>
@@ -535,24 +558,6 @@ git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNA
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CODE_HOME="$(pwd)/kitchensink"
 export CONF_HOME="$(pwd)/kitchensink-conf"</code></pre>
-</div>
-</div>
-</div>
-<div class="tab-pane" aria-labelledby="tabset1_web-terminal">
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd ~/scratch
-git clone  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink</a>
-git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf</a></code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CODE_HOME="$(pwd)/kitchensink"
-export CONF_HOME="$(pwd)/kitchensink-conf"</code></pre>
-</div>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -610,8 +615,20 @@ export CONF_HOME="$(pwd)/kitchensink-conf"</code></pre>
 <div class="sect1">
 <h2 id="create-devspaces-workspace"><a class="anchor" href="#create-devspaces-workspace"></a>Create Your DevSpaces Workspace</h2>
 <div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you&#8217;re running the guide in a laptop, you don&#8217;t need to do this.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
-<p>Please copy and paste the following link and open it in a browser. It will take you to a Red Hat DevSpaces deployment in the OpenShift cluster you&#8217;re interacting with in this lab. Use this credentials to log in.</p>
+<p>Please copy and paste the following link and open it in a browser. It will take you to a Red Hat DevSpaces deployment in the OpenShift cluster you&#8217;re interacting with in this lab. Use this credentials to log in and click on <code>Allow selected permissions</code>.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -626,6 +643,48 @@ export CONF_HOME="$(pwd)/kitchensink-conf"</code></pre>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://devspaces.apps.%BASE_SUBDOMAIN%/#/https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink/raw/main/devfile.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After some seconds you will see that the devfile has been loaded and that your workspace is been created.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/devspaces-01.png" alt="Creation">
+</div>
+</div>
+<div class="paragraph">
+<p>After a minute or two you&#8217;ll have the workspaces prepared and you&#8217;ll be prompted to answer this question: <code>Do you trust the authors of the files in this folder?</code>. Click on <code>Yes, I trust the authors&#8230;&#8203;</code>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/devspaces-02.png" alt="Question">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="opening-a-terminal-window-in-devspaces"><a class="anchor" href="#opening-a-terminal-window-in-devspaces"></a>Opening a Terminal Window in DevSpaces</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Go to the hamburger menu on the left, hover on <code>Terminal</code> then on <code>New Terminal</code> and click. As in this picture.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/devspaces-03.png" alt="New Terminal">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="allow-paste-from-clipboard"><a class="anchor" href="#allow-paste-from-clipboard"></a>Allow Paste From Clipboard</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Should you be prompted to give/deny the paste permission as in the next picture while trying to paste commands in a DevSpaces terminal window, please allow it.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/devspaces-04.png" alt="Allow Paste Permission">
 </div>
 </div>
 </div>

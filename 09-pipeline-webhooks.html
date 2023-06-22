@@ -213,6 +213,32 @@
 <div class="sect1">
 <h2 id="create-ci-webhooks"><a class="anchor" href="#create-ci-webhooks"></a>Create CI Webhooks</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Before you can create the webhooks you need a <strong>Personal Access Token</strong> (PAT), which probably has been lost&#8230;&#8203; no problem following this instruction to generate another one.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You&#8217;ll need this token later you can copy it somewhere just in case you close the terminal window or run this command again and generate a new token.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">GIT_PAT=$(curl -k -s -XPOST -H "Content-Type: application/json" \
+  -d '{"name":"cicd'"${RANDOM}"'","scopes": ["repo"]}' \
+  -u %USERNAME%:openshift \
+  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens</a> | jq -r .sha1)
+echo "GIT_PAT=${GIT_PAT}"</code></pre>
+</div>
+</div>
 <div class="sect2">
 <h3 id="kitchensink-ci-webhook"><a class="anchor" href="#kitchensink-ci-webhook"></a>Kitchensink CI Webhook</h3>
 <div class="listingblock console-input">
