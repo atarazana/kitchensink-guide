@@ -2,6 +2,10 @@
 [#create-ci-webhooks]
 == Create CI Webhooks
 
+Before you can create the webhooks you need a *Personal Access Token* (PAT), which probably has been lost... no problem following this instruction to generate another one.
+
+include::partial$gitea-create-pat.adoc[]
+
 [#kitchensink-ci-webhook]
 === Kitchensink CI Webhook
 

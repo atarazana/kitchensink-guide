@@ -23,6 +23,28 @@ include::partial$create-quay-account.adoc[]
 
 endif::[]
 
+[#which-terminal]
+== Which Terminal
+
+Throughout the lab you will have to run commands in a terminal, you can choose to run everything in your computer or in a web-terminal and web-ide. Whichever decision is fine but you have to honor that decision for the whole lab or redo some commands if you change, in this case... you will be on your own.
+
+[CAUTION]
+====
+*If you choose to use web-terminal, stick to that decision throughout the whole guide.*
+
+Next, *open the following link*, *create a new project* called: `terminal-{username}` and *click on `Start`*. If credentials are required use these:
+
+- *USERNAME:* {username}
+- *PASSWORD:* {password}
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{openshift-console-host}/terminal
+----
+====
+
+
 [#prepare-repositories]
 == Prepare Repositories
 
@@ -77,7 +99,9 @@ Once you have made the changes scroll down and click on `Commit Changes`.
 [#create-devspaces-workspace]
 == Create Your DevSpaces Workspace
 
-Please copy and paste the following link and open it in a browser. It will take you to a Red Hat DevSpaces deployment in the OpenShift cluster you're interacting with in this lab. Use this credentials to log in.
+NOTE: If you're running the guide in a laptop, you don't need to do this.
+
+Please copy and paste the following link and open it in a browser. It will take you to a Red Hat DevSpaces deployment in the OpenShift cluster you're interacting with in this lab. Use this credentials to log in and click on `Allow selected permissions`.
 
 - *Username:* {username}
 - *Password:* {password}
@@ -87,3 +111,26 @@ Please copy and paste the following link and open it in a browser. It will take 
 ----
 https://{devspaces-server}/#/https://{gitea-host}/{username}/kitchensink/raw/main/devfile.yaml
 ----
+
+After some seconds you will see that the devfile has been loaded and that your workspace is been created.
+
+image::devspaces-01.png[Creation]
+
+After a minute or two you'll have the workspaces prepared and you'll be prompted to answer this question: `Do you trust the authors of the files in this folder?`. Click on `Yes, I trust the authors...`.
+
+image::devspaces-02.png[Question]
+
+[#opening-a-terminal-window-in-devspaces]
+== Opening a Terminal Window in DevSpaces
+
+Go to the hamburger menu on the left, hover on `Terminal` then on `New Terminal` and click. As in this picture.
+
+image::devspaces-03.png[New Terminal]
+
+[#allow-paste-from-clipboard]
+== Allow Paste From Clipboard 
+
+Should you be prompted to give/deny the paste permission as in the next picture while trying to paste commands in a DevSpaces terminal window, please allow it.
+
+image::devspaces-04.png[Allow Paste Permission]
+

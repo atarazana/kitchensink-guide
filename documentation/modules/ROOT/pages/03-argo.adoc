@@ -130,15 +130,15 @@ metadata:
     username: $\{USERNAME}
 spec:
   destination:
-    name: in-cluster
-    namespace: argo-$\{USERNAME}
-  ignoreDifferences:
+    name: in-cluster <2>
+    namespace: argo-$\{USERNAME} <1>
+  ignoreDifferences: <4>
     - group: apps.openshift.io
       jqPathExpressions:
         - '.spec.template.spec.containers[].image'
       kind: DeploymentConfig
   project: default
-  source:
+  source: <3>
     path: basic/base
     repoURL: 'https://{gitea-host}/{username}/kitchensink-conf'
     targetRevision: main
@@ -149,3 +149,33 @@ spec:
       - CreateNamespace=true
 EOF
 ----
+<1> Destination namespace
+<2> Destination cluster
+<3> Source #TODO#
+<4> Ignore differences #TODO#
+
+Open the next link to see how the Application object you just created is seen in ArgoCD UI.
+
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{argocd-server}
+----
+
+Click on the `LOG IN VIA OPENSHIFT` button and use the credentials you've used before:
+
+image::argo-01.png[Login]
+
+After logging in successfully and agreed to `Allow selected permissions` you will land in the `Applications` area and see the application you've just created.
+
+image::argo-02.png[Apps]
+
+To see the progress of deployment you should go to namespace `argo-{username}` in the OpenShift web console or just copy the following link.
+
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{openshift-console-host}/topology/ns/argo-{username}?view=graph
+----
+
+You have created 

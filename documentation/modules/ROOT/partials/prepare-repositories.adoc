@@ -1,16 +1,10 @@
 Everything we do in this section requires that you have fulfilled the xref:01-setup.adoc#prerequisite[prerequisites] section and you're logged in your OpenShift cluster.
 
-// [WARNING]
-// ====
-// . *EVEN* if you have two clusters and want to run the multicluster section... *log in the main one now* [.underline]#not in the secondary#.
-// . *AND* log in *as normal user*, not [.underline]#not as a cluster admin#.
-// ====
-
 So if not already logged in, please do it now.
 
 [CAUTION]
 ====
-If you're using the web-terminal, you don't need to log in, you're already logged in, try this command `oc whoami` and check that the response is: {username}.
+If you're using the `web-terminal` or `DevSpaces, you don't need to log in, you're already logged in, try this command `oc whoami` and check that the response is: {username}.
 
 If you receive this error:
 
@@ -29,12 +23,10 @@ Then add this flag to the `oc login` command: `--insecure-skip-tls-verify=true`
 oc login -u {username} -p {password} --server=https://api.{api-domain}
 ----
 
-[#source-of-truth]
-== Source Of Truth
+[#git-repositories]
+== Git Repositories
 
-As we have already exposed in GitOps Git is the source of truth so we need one to start with... you may have your own but for the sake of homogeneity in this guide we're going to use a git server deployed in OpenShift.
-
-Why not relying on a preexisting git server somewhere you may ask? This is so, because in order to execute the pipelines section of this guide you have to fork some git repositories.
+As explained before you will deploy the same application in different ways, using different tools. You will need to make some changes so the first thing you will do is migrate the code and also the configuration to your Gitea account that has been provisioned as part of the set up of the lab. 
 
 [NOTE]
 ====
@@ -44,12 +36,10 @@ This is necessary because:
 - you want to make changes to the code and promote those changes across environments
 ====
 
-These are the repositories you need to fork:
+These are the repositories you will migrate:
 
 - *Configuration Repo:* https://github.com/atarazana/kitchensink-conf.git
 - *Code Repo:* https://github.com/atarazana/kitchensink.git
-
-You could fork them in your preferred git server, but for the sake of simplicity your're going to use a git server (link:https://gitea.io[Gitea, window=_blank]) which should've been deployed in section xref:02-prepare-cluster.adoc#deploying-gitea[Deploying Gitea].
 
 [#explore-gitea-console]
 == Explore Gitea Console
@@ -81,7 +71,7 @@ include::partial$gitea-create-pat.adoc[]
 [#migrate-repositories]
 == Migrate Repositories
 
-Now that user *{username}* has been created let's migrate `gramola` repositories into Gitea.
+Now that user *{username}* has been created let's migrate our repositories into Gitea.
 
 include::partial$gitea-migrate-repos.adoc[]
 

@@ -118,7 +118,7 @@ argocd app list | grep kitchensink-cicd-{username}
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
 ----
-oc get project ${CICD_NAMESPACE}
+oc get project {cicd-namespace}-{username}
 ----
 
 You should see something like this:
@@ -135,10 +135,6 @@ Fine, the namespace is in place, *it's time to create the git secret our pipelin
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
 ----
-export GIT_URL="https://{gitea-host}/{username}/kitchensink"
-export GIT_USERNAME={username}
-export GIT_PAT_SECRET_NAME=$(yq eval '.gitPatSecretName' ./cicd/values.yaml)
-
 cat <<EOF | oc apply -n {cicd-namespace}-{username} -f -
 apiVersion: v1
 kind: Secret
@@ -161,6 +157,69 @@ We need to annotate the secret so that it can actually be used by the pipeline.
 ----
 oc annotate -n {cicd-namespace}-{username} secret {git-pat-secret-name} \
   "tekton.dev/git-0=https://{gitea-host}"
+----
+
+[#create-registry-secret]
+== Create Registry Secret
+
+As we have explained before, in this section we will deploy both CI and CD pipelines for the microservices that compose Gramola. If you have just created a secret so that the CI and CD pipelines can create Pull Requests, this time you are going to create a secret with the credentials needed to push images to the container images registry.
+
+The next set of commands will ask you for the *username* and *password* of the container registry account you already had or created above in this chapter or in your own registry.
+
+If you have followed all the instructions then copy and paste the next command and run it. If you have chosen to use your own registry, change accordingly.
+
+*USERNAME*
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+export CONTAINER_REGISTRY_USERNAME="{username}+cicd"
+----
+
+*TOKEN*
+
+Please use the next link to open the details of your robot account.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{quay-server}/user/{username}?tab=robots
+----
+
+Then click on the `{username}-cicd` link.
+
+image::quay-installed-view-credentials-robot-account-userX.png[Robot Account Credentials]
+
+Then copy the token as in the next image.
+
+image::quay-installed-copy-credentials-robot-account-userX.png[Robot Account Credentials]
+
+Then pasted when you run the following command.
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+echo "CONTAINER_REGISTRY_PASSWORD: " && read -s CONTAINER_REGISTRY_PASSWORD
+----
+
+Now that we have gather all the needed information let's create the secret.
+
+NOTE: As we did with the git secret we have to annotate it so that Tekton know it has to use this and no other.
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+export CONTAINER_REGISTRY_SECRET_NAME={container-registry-secret-name}
+
+if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] && [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
+    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
+else
+oc create -n {cicd-namespace}-{username} secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
+  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
+  --docker-username=$CONTAINER_REGISTRY_USERNAME \
+  --docker-password=$CONTAINER_REGISTRY_PASSWORD
+oc annotate -n {cicd-namespace}-{username} secret ${CONTAINER_REGISTRY_SECRET_NAME} \
+  "tekton.dev/docker-0=https://${CONTAINER_REGISTRY_SERVER}"
+fi
 ----
 
 [#grant-pull-permissions]

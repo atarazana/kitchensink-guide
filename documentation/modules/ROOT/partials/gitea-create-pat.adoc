@@ -1,4 +1,7 @@
-CAUTION: You'll need this token later so don't forget to copy it somewhere just in case you close the terminal window.
+[CAUTION]
+====
+You'll need this token later you can copy it somewhere just in case you close the terminal window or run this command again and generate a new token.
+====
 
 [.console-input]
 [source,bash, subs="+macros,+attributes"]

@@ -37,11 +37,17 @@ If you're using `DevSpaces` or the `web-terminal`, you don't need to log in, you
 oc login -u {username} -p {password} --server=https://api.{api-domain}
 ----
 
-
 [#deploy]
 == Deploying a JBOSS EAP 7.2 application manually
 
-Let's deploy the Kitchensink stack !
+Let's deploy the Kitchensink App!
+
+[IMPORTANT]
+====
+This template deploys our application using a `DeploymentConfig` instead of the kubernetes `Deployment` object, starting in chapter `ArgoCD + Helm` you will see that we've moved from `DeploymentConfig` to `Deployment`.
+
+#TODO#
+====
 
 . First of all, create the project that will host the application:
 +
@@ -50,6 +56,17 @@ Let's deploy the Kitchensink stack !
 ----
 oc new-project s2i-{username}
 ----
++
+[NOTE]
+====
+Please open the next link to watch the progress of the chapter. 
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{openshift-console-host}/topology/ns/s2i-{username}?view=graph
+----
+====
 +
 . Deploy the PostgreSQL database for the kitchensink app:
 +
@@ -118,6 +135,22 @@ oc annotate dc/kitchensink \
 The ``app.openshift.io/connects-to`` annotation is used to connect the nodes.
 ====
 
+Open the next link and click on the `in progress` icon to see the log of the building process.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{openshift-console-host}/topology/ns/s2i-{username}?view=graph
+----
+
+image::s2i-01.png[Build Config link]
+
+Eventually you will see a trace like this => `>>>>>>> Running install.sh <<<<<<`. This is a sign that the S2I building process has detected our script to prepare the image as desired.
+
+image::s2i-02.png[Build Log]
+
+#Explain this better and according to the explanations given before in this chapter#
+
 [#redeploy]
 == Redeploying a JBOSS EAP application
 
@@ -174,3 +207,7 @@ Open this link to check if the change is already applied.
 ----
 https://kitchensink-s2i-{username}.{cluster-subdomain}/index.jsf
 ----
+
+You should see something like this:
+
+image::s2i-03.png[After hot reload]

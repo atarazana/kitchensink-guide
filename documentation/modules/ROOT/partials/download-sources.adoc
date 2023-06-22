@@ -1,10 +1,5 @@
 Before we start setting up the environment, let’s clone the tutorial sources and set the `TUTORIAL_HOME` environment variable to point to the root directory of the tutorial:
 
-[tabs]
-====
-laptop::
-+
---
 [.console-input]
 [source,bash,subs="attributes+,+macros"]
 ----
@@ -18,24 +13,3 @@ git clone https://{gitea-host}/{username}/kitchensink-conf
 export CODE_HOME="$(pwd)/kitchensink"
 export CONF_HOME="$(pwd)/kitchensink-conf"
 ----
---
-web-terminal::
-+
---
-[.console-input]
-[source,bash,subs="attributes+,+macros"]
-----
-cd ~/scratch
-git clone  https://{gitea-host}/{username}/kitchensink
-git clone https://{gitea-host}/{username}/kitchensink-conf
-----
-
-[.console-input]
-[source,bash,subs="attributes+,+macros"]
-----
-export CODE_HOME="$(pwd)/kitchensink"
-export CONF_HOME="$(pwd)/kitchensink-conf"
-----
---
-====
-

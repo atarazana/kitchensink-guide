@@ -28,7 +28,7 @@ Again, you will deploy two environments (overlays in kustomize jargon) `dev` and
 . `dev` -> `helm-kustomize-dev-{username}`
 . `test` -> `helm-kustomize-test-{username}`
 
-Before you actually can deploy the application using kustomize you have to change the original target namespaces (`demo-5-dev` and `demo-5-test`) coming from the original repository you migrated from. In a nutshell you have to change:
+Before you actually can deploy the application using kustomize you have to change the original target namespaces (`demo-7-dev` and `demo-7-test`) coming from the original repository you migrated from. In a nutshell you have to change:
 
 . `demo-7-dev` -> `helm-kustomize-dev-{username}`
 . `demo-7-test` -> `helm-kustomize-test-{username}`
@@ -59,8 +59,26 @@ With this
 namespace: helm-kustomize-dev-{username}
 ----
 
-Once you have made the changes scroll down and click on `Commit Changes`.
+Now you have to also change this around line 20:
 
+[source,yaml,subs="attributes+,+macros"]
+----
+- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/kitchensink-cicd/kitchensink
+    newTag: latest
+----
+
+With this:
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/{cicd-namespace}-{username}/kitchensink
+    newTag: latest
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
 
 Now it's the turn of the `test` namespace. Please open the next link.
 
@@ -85,6 +103,25 @@ With this
 namespace: helm-kustomize-test-{username}
 ----
 
+Now you have to also change this around line 20:
+
+[source,yaml,subs="attributes+,+macros"]
+----
+- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/kitchensink-cicd/kitchensink
+    newTag: latest
+----
+
+With this:
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/{cicd-namespace}-{username}/kitchensink
+    newTag: latest
+----
+
 Once you have made the changes scroll down and click on `Commit Changes`.
 
 [#deploy-app]
@@ -98,33 +135,32 @@ Now we want to deploy a JBoss EAP application using the ``helm`` templates _kust
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
 ----
-export USERNAME="{username}"
 cat <<EOF | oc apply -n {root-apps-namespace} -f -
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: kitchensink-kustomized-helm-$\{USERNAME}
+  name: kitchensink-kustomized-helm-{username}
   namespace: openshift-gitops
   labels:
     argocd-root-app: "true"
-    username: $\{USERNAME}
+    username: {username}
 spec:
   generators:
   - list:
       elements:
       - env: dev
-        ns: helm-kustomize-dev-$\{USERNAME}
+        ns: helm-kustomize-dev-{username}
         desc: "Helm + Kustomize (Dev)"
       - env: test
-        ns: helm-kustomize-test-$\{USERNAME}
+        ns: helm-kustomize-test-{username}
         desc: "Helm + Kustomize (Test)"
   template:
     metadata:
-      name: kitchensink-kustomized-helm-app-{{ env }}-$\{USERNAME}
+      name: kitchensink-kustomized-helm-app-{{ env }}-{username}
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"
-        username: $\{USERNAME}
+        username: {username}
       finalizers:
       - resources-finalizer.argocd.argoproj.io
     spec:
@@ -174,3 +210,17 @@ Custom plugin, variables are passed to it as environment variables.
 * Allows deployment in multiple clusters in a simple way.
 * Includes the concept of a generator that simplifies complex deployments: multiple departments, business units, etc.
 * Not only deploys, but also fixes (un)voluntary modifications in the deployment environments.
+
+// [#grant-pull-permissions]
+// == Granting Pull Permissions
+
+// Both projects `helm-kustomize-dev-{username}` and `helm-kustomize-test-{username}` need permissions to pull the image from the cicd namespace (cicd-tekton-{username}) created in the previous chapter when deploying the pipelines.
+
+// We have to give pull permissions to the `default` service account in each namespace. Please run this command:
+
+// [.console-input]
+// [source,bash, subs="+macros,+attributes"]
+// ----
+// oc policy add-role-to-user system:image-puller system:serviceaccount:helm-kustomize-dev-{username}:default -n cicd-tekton-{username}
+// oc policy add-role-to-user system:image-puller system:serviceaccount:helm-kustomize-test-{username}:default -n cicd-tekton-{username}
+// ----
