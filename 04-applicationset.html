@@ -132,22 +132,22 @@
     <a class="nav-link" href="06-helm.html">6. ArgoCD + Helm</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="07-helm-kustomized.html">7. ArgoCD + Helm + Kustomize</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="07-helm-kustomized.html#overview">Overview</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="07-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="07-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
-  </li>
-</ul>
+    <a class="nav-link" href="07-cicd.html">7. CI/CD Pipelines</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="08-cicd.html">8. CI/CD Pipelines</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="08-helm-kustomized.html">8. ArgoCD + Helm + Kustomize</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="08-helm-kustomized.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="08-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="08-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a>
@@ -340,7 +340,7 @@ spec:
         desc: "ApplicationSet B"
   template:
     metadata:
-      name: kitchensink-basic-app-{{ env }}-${USERNAME}
+      name: kitchensink-basic-app-{{ env }}
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"

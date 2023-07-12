@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>ArgoCD + Kustomize :: Kitchensink Guide</title>
-    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/05-kustomize.html">
-    <link rel="prev" href="04-applicationset.html">
-    <link rel="next" href="06-helm.html">
+    <title>ArgoCD + Kustomize + Helm :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/08-helm-kustomized.html">
+    <link rel="prev" href="07-cicd.html">
+    <link rel="next" href="09-pipeline-webhooks.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -125,7 +125,7 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="05-kustomize.html">5. ArgoCD + Kustomize</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -134,18 +134,18 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="07-cicd.html">7. CI/CD Pipelines</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="08-helm-kustomized.html">8. ArgoCD + Helm + Kustomize</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="08-helm-kustomized.html#overview">Overview</a>
+    <a class="nav-link" href="#overview">Overview</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="08-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
+    <a class="nav-link" href="#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="08-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+    <a class="nav-link" href="#benefits">Benefits of the GitOps/ArgoCD model</a>
   </li>
 </ul>
   </li>
@@ -182,40 +182,81 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Kitchensink Guide</a></li>
-    <li><a href="05-kustomize.html">5. ArgoCD + Kustomize</a></li>
+    <li><a href="08-helm-kustomized.html">8. ArgoCD + Helm + Kustomize</a></li>
   </ul>
 </nav>
   <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
 </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">ArgoCD + Kustomize</h1>
+<h1 class="page">ArgoCD + Kustomize + Helm</h1>
 <div class="sect1">
-<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy Kitchensink app with ArgoCD + Kustomize</h2>
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Now we are going to deploy the same application in the same way, but instead of using descriptors directly we are going to customize them for the corresponding environment (overlay) with <code>kustomize</code>. You will deploy two environments (overlays in kustomize jargon) <code>dev</code> and <code>test</code> in two namespaces set by a list generator.</p>
+<p>Key points:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><mark>Git</mark> is the <mark>source of truth</mark></p>
+</li>
+<li>
+<p>We want to deploy on <mark>different platforms and different environments</mark></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To accomplish this, we need to use <code>helm</code> and <code>Kustomize</code>.</p>
+</div>
+<div id="img-helm_kustomize" class="imageblock">
+<div class="content">
+<a class="image" href="https://jfrog.com/blog/power-up-helm-charts-using-kustomize-to-manage-kubernetes-deployments/"><img src="_images/helm_kustomize.png" alt="helm kustomize"></a>
+</div>
+<div class="title">Figure 1. Difference between Template/Helm and Overlay/Kustomize</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you want to know more in detail the difference between <code>Helm</code> and <code>Kustomize</code>, click on the image.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="preparation"><a class="anchor" href="#preparation"></a>Preparation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Again, you will deploy two environments (overlays in kustomize jargon) <code>dev</code> and <code>test</code> in two namespaces set by a list generator.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><code>dev</code> &#8594; <code>kitchensink-dev-%USERNAME%</code></p>
+<p><code>dev</code> &#8594; <code>helm-kustomize-dev-%USERNAME%</code></p>
 </li>
 <li>
-<p><code>test</code> &#8594; <code>kitchensink-test-%USERNAME%</code></p>
+<p><code>test</code> &#8594; <code>helm-kustomize-test-%USERNAME%</code></p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
-<p>Before you actually can deploy the application using kustomize you have to change the original target namespaces (<code>demo-5-dev</code> and <code>demo-5-test</code>) coming from the original repository you migrated from. In a nutshell you have to change:</p>
+<p>Before you actually can deploy the application using kustomize you have to change the original target namespaces (<code>demo-7-dev</code> and <code>demo-7-test</code>) coming from the original repository you migrated from. In a nutshell you have to change:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><code>demo-5-dev</code> &#8594; <code>kitchensink-dev-%USERNAME%</code></p>
+<p><code>demo-7-dev</code> &#8594; <code>helm-kustomize-dev-%USERNAME%</code></p>
 </li>
 <li>
-<p><code>demo-5-test</code> &#8594; <code>kitchensink-test-%USERNAME%</code></p>
+<p><code>demo-7-test</code> &#8594; <code>helm-kustomize-test-%USERNAME%</code></p>
 </li>
 </ol>
 </div>
@@ -234,7 +275,7 @@
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/_edit/main/kustomize/dev/kustomization.yml#L5</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/_edit/main/advanced/overlays/dev/kustomization.yml#L5</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -242,7 +283,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">namespace: demo-5-dev</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">namespace: demo-7-dev</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -250,7 +291,27 @@
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">namespace: kustomize-dev-%USERNAME%</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">namespace: helm-kustomize-dev-%USERNAME%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you have to also change this around line 20:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/kitchensink-cicd/kitchensink
+    newTag: latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/cicd-tekton-%USERNAME%/kitchensink
+    newTag: latest</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -261,7 +322,7 @@
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/_edit/main/kustomize/test/kustomization.yml#L5</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/_edit/main/advanced/overlays/test/kustomization.yml#L5</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -269,7 +330,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">namespace: demo-5-test</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">namespace: demo-7-test</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -277,7 +338,27 @@
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">namespace: kustomize-test-%USERNAME%</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">namespace: helm-kustomize-test-%USERNAME%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you have to also change this around line 20:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/kitchensink-cicd/kitchensink
+    newTag: latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+    newName: image-registry.openshift-image-registry.svc:5000/cicd-tekton-%USERNAME%/kitchensink
+    newTag: latest</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -288,46 +369,49 @@
 <div class="sect1">
 <h2 id="deploy-app"><a class="anchor" href="#deploy-app"></a>Deploy Using Kustomize and an ApplicationSet</h2>
 <div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy Kitchensink app with ArgoCD + Kustomize + Helm</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now we want to deploy a JBoss EAP application using the <code>helm</code> templates <em>kustomized</em> for dev and test environments.</p>
+</div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export USERNAME="%USERNAME%"
-cat &lt;&lt;EOF | oc apply -n openshift-gitops -f -
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat &lt;&lt;EOF | oc apply -n openshift-gitops -f -
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: kitchensink-kustomize-${USERNAME}
+  name: kitchensink-kustomized-helm-%USERNAME%
   namespace: openshift-gitops
   labels:
     argocd-root-app: "true"
-    username: ${USERNAME}
+    username: %USERNAME%
 spec:
   generators:
   - list:
       elements:
       - env: dev
-        ns: kustomize-dev-${USERNAME}
-        desc: "Kustomize Dev"
+        ns: helm-kustomize-dev-%USERNAME%
+        desc: "Helm + Kustomize (Dev)"
       - env: test
-        ns: kustomize-test-${USERNAME}
-        desc: "Kustomize Test"
+        ns: helm-kustomize-test-%USERNAME%
+        desc: "Helm + Kustomize (Test)"
   template:
     metadata:
-      name: kitchensink-kustomize-app-{{ env }}-${USERNAME}
+      name: kitchensink-kustomized-helm-app-{{ env }}-%USERNAME%
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"
-        username: ${USERNAME}
+        username: %USERNAME%
       finalizers:
       - resources-finalizer.argocd.argoproj.io
     spec:
       destination:
         namespace: '{{ ns }}'
         name: in-cluster
-      ignoreDifferences:
-      - group: apps.openshift.io
-        kind: DeploymentConfig
-        jqPathExpressions:
-          - .spec.template.spec.containers[].image
       project: default
       syncPolicy:
         automated:
@@ -335,17 +419,65 @@ spec:
         syncOptions:
           - CreateNamespace=true
       source:
-        path: kustomize/{{ env }}
+        path: advanced/overlays/{{ env }}
         repoURL: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf"
         targetRevision: main
+        plugin:
+          env:
+            - name: DEBUG
+              value: 'false'
+          name: kustomized-helm
 EOF</code></pre>
 </div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">plugin</div>
+<div class="paragraph">
+<p>Custom plugin, variables are passed to it as environment variables.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">...
+        plugin:
+          env:
+            - name: DEBUG
+              value: 'false'
+          name: kustomized-helm
+...</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="benefits"><a class="anchor" href="#benefits"></a>Benefits of the GitOps/ArgoCD model</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>It provides an infrastructure base as code for application deployment.</p>
+</li>
+<li>
+<p>It is based on Git, so everything we know about git is reused.</p>
+</li>
+<li>
+<p>Allows deployment in multiple clusters in a simple way.</p>
+</li>
+<li>
+<p>Includes the concept of a generator that simplifies complex deployments: multiple departments, business units, etc.</p>
+</li>
+<li>
+<p>Not only deploys, but also fixes (un)voluntary modifications in the deployment environments.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="04-applicationset.html" class="query-params-link">4. ArgoCD + ApplicationSet</a></span>
-  <span class="next"><a href="06-helm.html" class="query-params-link">6. ArgoCD + Helm</a></span>
+  <span class="prev"><a href="07-cicd.html" class="query-params-link">7. CI/CD Pipelines</a></span>
+  <span class="next"><a href="09-pipeline-webhooks.html" class="query-params-link">9. Pipeline Webhooks</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

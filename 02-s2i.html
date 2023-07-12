@@ -132,22 +132,22 @@
     <a class="nav-link" href="06-helm.html">6. ArgoCD + Helm</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="07-helm-kustomized.html">7. ArgoCD + Helm + Kustomize</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="07-helm-kustomized.html#overview">Overview</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="07-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="07-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
-  </li>
-</ul>
+    <a class="nav-link" href="07-cicd.html">7. CI/CD Pipelines</a>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="08-cicd.html">8. CI/CD Pipelines</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="08-helm-kustomized.html">8. ArgoCD + Helm + Kustomize</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="08-helm-kustomized.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="08-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="08-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a>
@@ -435,11 +435,49 @@ oc annotate dc/kitchensink \
 <div class="paragraph">
 <p><mark>Explain this better and according to the explanations given before in this chapter</mark></p>
 </div>
+<div class="paragraph">
+<p>After the building process has finished the image is pushed and the <code>DeploymentConfig</code> object is updated accordingly to use the new image. If you go the <code>Topology</code> view you should see this.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-04.png" alt="Deployed">
+</div>
+</div>
+<div class="paragraph">
+<p>Time to check if our application works as expected. Please click on the route icon.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-05.png" alt="Checking">
+</div>
+</div>
+<div class="paragraph">
+<p>You should see something like this.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-06.png" alt="Result">
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="redeploy"><a class="anchor" href="#redeploy"></a>Redeploying a JBOSS EAP application</h2>
 <div class="sectionbody">
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You have to wait until the application has been deployed, in the previous item, in order to redeploy it!</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>Let&#8217;s explore a quick way to test <em>minor</em> changes in our application. In this case you will package your JBoss EAP application locally and later you will use <code>oc cp</code> to copy the WAR file directly to the deployment folder of JBoss EAP already running in OCP.</p>
 </div>
@@ -508,6 +546,20 @@ oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war</code></pre>
 </div>
 <div class="paragraph">
 <p>Open this link to check if the change is already applied.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Take into account that for a short period of time the app is being replaced and you could get a 404 error if you&#8217;re quick enough.</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="listingblock console-input">
 <div class="content">
