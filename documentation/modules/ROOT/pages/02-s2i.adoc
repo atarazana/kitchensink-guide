@@ -151,8 +151,27 @@ image::s2i-02.png[Build Log]
 
 #Explain this better and according to the explanations given before in this chapter#
 
+After the building process has finished the image is pushed and the `DeploymentConfig` object is updated accordingly to use the new image. If you go the `Topology` view you should see this.
+
+image::s2i-04.png[Deployed]
+
+Time to check if our application works as expected. Please click on the route icon.
+
+image::s2i-05.png[Checking]
+
+You should see something like this.
+
+image::s2i-06.png[Result]
+
 [#redeploy]
 == Redeploying a JBOSS EAP application
+
+[CAUTION]
+====
+You have to wait until the application has been deployed, in the previous item, in order to redeploy it!
+
+
+====
 
 Let's explore a quick way to test _minor_ changes in our application. In this case you will package your JBoss EAP application locally and later you will use ``oc cp`` to copy the WAR file directly to the deployment folder of JBoss EAP already running in OCP.
 
@@ -201,6 +220,11 @@ oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war
 ----
 
 Open this link to check if the change is already applied.
+
+[CAUTION]
+====
+Take into account that for a short period of time the app is being replaced and you could get a 404 error if you're quick enough.
+====
 
 [.console-input]
 [source,url, subs="+attributes"]

@@ -127,7 +127,7 @@ spec:
         desc: "ApplicationSet B"
   template:
     metadata:
-      name: kitchensink-basic-app-{{ env }}-$\{USERNAME}
+      name: kitchensink-basic-app-{{ env }}
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"

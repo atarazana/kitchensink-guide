@@ -23,11 +23,11 @@ endif::[]
 
 * xref:06-helm.adoc[6. ArgoCD + Helm]
 
-* xref:07-helm-kustomized.adoc[7. ArgoCD + Helm + Kustomize]
-** xref:07-helm-kustomized.adoc#overview[Overview]
-** xref:07-helm-kustomized.adoc#deploy[Deploy Kitchensink app with ArgoCD + Kustomize + Helm]
-** xref:07-helm-kustomized.adoc#benefits[Benefits of the GitOps/ArgoCD model]
+* xref:07-cicd.adoc[7. CI/CD Pipelines]
 
-* xref:08-cicd.adoc[8. CI/CD Pipelines]
+* xref:08-helm-kustomized.adoc[8. ArgoCD + Helm + Kustomize]
+** xref:08-helm-kustomized.adoc#overview[Overview]
+** xref:08-helm-kustomized.adoc#deploy[Deploy Kitchensink app with ArgoCD + Kustomize + Helm]
+** xref:08-helm-kustomized.adoc#benefits[Benefits of the GitOps/ArgoCD model]
 
 * xref:09-pipeline-webhooks.adoc[9. Pipeline Webhooks]
