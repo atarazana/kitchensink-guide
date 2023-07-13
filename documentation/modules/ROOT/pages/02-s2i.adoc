@@ -4,15 +4,42 @@ include::_attributes.adoc[]
 [#overview]
 == Overview
 
-https://github.com/openshift/source-to-image[Source-to-Image (S2I)] is a framework that makes it easy to write images that take application source code as an input and produce a new image that runs the assembled application as output.
+https://github.com/openshift/source-to-image[Source-to-Image (S2I)] is a framework that makes it easy to build images starting from your source code. In reality S2I can start from your source code, a file (usually a binary), a bunch of files or a Dockerfile.
 
-The main advantage of using S2I for building reproducible container images is the ease of use for developers.
+Here we're going to concentrate on the first strategy, building our application image starting from the code in a git repository.
+
+TIP: The *main advantages* of using S2I for building images are the *ease of use* for developers and being a *repeatable process*.
 
 .Source code deployment process
 image::s2i.png[] 
 
-#TODO EXPLAIN THE S2I NITTY GRITTY!!!!!!#
+[#but-how-does-it-work]
+=== But How Does It Work?
 
+Well as you can see in the previous image building an image that runs your code comprises three phases:
+
+- *Build App:* Compiling code, this is language specific and can imply downloading dependencies, compiling, linking, etc. All the tools needed should be present at the builder image. The output of this phase is a binary file or a jar, along with libraries if necessary, etc.
+- *Build Image:* In this phase we put the output of the previous phase in a known location inside the image so that it can be run later as a container. The output of this phase is an image based on the builder image or a specific image with the minimum required components for running and your application.
+- *Deploy:* Finally we need to deploy our image to a kubernetes cluster and this means referring to our application image from a *Deployment*, *DeploymentConfig*, *StatefulSet*, *DaemonSet*, *Job*, etc.
+
+Let's go a bit deeper with the explanation, in order to build your application you will need a builder image designed according to the S2I framework. In general, you will use a supported image by Red Hat, it can be for Java, Python, .Net, etc. go link:https://docs.openshift.com/container-platform/4.12/openshift_images/using_images/using-s21-images.html[here] but if you need or want to create your own builder image you can go link:https://access.redhat.com/documentation/en-us/openshift_container_platform/4.12/html/images/creating-images#images-create-s2i-scripts_create-images[here] to learn all you need to do it.
+
+In a nutshell a builder image is an image that includes:
+
+- *All the tools you need to compile*, download dependencies, etc. for a given programming language.
+- *Source-to-image scripts:* You can write source-to-image (S2I) scripts in any programming language, as long as the scripts are executable inside the builder image. S2I supports multiple options providing `assemble/run/save-artifacts` scripts.
+
+The two more important scripts are `assemble` and `run`:
+
+- *`assemble`* -> The assemble script builds the application artifacts from a source and places them into appropriate directories inside the image. This script is required.
+- *`run`* ->  The run script executes your application. This script is required.
+
+[#being-more-specific]
+=== Being More Specific
+
+Ok, for now the explanation applies to any language/framework, let's get a bit deeper for our case.
+
+First, you will be using a JBoss EAP builder image => `registry.redhat.io/jboss-eap-7/eap72-openshift:latest`
 
 [#getting-started]
 == Let's get started
