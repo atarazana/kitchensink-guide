@@ -6,7 +6,7 @@
     <title>Setup :: Kitchensink Guide</title>
     <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/01-setup.html">
     <link rel="prev" href="index.html">
-    <link rel="next" href="02-s2i.html">
+    <link rel="next" href="02-prepare-cluster.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -88,69 +88,141 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="02-s2i.html">2. Deploy JBoss EAP Application with S2I</a>
+    <a class="nav-link" href="02-prepare-cluster.html">2. Prepare Cluster</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-s2i.html#overview">Overview</a>
+    <a class="nav-link" href="02-prepare-cluster.html#deploying-core-components">Deploying core components</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
+    <a class="nav-link" href="02-prepare-cluster.html#high-level-tests">High Level Tests</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
+    <a class="nav-link" href="02-prepare-cluster.html#checking-quay">Checking Quay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#deploying-gitea">Deploying Gitea</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="03-argo.html">3. Deploy JBoss EAP Application with ArgoCD</a>
+    <a class="nav-link" href="03-prepare-repositories.html">3. Prepare Repositories</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-argo.html#overview">Simplification, git-based automation</a>
+    <a class="nav-link" href="03-prepare-repositories.html#source-of-truth">Source Of Truth</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-argo.html#deploy">Deploy Kitchensink app with ArgoCD</a>
+    <a class="nav-link" href="03-prepare-repositories.html#explore-gitea-console">Explore Gitea console</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#create-git-pat">Create Git PAT</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#migrate-repositories">Migrate Repositories</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="04-applicationset.html">4. ArgoCD + ApplicationSet</a>
+    <a class="nav-link" href="04-s2i.html">4. Deploy JBoss EAP Application with S2I</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="04-applicationset.html#overview">Overview</a>
+    <a class="nav-link" href="04-s2i.html#overview">Overview</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="04-applicationset.html#deploy">Deploy Kitchensink app with ArgoCD + ApplicationSet</a>
+    <a class="nav-link" href="04-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
   </li>
 </ul>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="05-kustomize.html">5. ArgoCD + Kustomize</a>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="06-helm.html">6. ArgoCD + Helm</a>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="07-cicd.html">7. CI/CD Pipelines</a>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="08-helm-kustomized.html">8. ArgoCD + Helm + Kustomize</a>
+    <a class="nav-link" href="05-argo.html">5. Deploy JBoss EAP Application with ArgoCD</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="08-helm-kustomized.html#overview">Overview</a>
+    <a class="nav-link" href="05-argo.html#overview">Simplification, git-based automation</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="08-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="08-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+    <a class="nav-link" href="05-argo.html#deploy">Deploy Kitchensink app with ArgoCD</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="06-applicationset.html">6. ArgoCD + ApplicationSet</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#deploy">Deploy Kitchensink app with ArgoCD + ApplicationSet</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="07-kustomize.html">7. ArgoCD + Kustomize</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="08-helm.html">8. ArgoCD + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="10-helm-kustomized.html">10. ArgoCD + Helm + Kustomize</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="11-pipeline-webhooks.html">11. Pipeline Webhooks</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="12-test-cicd-pipelines.html">12. Check Pipeline Webhooks</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="12-test-cicd-pipelines.html#check-kitchensink-ci-web-hook">Check Kitchensink CI Web Hook</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="12-test-cicd-pipelines.html#check-kitchensink-cd-web-hook">Check Kitchensink CD Web Hook</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="13-end-to-end-test.html">13. End to End Test</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#introduction">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#current-status">Ⓐ Current Status</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#change-the-code">Ⓑ Change the code</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#run-ci-pipeline">Ⓒ Run CI pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-dev">Ⓓ Run CD pipeline (<code>dev</code>)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-test">Ⓔ Run CD pipeline (<code>test</code>)</a>
+  </li>
+</ul>
   </li>
 </ul>
   </li>
@@ -196,6 +268,18 @@
 <div class="paragraph">
 <p>The following CLI tools are required for running the exercises in this tutorial.
 Please have them installed and configured before you get started with any of the tutorial chapters.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+It is also necessary to have a working <mark>Java</mark> and <mark>Maven</mark> environment (at least for the s2i chapter).
+</td>
+</tr>
+</table>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -316,231 +400,7 @@ Please have them installed and configured before you get started with any of the
 </div>
 </div>
 <div class="sect1">
-<h2 id="prepare-repositories"><a class="anchor" href="#prepare-repositories"></a>Prepare Repositories</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Everything we do in this section requires that you have fulfilled the <a href="#prerequisite">prerequisites</a> section and you&#8217;re logged in your OpenShift cluster.</p>
-</div>
-<div class="paragraph">
-<p>So if not already logged in, please do it now.</p>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>If you&#8217;re using the <code>web-terminal</code> or <code>DevSpaces, you don&#8217;t need to log in, you&#8217;re already logged in, try this command `oc whoami</code> and check that the response is: %USERNAME%.</p>
-</div>
-<div class="paragraph">
-<p>If you receive this error:</p>
-</div>
-<div class="listingblock console-output">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">error: x509: “kube-apiserver-lb-signer” certificate is not trusted</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Then add this flag to the <code>oc login</code> command: <code>--insecure-skip-tls-verify=true</code></p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">oc login -u %USERNAME% -p %PASSWORD% --server=https://api.%BASE_SUBDOMAIN%:6443</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="git-repositories"><a class="anchor" href="#git-repositories"></a>Git Repositories</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>As explained before you will deploy the same application in different ways, using different tools. You will need to make some changes so the first thing you will do is migrate the code and also the configuration to your Gitea account that has been provisioned as part of the set up of the lab.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>This is necessary because:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>webhooks need to be created and obviously you need permissions on them</p>
-</li>
-<li>
-<p>you want to make changes to the code and promote those changes across environments</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>These are the repositories you will migrate:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Configuration Repo:</strong> <a href="https://github.com/atarazana/kitchensink-conf.git" class="bare">https://github.com/atarazana/kitchensink-conf.git</a></p>
-</li>
-<li>
-<p><strong>Code Repo:</strong> <a href="https://github.com/atarazana/kitchensink.git" class="bare">https://github.com/atarazana/kitchensink.git</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="explore-gitea-console"><a class="anchor" href="#explore-gitea-console"></a>Explore Gitea Console</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Before we continue with the migration of the git repositories of our application open the console and check that your credentials are valid and all looks good.</p>
-</div>
-<div class="paragraph">
-<p>Copy the next url and open it in a new tab, please use these credentials:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>USERNAME:</strong> %USERNAME%</p>
-</li>
-<li>
-<p><strong>PASSWORD:</strong> openshift</p>
-</li>
-</ul>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/user/login</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You should see something like this. Please enter your credentials and hit the green button.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/gitea-login.png" alt="Gitea Login">
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="create-git-pat"><a class="anchor" href="#create-git-pat"></a>Create Git PAT</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Let&#8217;s create a <strong>Personal Access Token</strong> (PAT) in Gitea for user <strong>%USERNAME%</strong>.</p>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>You&#8217;ll need this token later you can copy it somewhere just in case you close the terminal window or run this command again and generate a new token.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">GIT_PAT=$(curl -k -s -XPOST -H "Content-Type: application/json" \
-  -d '{"name":"cicd'"${RANDOM}"'","scopes": ["repo"]}' \
-  -u %USERNAME%:openshift \
-  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens</a> | jq -r .sha1)
-echo "GIT_PAT=${GIT_PAT}"</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="migrate-repositories"><a class="anchor" href="#migrate-repositories"></a>Migrate Repositories</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Now that user <strong>%USERNAME%</strong> has been created let&#8217;s migrate our repositories into Gitea.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">  curl -k -X 'POST' \
-      "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/repos/migrate" \
-      -H 'accept: application/json' \
-      -H  "Authorization: token ${GIT_PAT}" \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "clone_addr": "https://github.com/atarazana/kitchensink.git",
-      "description": "kitchensink code",
-      "issues": false,
-      "labels": false,
-      "lfs": false,
-      "milestones": false,
-      "private": false,
-      "pull_requests": false,
-      "releases": false,
-      "repo_name": "kitchensink",
-      "repo_owner": "%USERNAME%",
-      "service": "git",
-      "wiki": false
-    }'
-
-  curl -k -X 'POST' \
-      "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/repos/migrate" \
-      -H 'accept: application/json' \
-      -H  "Authorization: token ${GIT_PAT}" \
-      -H 'Content-Type: application/json' \
-      -d '{
-      "clone_addr": "https://github.com/atarazana/kitchensink-conf.git",
-      "description": "kitchensink configuration",
-      "issues": false,
-      "labels": false,
-      "lfs": false,
-      "milestones": false,
-      "private": false,
-      "pull_requests": false,
-      "releases": false,
-      "repo_name": "kitchensink-conf",
-      "repo_owner": "%USERNAME%",
-      "service": "git",
-      "wiki": false
-    }'</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>After successfully migrating all the repos you should see this in the Gitea console.</p>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-Don&#8217;t forget to refresh your browser.
-</td>
-</tr>
-</table>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/gitea-migrated-repos.png" alt="Gitea Migrated Repos">
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="clone-repos-locally"><a class="anchor" href="#clone-repos-locally"></a>Clone Repos Locally</h2>
+<h2 id="download-tutorial"><a class="anchor" href="#download-tutorial"></a>Get tutorial sources</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.</p>
@@ -548,150 +408,91 @@ Don&#8217;t forget to refresh your browser.
 <div class="paragraph">
 <p>Before we start setting up the environment, let’s clone the tutorial sources and set the <code>TUTORIAL_HOME</code> environment variable to point to the root directory of the tutorial:</p>
 </div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink</a>
-git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf</a></code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CODE_HOME="$(pwd)/kitchensink"
-export CONF_HOME="$(pwd)/kitchensink-conf"</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="prepare-devfile"><a class="anchor" href="#prepare-devfile"></a>Prepare Devfile</h2>
-<div class="sectionbody">
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
 <div class="paragraph">
-<p>Please copy and paste the following link and open it in a browser. It will take you to file <code>devfile.yaml</code> where you have to change the git url to match the one of the previously migrated repository of code. Use this credentials to log in.</p>
+<p><strong>If you choose to use web-terminal, stick to that decision throughout the guide.</strong></p>
+</div>
+<div class="paragraph">
+<p>Next, <strong>open the following link</strong>, <strong>create a new project</strong> called: <code>terminal-%USERNAME%</code> and <strong>click on <code>Start</code></strong>. If credentials are required use these:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Username:</strong> %USERNAME%</p>
+<p><strong>USERNAME:</strong> %USERNAME%</p>
 </li>
 <li>
-<p><strong>Password:</strong> openshift</p>
+<p><strong>PASSWORD:</strong> %PASSWORD%</p>
 </li>
 </ul>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink/_edit/main/devfile.yaml#L12</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/terminal</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Once there, you have to change this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">projects:
-  - git:
-      remotes:
-        origin: 'https://github.com/atarazana/kitchensink'
-    name: kintchensink</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>With this</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">projects:
-  - git:
-      remotes:
-        origin: 'https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink'
-    name: kintchensink</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="create-devspaces-workspace"><a class="anchor" href="#create-devspaces-workspace"></a>Create Your DevSpaces Workspace</h2>
-<div class="sectionbody">
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-If you&#8217;re running the guide in a laptop, you don&#8217;t need to do this.
 </td>
 </tr>
 </table>
 </div>
-<div class="paragraph">
-<p>Please copy and paste the following link and open it in a browser. It will take you to a Red Hat DevSpaces deployment in the OpenShift cluster you&#8217;re interacting with in this lab. Use this credentials to log in and click on <code>Allow selected permissions</code>.</p>
-</div>
-<div class="ulist">
+<div class="tabset is-loading">
+<div class="ulist tabs">
 <ul>
 <li>
-<p><strong>Username:</strong> %USERNAME%</p>
+<p><a id="tabset1_laptop"></a>laptop</p>
 </li>
 <li>
-<p><strong>Password:</strong> %PASSWORD%</p>
+<p><a id="tabset1_web-terminal"></a>web-terminal</p>
 </li>
 </ul>
 </div>
+<div class="content">
+<div class="tab-pane" aria-labelledby="tabset1_laptop">
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://devspaces.apps.%BASE_SUBDOMAIN%/#/https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink/raw/main/devfile.yaml</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://github.com/atarazana/kitchensink-conf.git" class="bare">https://github.com/atarazana/kitchensink-conf.git</a> kitchensink-guides</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>After some seconds you will see that the devfile has been loaded and that your workspace is been created.</p>
-</div>
-<div class="imageblock">
+<div class="listingblock console-input">
 <div class="content">
-<img src="_images/devspaces-01.png" alt="Creation">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/kitchensink-guides"</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>After a minute or two you&#8217;ll have the workspaces prepared and you&#8217;ll be prompted to answer this question: <code>Do you trust the authors of the files in this folder?</code>. Click on <code>Yes, I trust the authors&#8230;&#8203;</code>.</p>
-</div>
-<div class="imageblock">
+<div class="listingblock console-input">
 <div class="content">
-<img src="_images/devspaces-02.png" alt="Question">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
 </div>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="opening-a-terminal-window-in-devspaces"><a class="anchor" href="#opening-a-terminal-window-in-devspaces"></a>Opening a Terminal Window in DevSpaces</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Go to the hamburger menu on the left, hover on <code>Terminal</code> then on <code>New Terminal</code> and click. As in this picture.</p>
-</div>
-<div class="imageblock">
+<div class="tab-pane" aria-labelledby="tabset1_web-terminal">
+<div class="listingblock console-input">
 <div class="content">
-<img src="_images/devspaces-03.png" alt="New Terminal">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd ~/scratch &amp;&amp; git clone <a href="https://github.com/atarazana/kitchensink-conf.git" class="bare">https://github.com/atarazana/kitchensink-conf.git</a> kitchensink-guides</code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="allow-paste-from-clipboard"><a class="anchor" href="#allow-paste-from-clipboard"></a>Allow Paste From Clipboard</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Should you be prompted to give/deny the paste permission as in the next picture while trying to paste commands in a DevSpaces terminal window, please allow it.</p>
-</div>
-<div class="imageblock">
+<div class="listingblock console-input">
 <div class="content">
-<img src="_images/devspaces-04.png" alt="Allow Paste Permission">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/kitchensink-guides"</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="index.html" class="query-params-link">Kitchensink Guide</a></span>
-  <span class="next"><a href="02-s2i.html" class="query-params-link">2. Deploy JBoss EAP Application with S2I</a></span>
+  <span class="next"><a href="02-prepare-cluster.html" class="query-params-link">2. Prepare Cluster</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

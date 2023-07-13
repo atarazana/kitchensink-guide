@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Checking Pipelines Webhooks :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/12-test-cicd-pipelines.html">
+    <link rel="prev" href="11-pipeline-webhooks.html">
+    <link rel="next" href="13-end-to-end-test.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="./_/css/site.css">
+<link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="./_/img/header_logo.png" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://atarazana.github.io/kitchensink-guide">Kitchensink Guide</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Books</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">CheatSheets</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">CheatSheet A</a>
+            <a class="navbar-item" href="#">CheatSheet B</a>
+            <a class="navbar-item" href="#">CheatSheet C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Upcoming Events</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Event A</a>
+            <a class="navbar-item" href="#">Event B</a>
+            <a class="navbar-item" href="#">Event C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Tutorial A</a>
+            <a class="navbar-item" href="#">Tutorial B</a>
+            <a class="navbar-item" href="#">Tutorial C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ROOT" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">Kitchensink Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-setup.html">1. Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#prerequisite">Prerequisites</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#openshift">Setup OpenShift 4</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#download-tutorial">Get tutorial sources</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-prepare-cluster.html">2. Prepare Cluster</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#deploying-core-components">Deploying core components</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#high-level-tests">High Level Tests</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#checking-quay">Checking Quay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#deploying-gitea">Deploying Gitea</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-prepare-repositories.html">3. Prepare Repositories</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#source-of-truth">Source Of Truth</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#explore-gitea-console">Explore Gitea console</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#create-git-pat">Create Git PAT</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#migrate-repositories">Migrate Repositories</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-s2i.html">4. Deploy JBoss EAP Application with S2I</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-s2i.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-argo.html">5. Deploy JBoss EAP Application with ArgoCD</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-argo.html#overview">Simplification, git-based automation</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-argo.html#deploy">Deploy Kitchensink app with ArgoCD</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="06-applicationset.html">6. ArgoCD + ApplicationSet</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#deploy">Deploy Kitchensink app with ArgoCD + ApplicationSet</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="07-kustomize.html">7. ArgoCD + Kustomize</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="08-helm.html">8. ArgoCD + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="10-helm-kustomized.html">10. ArgoCD + Helm + Kustomize</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="11-pipeline-webhooks.html">11. Pipeline Webhooks</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="12-test-cicd-pipelines.html">12. Check Pipeline Webhooks</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#check-kitchensink-ci-web-hook">Check Kitchensink CI Web Hook</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#check-kitchensink-cd-web-hook">Check Kitchensink CD Web Hook</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="13-end-to-end-test.html">13. End to End Test</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#introduction">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#current-status">Ⓐ Current Status</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#change-the-code">Ⓑ Change the code</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#run-ci-pipeline">Ⓒ Run CI pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-dev">Ⓓ Run CD pipeline (<code>dev</code>)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-test">Ⓔ Run CD pipeline (<code>test</code>)</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Kitchensink Guide</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Kitchensink Guide</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Kitchensink Guide</a></li>
+    <li><a href="12-test-cicd-pipelines.html">12. Check Pipeline Webhooks</a></li>
+  </ul>
+</nav>
+  <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Checking Pipelines Webhooks</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Webhooks are in place, it&#8217;s time to check if they are working correctly. Red Hat OpenShift Pipelines Operator generates <code>Deployments</code> and <code>Routes</code> objects starting from the definition of <code>EventListeners</code>. The tests you&#8217;re going to run here are simply testing that those deployments are running properly, the same technique can be used to debug <code>TriggerBinding</code> and <code>TriggerTemplate</code> attribute mapping and <code>EventListener</code> cel<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> filters.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="check-kitchensink-ci-web-hook"><a class="anchor" href="#check-kitchensink-ci-web-hook"></a>Check Kitchensink CI Web Hook</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let’s check if the webhook is working, please open a new terminal and execute the following command which will send a <code>dummy</code> event. Run the following command:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <code>EventListener</code> expects a <code>push</code> event, hence because we&#8217;re sending a <code>dummy</code> payload and event of type <code>dummy</code> we should expect and error but the test will be successful because we&#8217;re testing the frontend of the <code>EventListener</code> here.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST -k  http://$(oc get route/el-kitchensink-ci-pl-push-gitea-listener  -n $CICD_NAMESPACE -o jsonpath='{.spec.host}') \
+ -H 'X-GitHub-Event: dummy' -H 'X-GitHub-Event-Type: dummy' -H 'X-Gitea-Event: dummy' -H 'X-Gitea-Event-Type: dummy' \
+ -H 'Content-Type: application/json' \
+ --data '{ "dummy": "dummy"}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should get something like this.</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"eventListener":"kitchensink-ci-pl-push-gitea-listener","namespace":"kitchensink-cicd-user1","eventListenerUID":"6faba931-1949-4e8c-94be-e3c85608f13d","eventID":"a4f352e1-0088-4339-b671-4287d770e8b5"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now run this command to see what happened on the other end, the event listener:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export USERNAME="%USERNAME%"
+export CICD_NAMESPACE="kitchensink-cicd-${USERNAME}"
+oc logs deployment/el-kitchensink-ci-pl-push-gitea-listener -n ${CICD_NAMESPACE} | grep dummy</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is the expected output, as you can see <code>event type dummy is not allowed</code>.</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"level":"info","ts":"2022-09-12T16:30:11.860Z","logger":"eventlistener","caller":"sink/sink.go:234","msg":"interceptor stopped trigger processing: rpc error: code = FailedPrecondition desc = event type dummy is not allowed","commit":"fbb0fd1","knative.dev/controller":"eventlistener","eventlistener":"kitchensink-ci-pl-push-gitea-listener","namespace":"kitchensink-cicd-user1","eventlistenerUID":"2a940da6-e625-4f18-98b2-3bf44f48668a","/triggers-eventid":"507dd6b4-8715-4c6a-a89e-b703a800c230","/trigger":"github-listener"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can do the same for the other webhooks, this time with a lot less wording.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="check-kitchensink-cd-web-hook"><a class="anchor" href="#check-kitchensink-cd-web-hook"></a>Check Kitchensink CD Web Hook</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Send the <code>dummy</code> event to the Kitchensink CD web hook:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST -k  http://$(oc get route/el-kitchensink-cd-pl-pr-gitea-listener  -n $CICD_NAMESPACE -o jsonpath='{.spec.host}') \
+ -H 'X-GitHub-Event: dummy' -H 'X-GitHub-Event-Type: dummy' -H 'X-Gitea-Event: dummy' -H 'X-Gitea-Event-Type: dummy' \
+ -H 'Content-Type: application/json' \
+ --data '{ "dummy": "dummy"}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now run this command to see what happened on the other end, the event listener:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export USERNAME="%USERNAME%"
+export CICD_NAMESPACE="kitchensink-cicd-${USERNAME}"
+oc logs deployment/el-kitchensink-cd-pl-pr-gitea-listener -n ${CICD_NAMESPACE} | grep dummy</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. <a href="https://tekton.dev/docs/triggers/interceptors/#cel-interceptors" class="bare">https://tekton.dev/docs/triggers/interceptors/#cel-interceptors</a>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="11-pipeline-webhooks.html" class="query-params-link">11. Pipeline Webhooks</a></span>
+  <span class="next"><a href="13-end-to-end-test.html" class="query-params-link">13. End to End Test</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="./_/js/vendor/clipboard.js"></script>
+<script src="./_/js/site.js"></script>
+<script async src="./_/js/vendor/highlight.js"></script>
+  </body>
+</html>

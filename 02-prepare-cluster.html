@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Prepare Cluster :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/02-prepare-cluster.html">
+    <link rel="prev" href="01-setup.html">
+    <link rel="next" href="03-prepare-repositories.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="./_/css/site.css">
+<link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="./_/img/header_logo.png" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://atarazana.github.io/kitchensink-guide">Kitchensink Guide</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Books</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">CheatSheets</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">CheatSheet A</a>
+            <a class="navbar-item" href="#">CheatSheet B</a>
+            <a class="navbar-item" href="#">CheatSheet C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Upcoming Events</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Event A</a>
+            <a class="navbar-item" href="#">Event B</a>
+            <a class="navbar-item" href="#">Event C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Tutorial A</a>
+            <a class="navbar-item" href="#">Tutorial B</a>
+            <a class="navbar-item" href="#">Tutorial C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ROOT" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">Kitchensink Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-setup.html">1. Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#prerequisite">Prerequisites</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#openshift">Setup OpenShift 4</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#download-tutorial">Get tutorial sources</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-prepare-cluster.html">2. Prepare Cluster</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#deploying-core-components">Deploying core components</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#high-level-tests">High Level Tests</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#checking-quay">Checking Quay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#deploying-gitea">Deploying Gitea</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-prepare-repositories.html">3. Prepare Repositories</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#source-of-truth">Source Of Truth</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#explore-gitea-console">Explore Gitea console</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#create-git-pat">Create Git PAT</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#migrate-repositories">Migrate Repositories</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-s2i.html">4. Deploy JBoss EAP Application with S2I</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-s2i.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-argo.html">5. Deploy JBoss EAP Application with ArgoCD</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-argo.html#overview">Simplification, git-based automation</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-argo.html#deploy">Deploy Kitchensink app with ArgoCD</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="06-applicationset.html">6. ArgoCD + ApplicationSet</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#deploy">Deploy Kitchensink app with ArgoCD + ApplicationSet</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="07-kustomize.html">7. ArgoCD + Kustomize</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="08-helm.html">8. ArgoCD + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="10-helm-kustomized.html">10. ArgoCD + Helm + Kustomize</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="11-pipeline-webhooks.html">11. Pipeline Webhooks</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="12-test-cicd-pipelines.html">12. Check Pipeline Webhooks</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="12-test-cicd-pipelines.html#check-kitchensink-ci-web-hook">Check Kitchensink CI Web Hook</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="12-test-cicd-pipelines.html#check-kitchensink-cd-web-hook">Check Kitchensink CD Web Hook</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="13-end-to-end-test.html">13. End to End Test</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#introduction">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#current-status">Ⓐ Current Status</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#change-the-code">Ⓑ Change the code</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#run-ci-pipeline">Ⓒ Run CI pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-dev">Ⓓ Run CD pipeline (<code>dev</code>)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-test">Ⓔ Run CD pipeline (<code>test</code>)</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Kitchensink Guide</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Kitchensink Guide</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Kitchensink Guide</a></li>
+    <li><a href="02-prepare-cluster.html">2. Prepare Cluster</a></li>
+  </ul>
+</nav>
+  <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Prepare Cluster</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section is devoted to prepare the OpenShift cluster, hence something to be done before actually run the proper GitOps lab.</p>
+</div>
+<div class="paragraph">
+<p>Everything we do in this section requires that you have fulfilled the <a href="01-setup.html#prerequisite" class="xref page">prerequisites</a> section, that you&#8217;re logged in your OpenShift cluster and you have <code>cluster-admin</code> permissions on it.</p>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t have an OpenShift cluster and/or you don&#8217;t have <code>cluster-admin</code> permissions on it you could for instance using <a href="https://try.openshift.com">try.openshift.com</a>.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>Run this section only if you&#8217;re preparing the lab environment</strong> and as a <code>cluster-admin</code> user. If you just want to run the lab then proceed to the  <a href="03-prepare-repositories.html" class="xref page">next section</a>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>So if you are not already logged in, please do it now.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">oc login -u %USERNAME% -p %PASSWORD% --server=https://api.%BASE_SUBDOMAIN%:6443 --insecure-skip-tls-verify</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If the API server you&#8217;re trying to log in uses a self-signed certificate or otherwise non trusted CA you will receive this message</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">The server uses a certificate signed by an unknown authority.
+You can bypass the certificate check, but any data you send to the server could be intercepted by others.
+Use insecure connections? (y/n):</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Type 'y' only if you trust the server!</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploying-core-components"><a class="anchor" href="#deploying-core-components"></a>Deploying core components</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to run this guide we&#8217;re going to need several components, more prominently:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>ArgoCD</strong>, the GitOps engine supported by Red Hat through the <strong>OpenShift GitOps operator</strong></p>
+</li>
+<li>
+<p><strong>Tekton</strong>, the <em>de facto</em> kubernetes native CICD pipelines system supported by Red Hat through the <strong>OpenShift Pipelines operator</strong></p>
+</li>
+<li>
+<p><strong>Quay</strong>, Red Hat&#8217;s container registry</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s install all of them:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">until oc apply -k util/bootstrap/; do sleep 2; done</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This command execute <code>oc apply -k &#8230;&#8203;</code> until it&#8217;s done every 2 seconds&#8230;&#8203; this is so because behind scenes some tasks are run asynchronously and in the meantime some errors will be seen as in the next example. The number of errors decreases as components are installed until there are no errors.</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ until oc apply -k util/bootstrap/; do sleep 2; done
+namespace/gitea-system created
+namespace/kitchensink-infra created
+namespace/openshift-logging created
+namespace/openshift-operators-redhat created
+namespace/openshift-storage created
+namespace/quay-system created
+serviceaccount/guide-setup-job created
+serviceaccount/occli created
+serviceaccount/occli created
+
+...
+
+checluster.org.eclipse.che/devspaces configured
+route.route.openshift.io/s3-insecure unchanged
+template.template.openshift.io/eap72-basic-s2i configured
+group.user.openshift.io/gitops-guide-users unchanged
+devworkspacetemplate.workspace.devfile.io/web-terminal-exec unchanged
+devworkspacetemplate.workspace.devfile.io/web-terminal-tooling unchanged</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+After a few reconciliation cycles the final output is <code>unchanged</code> for all objects created by the scripts.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="high-level-tests"><a class="anchor" href="#high-level-tests"></a>High level tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s open the OpenShift Web Console and run some validation tests.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see something like.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You can skip the tour or run it if you want and have time.
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/openshift-console.png" alt="OpenShift Web Console">
+</div>
+</div>
+<div class="paragraph">
+<p>Now, take a look to the next picture, there are two arrows pointing to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The ArgoCD web console link</p>
+</li>
+<li>
+<p>The Pipelines section</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd-pipelines-test-1.png" alt="High level tests 1">
+</div>
+</div>
+<div class="paragraph">
+<p>You can see both then we&#8217;re on the good way.</p>
+</div>
+<div class="paragraph">
+<p>Open the ArgoCD web console then click on the "LOG IN VIA OPENSHIFT" button on the upper right corner and use your credentials:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The first time you successfully log in you&#8217;ll see an Authorize Access request, leave it "as is"  and click on the button that says "Allow selected permissions"
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd-login.png" alt="ArgoCD Log In">
+</div>
+</div>
+<div class="paragraph">
+<p>Finally if all went well you should land in the ArgoCD console and see this.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd-console.png" alt="ArgoCD Console">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="checking-quay"><a class="anchor" href="#checking-quay"></a>Checking Quay</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First of, open the OpenShift console and go to the topology view of namespace <code>quay-system</code>, use the following link.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/k8s/cluster/projects/quay-system/workloads?view=graph</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see something similar to this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/quay-installed-topology.png" alt="Quay Topology">
+</div>
+</div>
+<div class="paragraph">
+<p>Please open Quay Console in another tab or browser window.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see something like this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/quay-installed-login.png" alt="Quay Login">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploying-gitea"><a class="anchor" href="#deploying-gitea"></a>Deploying Gitea</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Run this command to deploy the Gitea operator and Gitea itself in your OpenShift cluster.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Gitea will be installed in <code>gitea-system</code> namespace
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">until oc apply -k util/gitea/; do sleep 2; done</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous command will retry until it&#8217;s all installed but <strong>we still need to check if it all works properly</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s have a look to the Gitea deployment object.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This command only works as expected once the Deployment object has been created by the operator, be patient and try again if you get.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">Error from server (NotFound): deployments.apps "repository" not found</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc rollout status deploy/repository -n gitea-system</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is the normal state after being successfully rolled out.</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">deployment "repository" successfully rolled out
+oc get deployment/repository -n gitea-system
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+repository   1/1     1            1           32m</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once Gitea has been rolled out, run this little smoke test.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -k -I <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/</a></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You should get something like this. If you don&#8217;t, be patient and run this command in 2 mins or so.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">HTTP/1.1 200 OK
+set-cookie: i_like_gitea=82e42fd387b6ea7a; Path=/; HttpOnly; SameSite=Lax
+date: Mon, 25 Oct 2021 08:06:22 GMT
+set-cookie: 5b3fc896c2f6eedc568a6b59cd1862ea=23d42cb20150039ef52136e8993c6865; path=/; HttpOnly; Secure; SameSite=None
+cache-control: private</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>While Gitea is being installed a <code>Job</code> will in it&#8217;s turn create some users in Gitea.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s wait until the job is complete or times out after 120s with the following command:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc wait --for=condition=complete --timeout=120s job/gitea-setup -n gitea-system</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Copy the next url and open it in a new tab, please use these credentials:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>USERNAME:</strong> user1</p>
+</li>
+<li>
+<p><strong>PASSWORD:</strong> openshift</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/user/login</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you just want to create one user do this.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Ignore error "Internal Server Error" user %USERNAME% should have been created.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">GITEA_INSTALL_TOKEN=$(curl -k -s -XPOST -H "Content-Type: application/json" \
+  -d '{"name":"install"}' \
+  -u %USERNAME%:openshift \
+  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens</a> | jq -r .sha1)
+echo "GITEA_INSTALL_TOKEN=${GITEA_INSTALL_TOKEN}"
+
+curl -k -X 'POST' \
+    "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/admin/users?access_token=${GITEA_INSTALL_TOKEN}" \
+    -H 'accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{
+          "email": "%USERNAME%@example.com",
+          "full_name": "User %USERNAME%",
+          "login_name": "%USERNAME%",
+          "must_change_password": false,
+          "password": "openshift",
+          "send_notify": true,
+          "source_id": 0,
+          "username": "%USERNAME%",
+          "visibility" : "public"
+    }'</code></pre>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="01-setup.html" class="query-params-link">1. Setup</a></span>
+  <span class="next"><a href="03-prepare-repositories.html" class="query-params-link">3. Prepare Repositories</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="./_/js/vendor/clipboard.js"></script>
+<script src="./_/js/site.js"></script>
+<script async src="./_/js/vendor/highlight.js"></script>
+  </body>
+</html>

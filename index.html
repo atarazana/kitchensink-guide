@@ -87,69 +87,141 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="02-s2i.html">2. Deploy JBoss EAP Application with S2I</a>
+    <a class="nav-link" href="02-prepare-cluster.html">2. Prepare Cluster</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-s2i.html#overview">Overview</a>
+    <a class="nav-link" href="02-prepare-cluster.html#deploying-core-components">Deploying core components</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
+    <a class="nav-link" href="02-prepare-cluster.html#high-level-tests">High Level Tests</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
+    <a class="nav-link" href="02-prepare-cluster.html#checking-quay">Checking Quay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#deploying-gitea">Deploying Gitea</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="03-argo.html">3. Deploy JBoss EAP Application with ArgoCD</a>
+    <a class="nav-link" href="03-prepare-repositories.html">3. Prepare Repositories</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-argo.html#overview">Simplification, git-based automation</a>
+    <a class="nav-link" href="03-prepare-repositories.html#source-of-truth">Source Of Truth</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-argo.html#deploy">Deploy Kitchensink app with ArgoCD</a>
+    <a class="nav-link" href="03-prepare-repositories.html#explore-gitea-console">Explore Gitea console</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#create-git-pat">Create Git PAT</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#migrate-repositories">Migrate Repositories</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="04-applicationset.html">4. ArgoCD + ApplicationSet</a>
+    <a class="nav-link" href="04-s2i.html">4. Deploy JBoss EAP Application with S2I</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="04-applicationset.html#overview">Overview</a>
+    <a class="nav-link" href="04-s2i.html#overview">Overview</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="04-applicationset.html#deploy">Deploy Kitchensink app with ArgoCD + ApplicationSet</a>
+    <a class="nav-link" href="04-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
   </li>
 </ul>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="05-kustomize.html">5. ArgoCD + Kustomize</a>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="06-helm.html">6. ArgoCD + Helm</a>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="07-cicd.html">7. CI/CD Pipelines</a>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="08-helm-kustomized.html">8. ArgoCD + Helm + Kustomize</a>
+    <a class="nav-link" href="05-argo.html">5. Deploy JBoss EAP Application with ArgoCD</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="08-helm-kustomized.html#overview">Overview</a>
+    <a class="nav-link" href="05-argo.html#overview">Simplification, git-based automation</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="08-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="08-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+    <a class="nav-link" href="05-argo.html#deploy">Deploy Kitchensink app with ArgoCD</a>
   </li>
 </ul>
   </li>
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="09-pipeline-webhooks.html">9. Pipeline Webhooks</a>
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="06-applicationset.html">6. ArgoCD + ApplicationSet</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#deploy">Deploy Kitchensink app with ArgoCD + ApplicationSet</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="07-kustomize.html">7. ArgoCD + Kustomize</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="08-helm.html">8. ArgoCD + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="10-helm-kustomized.html">10. ArgoCD + Helm + Kustomize</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="11-pipeline-webhooks.html">11. Pipeline Webhooks</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="12-test-cicd-pipelines.html">12. Check Pipeline Webhooks</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="12-test-cicd-pipelines.html#check-kitchensink-ci-web-hook">Check Kitchensink CI Web Hook</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="12-test-cicd-pipelines.html#check-kitchensink-cd-web-hook">Check Kitchensink CD Web Hook</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="13-end-to-end-test.html">13. End to End Test</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#introduction">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#current-status">Ⓐ Current Status</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#change-the-code">Ⓑ Change the code</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#run-ci-pipeline">Ⓒ Run CI pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-dev">Ⓓ Run CD pipeline (<code>dev</code>)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-test">Ⓔ Run CD pipeline (<code>test</code>)</a>
+  </li>
+</ul>
   </li>
 </ul>
   </li>

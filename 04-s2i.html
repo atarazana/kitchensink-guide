@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Deploy JBoss EAP Application with S2I :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/04-s2i.html">
+    <link rel="prev" href="03-prepare-repositories.html">
+    <link rel="next" href="05-argo.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="./_/css/site.css">
+<link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="./_/img/header_logo.png" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://atarazana.github.io/kitchensink-guide">Kitchensink Guide</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Books</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">CheatSheets</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">CheatSheet A</a>
+            <a class="navbar-item" href="#">CheatSheet B</a>
+            <a class="navbar-item" href="#">CheatSheet C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Upcoming Events</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Event A</a>
+            <a class="navbar-item" href="#">Event B</a>
+            <a class="navbar-item" href="#">Event C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Tutorial A</a>
+            <a class="navbar-item" href="#">Tutorial B</a>
+            <a class="navbar-item" href="#">Tutorial C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="ROOT" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">Kitchensink Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-setup.html">1. Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#prerequisite">Prerequisites</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#openshift">Setup OpenShift 4</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-setup.html#download-tutorial">Get tutorial sources</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-prepare-cluster.html">2. Prepare Cluster</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#deploying-core-components">Deploying core components</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#high-level-tests">High Level Tests</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#checking-quay">Checking Quay</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-prepare-cluster.html#deploying-gitea">Deploying Gitea</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-prepare-repositories.html">3. Prepare Repositories</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#source-of-truth">Source Of Truth</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#explore-gitea-console">Explore Gitea console</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#create-git-pat">Create Git PAT</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-prepare-repositories.html#migrate-repositories">Migrate Repositories</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-s2i.html">4. Deploy JBoss EAP Application with S2I</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#redeploy">Redeploying a JBOSS EAP application</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="05-argo.html">5. Deploy JBoss EAP Application with ArgoCD</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-argo.html#overview">Simplification, git-based automation</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="05-argo.html#deploy">Deploy Kitchensink app with ArgoCD</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="06-applicationset.html">6. ArgoCD + ApplicationSet</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="06-applicationset.html#deploy">Deploy Kitchensink app with ArgoCD + ApplicationSet</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="07-kustomize.html">7. ArgoCD + Kustomize</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="08-helm.html">8. ArgoCD + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="10-helm-kustomized.html">10. ArgoCD + Helm + Kustomize</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#overview">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#deploy">Deploy Kitchensink app with ArgoCD + Kustomize + Helm</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="10-helm-kustomized.html#benefits">Benefits of the GitOps/ArgoCD model</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="11-pipeline-webhooks.html">11. Pipeline Webhooks</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="12-test-cicd-pipelines.html">12. Check Pipeline Webhooks</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="12-test-cicd-pipelines.html#check-kitchensink-ci-web-hook">Check Kitchensink CI Web Hook</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="12-test-cicd-pipelines.html#check-kitchensink-cd-web-hook">Check Kitchensink CD Web Hook</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="13-end-to-end-test.html">13. End to End Test</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#introduction">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#current-status">Ⓐ Current Status</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#change-the-code">Ⓑ Change the code</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#run-ci-pipeline">Ⓒ Run CI pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-dev">Ⓓ Run CD pipeline (<code>dev</code>)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="13-end-to-end-test.html#running-cd-pipeline-test">Ⓔ Run CD pipeline (<code>test</code>)</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Kitchensink Guide</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Kitchensink Guide</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Kitchensink Guide</a></li>
+    <li><a href="04-s2i.html">4. Deploy JBoss EAP Application with S2I</a></li>
+  </ul>
+</nav>
+  <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
+</div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Deploy JBoss EAP Application with S2I</h1>
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://github.com/openshift/source-to-image">Source-to-Image (S2I)</a> is a framework that makes it easy to build images starting from your source code. In reality S2I can start from your source code, a file (usually a binary), a bunch of files or a Dockerfile.</p>
+</div>
+<div class="paragraph">
+<p>Here we&#8217;re going to concentrate on the first strategy, building our application image starting from the code in a git repository.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The <strong>main advantages</strong> of using S2I for building images are the <strong>ease of use</strong> for developers and being a <strong>repeatable process</strong>.
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i.png" alt="s2i">
+</div>
+<div class="title">Figure 1. Source code deployment process</div>
+</div>
+<div class="sect2">
+<h3 id="but-how-does-it-work"><a class="anchor" href="#but-how-does-it-work"></a>But How Does It Work?</h3>
+<div class="paragraph">
+<p>Well as you can see in the previous image building an image that runs your code comprises three phases:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Build App:</strong> Compiling code, this is language specific and can imply downloading dependencies, compiling, linking, etc. All the tools needed should be present at the builder image. The output of this phase is a binary file or a jar, along with libraries if necessary, etc.</p>
+</li>
+<li>
+<p><strong>Build Image:</strong> In this phase we put the output of the previous phase in a known location inside the image so that it can be run later as a container. The output of this phase is an image based on the builder image or a specific image with the minimum required components for running and your application.</p>
+</li>
+<li>
+<p><strong>Deploy:</strong> Finally we need to deploy our image to a kubernetes cluster and this means referring to our application image from a <strong>Deployment</strong>, <strong>DeploymentConfig</strong>, <strong>StatefulSet</strong>, <strong>DaemonSet</strong>, <strong>Job</strong>, etc.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s go a bit deeper with the explanation, in order to build your application you will need a builder image designed according to the S2I framework. In general, you will use a supported image by Red Hat, it can be for Java, Python, .Net, etc. go <a href="https://docs.openshift.com/container-platform/4.12/openshift_images/using_images/using-s21-images.html">here</a> but if you need or want to create your own builder image you can go <a href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.12/html/images/creating-images#images-create-s2i-scripts_create-images">here</a> to learn all you need to do it.</p>
+</div>
+<div class="paragraph">
+<p>In a nutshell a builder image is an image that includes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>All the tools you need to compile</strong>, download dependencies, etc. for a given programming language.</p>
+</li>
+<li>
+<p><strong>Source-to-image scripts:</strong> You can write source-to-image (S2I) scripts in any programming language, as long as the scripts are executable inside the builder image. S2I supports multiple options providing <code>assemble/run/save-artifacts</code> scripts.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The two more important scripts are <code>assemble</code> and <code>run</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong><code>assemble</code></strong> &#8594; The assemble script builds the application artifacts from a source and places them into appropriate directories inside the image. This script is required.</p>
+</li>
+<li>
+<p><strong><code>run</code></strong> &#8594;  The run script executes your application. This script is required.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="being-more-specific"><a class="anchor" href="#being-more-specific"></a>Being More Specific</h3>
+<div class="paragraph">
+<p>Ok, for now the explanation applies to any language/framework, let&#8217;s get a bit deeper for our case.</p>
+</div>
+<div class="paragraph">
+<p>First, you will be using a JBoss EAP builder image &#8658; <code>registry.redhat.io/jboss-eap-7/eap72-openshift:latest</code></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started"><a class="anchor" href="#getting-started"></a>Let&#8217;s get started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Everything we do in this section requires that you have fulfilled the <a href="01-setup.html#prerequisite" class="xref page">prerequisites</a> section and you&#8217;re logged in your OpenShift cluster.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Log in <strong>as normal user</strong>, <span class="underline">not as a cluster admin</span>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>So if not already logged in, please do it now.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you&#8217;re using <code>DevSpaces</code> or the <code>web-terminal</code>, you don&#8217;t need to log in, you&#8217;re already logged in, try this command <code>oc whoami</code> and check that the response is: %USERNAME%.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">oc login -u %USERNAME% -p %PASSWORD% --server=https://api.%BASE_SUBDOMAIN%:6443</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploying a JBOSS EAP 7.2 application manually</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s deploy the Kitchensink App!</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This template deploys our application using a <code>DeploymentConfig</code> instead of the kubernetes <code>Deployment</code> object, starting in chapter <code>ArgoCD + Helm</code> you will see that we&#8217;ve moved from <code>DeploymentConfig</code> to <code>Deployment</code>.</p>
+</div>
+<div class="paragraph">
+<p><mark>TODO</mark></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>First of all, create the project that will host the application:</p>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-project s2i-%USERNAME%</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Please open the next link to watch the progress of the chapter.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/s2i-%USERNAME%?view=graph</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Deploy the PostgreSQL database for the kitchensink app:</p>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-app --name=kitchensink-db \
+ -e POSTGRESQL_USER=luke \
+ -e POSTGRESQL_PASSWORD=secret \
+ -e POSTGRESQL_DATABASE=kitchensink centos/postgresql-10-centos7 \
+ --as-deployment-config=false
+
+oc label deployment/kitchensink-db app.kubernetes.io/part-of=kitchensink-app --overwrite=true &amp;&amp; \
+oc label deployment/kitchensink-db app.openshift.io/runtime=postgresql --overwrite=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code>oc label</code> commands adds decoration to our deployment (used for the <mark>Topology view</mark>):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>app.openshift.io/runtime</code>: Icon displayed in the node</p>
+</li>
+<li>
+<p><code>app.kubernetes.io/part-of</code>: App grouping</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Deploy the kitchensink app:</p>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-app --template=eap72-basic-s2i \
+-p APPLICATION_NAME=kitchensink \
+-p MAVEN_ARGS_APPEND="-Dcom.redhat.xpaas.repo.jbossorg" \
+-p SOURCE_REPOSITORY_URL="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink" \
+-p SOURCE_REPOSITORY_REF=main \
+-p CONTEXT_DIR=.</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>In order to deploy the Kitchensink app, we use a template, <code>eap72-basic-s2i</code>.</p>
+</div>
+<div class="paragraph">
+<p>A template describes a set of objects that can be parameterized and processed to produce a list of objects for creation by OpenShift Container Platform. A template can be processed to create anything you have permission to create within a project, for example services, build configurations, and deployment configurations. A template can also define a set of labels to apply to every object defined in the template.</p>
+</div>
+<div class="paragraph">
+<p>You can create a list of objects from a template using the CLI or, if a template has been uploaded to your project or the global template library, using the web console.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Adjust the context of the application and add <em>decoration</em> (labels and annotation):</p>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc set env dc/kitchensink DB_HOST=kitchensink-db DB_PORT=5432 DB_NAME=kitchensink DB_USERNAME=luke DB_PASSWORD=secret &amp;&amp; \
+oc set probe dc/kitchensink --readiness --initial-delay-seconds=90 --failure-threshold=5 &amp;&amp; \
+oc set probe dc/kitchensink --liveness --initial-delay-seconds=90 --failure-threshold=5
+
+oc label dc/kitchensink app.kubernetes.io/part-of=kitchensink-app --overwrite=true &amp;&amp; \
+oc label dc/kitchensink app.openshift.io/runtime=jboss --overwrite=true
+
+oc annotate dc/kitchensink \
+ app.openshift.io/connects-to='[{"apiVersion":"apps/v1","kind":"Deployment","name":"kitchensink-db"}]' \
+ --overwrite=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code>app.openshift.io/connects-to</code> annotation is used to connect the nodes.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Open the next link and click on the <code>in progress</code> icon to see the log of the building process.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/s2i-%USERNAME%?view=graph</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-01.png" alt="Build Config link">
+</div>
+</div>
+<div class="paragraph">
+<p>Eventually you will see a trace like this &#8658; <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; Running install.sh &lt;&lt;&lt;&lt;&lt;&lt;</code>. This is a sign that the S2I building process has detected our script to prepare the image as desired.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-02.png" alt="Build Log">
+</div>
+</div>
+<div class="paragraph">
+<p><mark>Explain this better and according to the explanations given before in this chapter</mark></p>
+</div>
+<div class="paragraph">
+<p>After the building process has finished the image is pushed and the <code>DeploymentConfig</code> object is updated accordingly to use the new image. If you go the <code>Topology</code> view you should see this.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-04.png" alt="Deployed">
+</div>
+</div>
+<div class="paragraph">
+<p>Time to check if our application works as expected. Please click on the route icon.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-05.png" alt="Checking">
+</div>
+</div>
+<div class="paragraph">
+<p>You should see something like this.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-06.png" alt="Result">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="redeploy"><a class="anchor" href="#redeploy"></a>Redeploying a JBOSS EAP application</h2>
+<div class="sectionbody">
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You have to wait until the application has been deployed, in the previous item, in order to redeploy it!</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s explore a quick way to test <em>minor</em> changes in our application. In this case you will package your JBoss EAP application locally and later you will use <code>oc cp</code> to copy the WAR file directly to the deployment folder of JBoss EAP already running in OCP.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Use this way of deployment only in a <mark>development environment</mark>, <mark><strong>NEVER</strong> in productive environments</mark>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s make a change in our application, open file <code>$TUTORIAL_HOME/src/main/webapp/index.xhtml</code> (the Kitchensink code repo) and go to line 27 approx. and make a change. For instance change this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&lt;div&gt;
+    &lt;p&gt;You have successfully deployed the JBoss Application in OpenShift&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&lt;div&gt;
+    &lt;p&gt;You have successfully deployed the JBoss Application in OpenShift !!!&lt;/p&gt;
+&lt;/div</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then please, run these commands:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>oc cp</code> command doesn&#8217;t show a progress bar and usually is quite fast, if there are no errors no messages will be surfaced, just proceed with the tests.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc project s2i-%USERNAME%
+
+POD_NAME=$(oc get pod -l application=kitchensink -o json | jq -r .items[0].metadata.name)
+echo "POD_NAME=${POD_NAME}"
+
+mvn package -Popenshift
+
+oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Open this link to check if the change is already applied.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Take into account that for a short period of time the app is being replaced and you could get a 404 error if you&#8217;re quick enough.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://kitchensink-s2i-%USERNAME%.apps.%BASE_SUBDOMAIN%/index.jsf</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You should see something like this:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/s2i-03.png" alt="After hot reload">
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="03-prepare-repositories.html" class="query-params-link">3. Prepare Repositories</a></span>
+  <span class="next"><a href="05-argo.html" class="query-params-link">5. Deploy JBoss EAP Application with ArgoCD</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="./_/js/vendor/clipboard.js"></script>
+<script src="./_/js/site.js"></script>
+<script async src="./_/js/vendor/highlight.js"></script>
+  </body>
+</html>
