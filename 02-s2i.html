@@ -194,10 +194,22 @@
 <h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><a href="https://github.com/openshift/source-to-image">Source-to-Image (S2I)</a> is a framework that makes it easy to write images that take application source code as an input and produce a new image that runs the assembled application as output.</p>
+<p><a href="https://github.com/openshift/source-to-image">Source-to-Image (S2I)</a> is a framework that makes it easy to build images starting from your source code. In reality S2I can start from your source code, a file (usually a binary), a bunch of files or a Dockerfile.</p>
 </div>
 <div class="paragraph">
-<p>The main advantage of using S2I for building reproducible container images is the ease of use for developers.</p>
+<p>Here we&#8217;re going to concentrate on the first strategy, building our application image starting from the code in a git repository.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The <strong>main advantages</strong> of using S2I for building images are the <strong>ease of use</strong> for developers and being a <strong>repeatable process</strong>.
+</td>
+</tr>
+</table>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -205,8 +217,62 @@
 </div>
 <div class="title">Figure 1. Source code deployment process</div>
 </div>
+<div class="sect2">
+<h3 id="but-how-does-it-work"><a class="anchor" href="#but-how-does-it-work"></a>But How Does It Work?</h3>
 <div class="paragraph">
-<p><mark>TODO EXPLAIN THE S2I NITTY GRITTY!!!!!!</mark></p>
+<p>Well as you can see in the previous image building an image that runs your code comprises three phases:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Build App:</strong> Compiling code, this is language specific and can imply downloading dependencies, compiling, linking, etc. All the tools needed should be present at the builder image. The output of this phase is a binary file or a jar, along with libraries if necessary, etc.</p>
+</li>
+<li>
+<p><strong>Build Image:</strong> In this phase we put the output of the previous phase in a known location inside the image so that it can be run later as a container. The output of this phase is an image based on the builder image or a specific image with the minimum required components for running and your application.</p>
+</li>
+<li>
+<p><strong>Deploy:</strong> Finally we need to deploy our image to a kubernetes cluster and this means referring to our application image from a <strong>Deployment</strong>, <strong>DeploymentConfig</strong>, <strong>StatefulSet</strong>, <strong>DaemonSet</strong>, <strong>Job</strong>, etc.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s go a bit deeper with the explanation, in order to build your application you will need a builder image designed according to the S2I framework. In general, you will use a supported image by Red Hat, it can be for Java, Python, .Net, etc. go <a href="https://docs.openshift.com/container-platform/4.12/openshift_images/using_images/using-s21-images.html">here</a> but if you need or want to create your own builder image you can go <a href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.12/html/images/creating-images#images-create-s2i-scripts_create-images">here</a> to learn all you need to do it.</p>
+</div>
+<div class="paragraph">
+<p>In a nutshell a builder image is an image that includes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>All the tools you need to compile</strong>, download dependencies, etc. for a given programming language.</p>
+</li>
+<li>
+<p><strong>Source-to-image scripts:</strong> You can write source-to-image (S2I) scripts in any programming language, as long as the scripts are executable inside the builder image. S2I supports multiple options providing <code>assemble/run/save-artifacts</code> scripts.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The two more important scripts are <code>assemble</code> and <code>run</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong><code>assemble</code></strong> &#8594; The assemble script builds the application artifacts from a source and places them into appropriate directories inside the image. This script is required.</p>
+</li>
+<li>
+<p><strong><code>run</code></strong> &#8594;  The run script executes your application. This script is required.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="being-more-specific"><a class="anchor" href="#being-more-specific"></a>Being More Specific</h3>
+<div class="paragraph">
+<p>Ok, for now the explanation applies to any language/framework, let&#8217;s get a bit deeper for our case.</p>
+</div>
+<div class="paragraph">
+<p>First, you will be using a JBoss EAP builder image &#8658; <code>registry.redhat.io/jboss-eap-7/eap72-openshift:latest</code></p>
+</div>
 </div>
 </div>
 </div>
