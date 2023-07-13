@@ -10,7 +10,7 @@ endif::[]
 ** xref:02-prepare-cluster.adoc#deploying-core-components[Deploying core components]
 ** xref:02-prepare-cluster.adoc#high-level-tests[High Level Tests]
 ** xref:02-prepare-cluster.adoc#checking-quay[Checking Quay]
-** xref:02-prepare-cluster.adoc#deploying-gitea[Deploying Gitea]
+** xref:02-prepare-cluster.adoc#checking-gitea[Checking Gitea]
 
 * xref:03-prepare-repositories.adoc[3. Prepare Repositories]
 ** xref:03-prepare-repositories.adoc#source-of-truth[Source Of Truth]

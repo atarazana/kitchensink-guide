@@ -146,20 +146,10 @@ image::quay-installed-login.png[Quay Login]
 
 endif::[]
 
-[#deploying-gitea]
-== Deploying Gitea
-
-Run this command to deploy the Gitea operator and Gitea itself in your OpenShift cluster.
+[#checking-gitea]
+== Checking Gitea
 
 NOTE: Gitea will be installed in `gitea-system` namespace
-
-[.console-input]
-[source,bash, subs="+macros,+attributes"]
-----
-until oc apply -k util/gitea/; do sleep 2; done
-----
-
-The previous command will retry until it's all installed but *we still need to check if it all works properly*.
 
 include::partial$gitea-tests.adoc[]
 
@@ -183,7 +173,3 @@ Copy the next url and open it in a new tab, please use these credentials:
 ----
 https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/user/login
 ----
-
-If you just want to create one user do this.
-
-include::partial$gitea-create-user.adoc[]
