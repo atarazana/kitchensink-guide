@@ -1,0 +1,122 @@
+= End To End Test
+include::_attributes.adoc[]
+
+[#introduction]
+== Introduction
+
+So far, *you have deployed your application and CICD pipelines*; additionally you *have created webhooks* and they are, apparently, working properly but we will never know for sure unless we make a change in the code and see if it all works as expected and we see that change being promoted through our environments. *It's about time for an end to end test!*
+
+The next diagram summarizes the end to end test you are going to run. As you can see, you will make a change to the code in the _Kitchensink API_ (*kitchensink*) which, via a webhook, will trigger the CI pipeline and hence the promotion of code. 
+
+image::end-to-end-pipeline-1.png[End to End Pipeline Test]
+
+These are the high level sequence of events (only relevant steps are mentioned, more details later on):
+
+1. Change the code and push those changes to the repository of code (*kitchensink* in this case).
+2. The *_Push Event_* is sent by the webhook to the *kitchensink CI Pipeline Event Listener* which in its turn triggers the pipeline by creating a *_PipelineRun_* object.
+3. The `build` step builds the image for *kitchensink* and pushes it to the registry, the hash of the new image is used to update the _kustomization.yaml_ file in the _dev overlay_, in a short-lived feature-branch in the configuration repository (*kitchensink-conf*)
+4. A *_Pull Request_* is created for *merging* the `feature branch` with the `main branch` in the `pr-create` step.
+5. The PR has to be confirmed so that changes are effectively merged into the main branch (this is a manual step)
+6. Once the PR is confirmed, the merge is effective and a *_Pull Request Event_* is sent by the corresponding webhook to the *kitchensink CD Pipeline Event Listener* which in its turn triggers the pipeline by creating another *_PipelineRun_* object. At this point the hash of the new image has replaced the previous one.
+7. The _CD pipeline fetches configuration not code_ and _in parallel triggers the sync of_ *kitchensink-kustomized-helm-app-dev* which means the new hash of the image is replaced in the Deployment object and hence a rolling update is triggered. Once the app is in sync a new PR is created to promote the code to the next environment.
+
+Steps 6 and 7 are repeated for each environment until the code has been promoted to all of them.
+
+Ok, done with the introduction, let's get down to work!
+
+[#current-status]
+== Ⓐ Current Status
+
+#TODO#
+
+[#change-the-code]
+== Ⓑ Change the code
+
+#TODO#
+
+[#run-ci-pipeline]
+== Ⓒ Run the CI pipeline
+
+#TODO#
+
+[#running-cd-pipeline-dev]
+== Ⓓ Run the CD pipeline (`dev`)
+
+#TODO#
+
+[#approving-pr-dev]
+=== Approve PR
+
+Well, it's time to continue where we left it, so go back to the PR and click on the `Create Merge Commit` then tick the `Delete Branch` check-box (we wont need that branch anymore) and click again on `Create Merge Commit`.
+
+[#cd-pipeline-triggered-dev]
+=== CD Pipeline Triggered
+
+The *Pull Request* event is sent out by the webhook to the *Kitchensink CD Pipeline `EventListener`* where some mapping and filtering will trigger the pipeline with a `PipelineRun` object populated with the necessary information.
+
+Please, open the next link or navigate to *Pipelines* in project `kitchensink-cicd-{username}` you will see the pipeline progressing.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{openshift-console-host}/dev-pipelines/ns/kitchensink-cicd-{username}
+----
+
+NOTE: As you have done previously you can click on the *PLR* object to drill down and have a look to the logs.
+
+#IMAGE TODO#
+
+Have a look at the pipeline details. As you can see there are several tasks, namely:
+
+- `argocd-sync` triggers the refresh and sync of descriptors coming from the corresponding overlay{empty}footnote:[https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays], `dev` in this case
+- `fetch-config-repository` clones the `kitchensink-conf` configuration repository
+- `update-image` creates a short-lived branch and updates the image hash in the `kustomization.yaml` file for the corresponding overlay
+- `github-pr-create` creates a PR for Github (not run)
+- `gitea-pr-create` creates a PR for Gitea
+
+#IMAGE TODO#
+
+[#argocd-app-synced-dev]
+=== ArgoCD App Synced
+
+#TODO#
+
+[#checking-openshift-console-dev]
+=== Checking OpenShift Console
+
+#TODO#
+
+[#checking-kitchensink-status-dev]
+=== Checking Kitchensink Status
+
+#TODO#
+
+[#running-cd-pipeline-test]
+== Ⓔ Run the CD pipeline (`test`)
+
+This time we're going to do this a bit faster and with less talking. This chapter is essentially the same as the previous one, but if you have access to an additional cluster and you have run section xref:04-prepare-argocd.adoc#register-additional-clusters[Register Additional Clusters], then you will see how *Kitchensink* is also updated in the additional cluster.
+
+[#approving-pr-test]
+=== Approve PR
+
+#TODO#
+
+[#cd-pipeline-triggered-test]
+=== CD Pipeline Triggered
+
+#TODO#
+
+[#argocd-app-synced-test]
+=== ArgoCD App Synced
+
+#TODO#
+
+[#checking-openshift-console-test]
+=== Checking OpenShift Console
+
+#TODO#
+
+[#checking-kitchensink-status-test]
+=== Checking Kitchensink Status
+
+#TODO#

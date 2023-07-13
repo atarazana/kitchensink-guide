@@ -1,15 +1,63 @@
 Before we start setting up the environment, let’s clone the tutorial sources and set the `TUTORIAL_HOME` environment variable to point to the root directory of the tutorial:
 
+[CAUTION]
+====
+*If you choose to use web-terminal, stick to that decision throughout the guide.*
+
+Next, *open the following link*, *create a new project* called: `terminal-{username}` and *click on `Start`*. If credentials are required use these:
+
+- *USERNAME:* {username}
+- *PASSWORD:* {password}
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{openshift-console-host}/terminal
+----
+====
+
+[tabs]
+====
+laptop::
++
+--
 [.console-input]
 [source,bash,subs="attributes+,+macros"]
 ----
-git clone https://{gitea-host}/{username}/kitchensink
-git clone https://{gitea-host}/{username}/kitchensink-conf
+git clone {tutorial-url} {folder}
 ----
 
 [.console-input]
 [source,bash,subs="attributes+,+macros"]
 ----
-export CODE_HOME="$(pwd)/kitchensink"
-export CONF_HOME="$(pwd)/kitchensink-conf"
+export TUTORIAL_HOME="$(pwd)/{folder}"
 ----
+
+[.console-input]
+[source,bash,subs="attributes+,+macros"]
+----
+cd $TUTORIAL_HOME
+----
+--
+web-terminal::
++
+--
+[.console-input]
+[source,bash,subs="attributes+,+macros"]
+----
+cd ~/scratch && git clone {tutorial-url} {folder}
+----
+
+[.console-input]
+[source,bash,subs="attributes+,+macros"]
+----
+export TUTORIAL_HOME="$(pwd)/{folder}"
+----
+
+[.console-input]
+[source,bash,subs="attributes+,+macros"]
+----
+cd $TUTORIAL_HOME
+----
+--
+====

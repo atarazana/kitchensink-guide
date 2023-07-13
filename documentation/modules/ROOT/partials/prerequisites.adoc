@@ -3,6 +3,8 @@ include::versions.adoc[]
 The following CLI tools are required for running the exercises in this tutorial. 
 Please have them installed and configured before you get started with any of the tutorial chapters.
 
+NOTE: It is also necessary to have a working #Java# and #Maven# environment (at least for the s2i chapter).
+
 [cols="4*^,4*.",options="header,+attributes"]
 |===
 |**Tool**|**macOS**|**Fedora**|**windows**

@@ -1,0 +1,126 @@
+= ArgoCD + Kustomize
+include::_attributes.adoc[]
+
+[#deploy]
+== Deploy Kitchensink app with ArgoCD + Kustomize
+
+Now we are going to deploy the same application in the same way, but instead of using descriptors directly we are going to customize them for the corresponding environment (overlay) with ``kustomize``. You will deploy two environments (overlays in kustomize jargon) `dev` and `test` in two namespaces set by a list generator.
+
+. `dev` -> `kitchensink-dev-{username}`
+. `test` -> `kitchensink-test-{username}`
+
+Before you actually can deploy the application using kustomize you have to change the original target namespaces (`demo-5-dev` and `demo-5-test`) coming from the original repository you migrated from. In a nutshell you have to change:
+
+. `demo-5-dev` -> `kitchensink-dev-{username}`
+. `demo-5-test` -> `kitchensink-test-{username}`
+
+So, let's get started, please copy and paste the following link and open it in a browser. Use this credentials to log in.
+
+- *Username:* {username}
+- *Password:* {static-password}
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/kustomize/dev/kustomization.yml#L5
+----
+
+Once there, you have to change this (around line 5):
+
+[source,yaml,subs="attributes+,+macros"]
+----
+namespace: demo-5-dev
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+namespace: kustomize-dev-{username}
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
+
+Now it's the turn of the `test` namespace. Please open the next link.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/kustomize/test/kustomization.yml#L5
+----
+
+Once there, you have to change this (around line 5):
+
+[source,yaml,subs="attributes+,+macros"]
+----
+namespace: demo-5-test
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+namespace: kustomize-test-{username}
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
+[#deploy-app]
+== Deploy Using Kustomize and an ApplicationSet
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+export USERNAME="{username}"
+cat <<EOF | oc apply -n {root-apps-namespace} -f -
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kitchensink-kustomize-$\{USERNAME}
+  namespace: openshift-gitops
+  labels:
+    argocd-root-app: "true"
+    username: $\{USERNAME}
+spec:
+  generators:
+  - list:
+      elements:
+      - env: dev
+        ns: kustomize-dev-$\{USERNAME}
+        desc: "Kustomize Dev"
+      - env: test
+        ns: kustomize-test-$\{USERNAME}
+        desc: "Kustomize Test"
+  template:
+    metadata:
+      name: kitchensink-kustomize-app-{{ env }}-$\{USERNAME}
+      namespace: openshift-gitops
+      labels:
+        kitchensink-root-app: "true"
+        username: $\{USERNAME}
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+    spec:
+      destination:
+        namespace: '{{ ns }}'
+        name: in-cluster
+      ignoreDifferences:
+      - group: apps.openshift.io
+        kind: DeploymentConfig
+        jqPathExpressions:
+          - .spec.template.spec.containers[].image
+      project: default
+      syncPolicy:
+        automated:
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      source:
+        path: kustomize/{{ env }}
+        repoURL: "https://{gitea-host}/{username}/kitchensink-conf"
+        targetRevision: main
+EOF
+----

@@ -1,0 +1,157 @@
+= ArgoCD + ApplicationSet
+include::_attributes.adoc[]
+
+[#overview]
+== Overview
+
+Now we are going to deploy the same application in the same way, but in two namespaces at the same time.
+
+We will use an ``ApplicationSet`` for this.
+
+[source, yaml,subs="+macros,+attributes"]
+----
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kitchensink-basic
+  namespace: openshift-gitops
+  labels:
+    argocd-root-app: "true"
+spec:
+  generators: <1>
+  - list:
+      elements:
+      - env: demo-4a
+        desc: "Demo 4a"
+      - env: demo-4b
+        desc: "Demo 4b"
+  template:
+    metadata:
+      name: kitchensink-basic-app-{{ env }}
+      namespace: openshift-gitops
+      labels:
+        kitchensink-root-app: "true"
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+    spec:
+      destination:
+        namespace: '{{ env }}'
+        name: in-cluster
+      ignoreDifferences:
+      - group: apps.openshift.io
+        kind: DeploymentConfig
+        jqPathExpressions:
+          - .spec.template.spec.containers[].image
+      project: default
+      syncPolicy:
+        automated:
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      source: <2>
+        path: basic/base
+        repoURL: "https://{gitea-host}/{username}/kitchensink-conf"
+        targetRevision: main
+----
+
+[NOTE]
+====
+<1> We introduce the concept of ``generators``. One Application per element.
+
+<2> Being the source the same, what we will do is to deploy the same application in two different environments (in our case, 2 different projects/namespaces).
+====
+
+The ``ApplicationSet`` controller is a Kubernetes controller that adds support for an ApplicationSet CustomResourceDefinition (CRD). This controller/CRD enables both automation and greater flexibility managing Argo CD Applications across a large number of clusters and within monorepos, plus it makes self-service usage possible on multitenant Kubernetes clusters.
+
+Let's explain the key parts:
+
+[sidebar]
+.generators
+--
+*Generators*{empty}footnote:[https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/], definitions that allow you to generate objects defined with the ``template``.
+
+[source, yaml, subs="+macros,+attributes"]
+----
+  generators:
+  - list:
+      elements:
+      - env: kitchensink-dev
+      - env: kitchensink-test
+----
+--
+
+[sidebar]
+.template
+--
+*Template* that uses the generator as a model to generate objects of type ``Application``.
+
+[source, yaml, subs="+macros,+attributes"]
+----
+
+  template:
+    metadata:
+      name: kitchensink-basic-app-{{ env }}
+      namespace: openshift-gitops
+      labels:
+        kitchensink-root-app: "true"
+      ...
+
+----
+--
+
+[#deploy]
+== Deploy Kitchensink app with ArgoCD + ApplicationSet
+
+You have to run the next command that created the ``ApplicationSet`` object that deploys Kitchensink app in ``appset-a-{username}`` and ``appset-b-{username}`` by using a list generator and deploys the descriptors stored in git.
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+export USERNAME="{username}"
+cat <<EOF | oc apply -n {root-apps-namespace} -f -
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: kitchensink-basic-$\{USERNAME}
+  namespace: openshift-gitops
+  labels:
+    argocd-root-app: "true"
+    username: $\{USERNAME}    
+spec:
+  generators:
+  - list:
+      elements:
+      - env: appset-a-$\{USERNAME}
+        desc: "ApplicationSet A"
+      - env: appset-b-$\{USERNAME}
+        desc: "ApplicationSet B"
+  template:
+    metadata:
+      name: kitchensink-basic-app-{{ env }}
+      namespace: openshift-gitops
+      labels:
+        kitchensink-root-app: "true"
+        username: $\{USERNAME}
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+    spec:
+      destination:
+        namespace: '{{ env }}'
+        name: in-cluster
+      ignoreDifferences:
+      - group: apps.openshift.io
+        kind: DeploymentConfig
+        jqPathExpressions:
+          - .spec.template.spec.containers[].image
+      project: default
+      syncPolicy:
+        automated:
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      source:
+        path: basic/base
+        repoURL: "https://{gitea-host}/{username}/kitchensink-conf"
+        targetRevision: main
+EOF
+----

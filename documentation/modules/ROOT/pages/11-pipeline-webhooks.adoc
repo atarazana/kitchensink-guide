@@ -1,0 +1,14 @@
+= Create Pipeline Webhooks
+include::_attributes.adoc[]
+
+[#pipeline-webhooks]
+== Pipeline Webhooks
+
+In the previous chapter we learn about *EventListeners*, *TriggerBindings*, etc. also the role played by webhooks. Don't forget that webhooks are generic but the way you create them and also potentially the payload of events are specific to the git provider.
+
+In this guide you're going to create the webhooks you need to trigger the CI and CD pipelines for both *Events* and *Gateway* microservices, namely:
+
+- *Kitchensink CI Push:* this webhook will send events only when changes are pushed to the source code repository
+- *Kitchensink CD PullRequest:* this webhook will send events only if a PullRequest is merged into the Gramola configuration repository
+
+include::partial$gitea-create-webhooks.adoc[]

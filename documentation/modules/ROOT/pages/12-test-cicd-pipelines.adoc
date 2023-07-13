@@ -1,0 +1,72 @@
+= Checking Pipelines Webhooks
+include::_attributes.adoc[]
+
+Webhooks are in place, it's time to check if they are working correctly. Red Hat OpenShift Pipelines Operator generates `Deployments` and `Routes` objects starting from the definition of `EventListeners`. The tests you're going to run here are simply testing that those deployments are running properly, the same technique can be used to debug `TriggerBinding` and `TriggerTemplate` attribute mapping and `EventListener` cel{empty}footnote:[https://tekton.dev/docs/triggers/interceptors/#cel-interceptors] filters.
+
+[#check-kitchensink-ci-web-hook]
+== Check Kitchensink CI Web Hook
+
+Let’s check if the webhook is working, please open a new terminal and execute the following command which will send a `dummy` event. Run the following command:
+
+NOTE: The `EventListener` expects a `push` event, hence because we're sending a `dummy` payload and event of type `dummy` we should expect and error but the test will be successful because we're testing the frontend of the `EventListener` here.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+curl -X POST -k  http://$(oc get route/el-kitchensink-ci-pl-push-{git-provider}-listener  -n $CICD_NAMESPACE -o jsonpath='{.spec.host}') \
+ -H 'X-GitHub-Event: dummy' -H 'X-GitHub-Event-Type: dummy' -H 'X-Gitea-Event: dummy' -H 'X-Gitea-Event-Type: dummy' \
+ -H 'Content-Type: application/json' \
+ --data '{ "dummy": "dummy"}'
+----
+
+You should get something like this.
+
+[.console-output]
+[source,json, subs="+macros,+attributes"]
+----
+{"eventListener":"kitchensink-ci-pl-push-gitea-listener","namespace":"kitchensink-cicd-user1","eventListenerUID":"6faba931-1949-4e8c-94be-e3c85608f13d","eventID":"a4f352e1-0088-4339-b671-4287d770e8b5"}
+----
+
+Now run this command to see what happened on the other end, the event listener:
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+export USERNAME="{username}"
+export CICD_NAMESPACE="kitchensink-cicd-$\{USERNAME}"
+oc logs deployment/el-kitchensink-ci-pl-push-{git-provider}-listener -n ${CICD_NAMESPACE} | grep dummy
+----
+
+This is the expected output, as you can see `event type dummy is not allowed`.
+
+[.console-output]
+[source,json, subs="+attributes"]
+----
+{"level":"info","ts":"2022-09-12T16:30:11.860Z","logger":"eventlistener","caller":"sink/sink.go:234","msg":"interceptor stopped trigger processing: rpc error: code = FailedPrecondition desc = event type dummy is not allowed","commit":"fbb0fd1","knative.dev/controller":"eventlistener","eventlistener":"kitchensink-ci-pl-push-gitea-listener","namespace":"kitchensink-cicd-user1","eventlistenerUID":"2a940da6-e625-4f18-98b2-3bf44f48668a","/triggers-eventid":"507dd6b4-8715-4c6a-a89e-b703a800c230","/trigger":"github-listener"}
+----
+
+Now you can do the same for the other webhooks, this time with a lot less wording.
+
+[#check-kitchensink-cd-web-hook]
+== Check Kitchensink CD Web Hook
+
+Send the `dummy` event to the Kitchensink CD web hook:
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+curl -X POST -k  http://$(oc get route/el-kitchensink-cd-pl-pr-{git-provider}-listener  -n $CICD_NAMESPACE -o jsonpath='{.spec.host}') \
+ -H 'X-GitHub-Event: dummy' -H 'X-GitHub-Event-Type: dummy' -H 'X-Gitea-Event: dummy' -H 'X-Gitea-Event-Type: dummy' \
+ -H 'Content-Type: application/json' \
+ --data '{ "dummy": "dummy"}'
+----
+
+Now run this command to see what happened on the other end, the event listener:
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+export USERNAME="{username}"
+export CICD_NAMESPACE="kitchensink-cicd-$\{USERNAME}"
+oc logs deployment/el-kitchensink-cd-pl-pr-{git-provider}-listener -n ${CICD_NAMESPACE} | grep dummy
+----

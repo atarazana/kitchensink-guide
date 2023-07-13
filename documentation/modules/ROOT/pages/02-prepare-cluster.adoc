@@ -1,0 +1,189 @@
+= Prepare Cluster
+include::_attributes.adoc[]
+
+This section is devoted to prepare the OpenShift cluster, hence something to be done before actually run the proper GitOps lab.
+
+Everything we do in this section requires that you have fulfilled the xref:01-setup.adoc#prerequisite[prerequisites] section, that you're logged in your OpenShift cluster and you have `cluster-admin` permissions on it.
+
+If you don't have an OpenShift cluster and/or you don't have `cluster-admin` permissions on it you could for instance using https://try.openshift.com[try.openshift.com].	
+
+[CAUTION]
+====
+*Run this section only if you're preparing the lab environment* and as a `cluster-admin` user. If you just want to run the lab then proceed to the  xref:03-prepare-repositories.adoc[next section].
+====
+
+So if you are not already logged in, please do it now.
+
+[source,sh, subs="+macros,+attributes"]
+----
+oc login -u {username} -p {password} --server=https://api.{api-domain} --insecure-skip-tls-verify
+----
+
+[WARNING]
+====
+If the API server you're trying to log in uses a self-signed certificate or otherwise non trusted CA you will receive this message
+
+[.console-output]
+[source,sh, subs="+macros,+attributes"]
+----
+The server uses a certificate signed by an unknown authority.
+You can bypass the certificate check, but any data you send to the server could be intercepted by others.
+Use insecure connections? (y/n): 
+----
+
+Type 'y' only if you trust the server!
+
+====
+
+[#deploying-core-components]
+== Deploying core components
+
+In order to run this guide we're going to need several components, more prominently:
+
+- *ArgoCD*, the GitOps engine supported by Red Hat through the *OpenShift GitOps operator*
+- *Tekton*, the _de facto_ kubernetes native CICD pipelines system supported by Red Hat through the *OpenShift Pipelines operator*
+- *Quay*, Red Hat's container registry
+
+Let's install all of them:
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+until oc apply -k util/bootstrap/; do sleep 2; done
+----
+
+This command execute `oc apply -k ...` until it's done every 2 seconds... this is so because behind scenes some tasks are run asynchronously and in the meantime some errors will be seen as in the next example. The number of errors decreases as components are installed until there are no errors.
+
+[.console-output]
+[source,bash,subs="attributes+,+macros"]	
+----	
+$ until oc apply -k util/bootstrap/; do sleep 2; done
+namespace/gitea-system created
+namespace/kitchensink-infra created
+namespace/openshift-logging created
+namespace/openshift-operators-redhat created
+namespace/openshift-storage created
+namespace/quay-system created
+serviceaccount/guide-setup-job created
+serviceaccount/occli created
+serviceaccount/occli created
+
+...
+
+checluster.org.eclipse.che/devspaces configured
+route.route.openshift.io/s3-insecure unchanged
+template.template.openshift.io/eap72-basic-s2i configured
+group.user.openshift.io/gitops-guide-users unchanged
+devworkspacetemplate.workspace.devfile.io/web-terminal-exec unchanged
+devworkspacetemplate.workspace.devfile.io/web-terminal-tooling unchanged
+----
+
+NOTE: After a few reconciliation cycles the final output is `unchanged` for all objects created by the scripts.
+
+[#high-level-tests]
+== High level tests
+
+Let's open the OpenShift Web Console and run some validation tests.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{openshift-console-host}
+----
+
+You should see something like.
+
+NOTE: You can skip the tour or run it if you want and have time.
+
+image::openshift-console.png[OpenShift Web Console]
+
+Now, take a look to the next picture, there are two arrows pointing to:
+
+- The ArgoCD web console link
+- The Pipelines section
+
+image::argocd-pipelines-test-1.png[High level tests 1]
+
+You can see both then we're on the good way.
+
+Open the ArgoCD web console then click on the "LOG IN VIA OPENSHIFT" button on the upper right corner and use your credentials:
+
+NOTE: The first time you successfully log in you'll see an Authorize Access request, leave it "as is"  and click on the button that says "Allow selected permissions"
+
+image::argocd-login.png[ArgoCD Log In]
+
+Finally if all went well you should land in the ArgoCD console and see this.
+
+image::argocd-console.png[ArgoCD Console]
+
+ifeval::["{use-quay-io}" != "true"]
+[#checking-quay]
+== Checking Quay
+
+First of, open the OpenShift console and go to the topology view of namespace `{quay-namespace}`, use the following link. 
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{openshift-console-host}/k8s/cluster/projects/quay-system/workloads?view=graph
+----
+
+You should see something similar to this:
+
+image::quay-installed-topology.png[Quay Topology]
+
+Please open Quay Console in another tab or browser window.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{quay-server}
+----
+
+You should see something like this:
+
+image::quay-installed-login.png[Quay Login]
+
+endif::[]
+
+[#deploying-gitea]
+== Deploying Gitea
+
+Run this command to deploy the Gitea operator and Gitea itself in your OpenShift cluster.
+
+NOTE: Gitea will be installed in `gitea-system` namespace
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+until oc apply -k util/gitea/; do sleep 2; done
+----
+
+The previous command will retry until it's all installed but *we still need to check if it all works properly*.
+
+include::partial$gitea-tests.adoc[]
+
+While Gitea is being installed a `Job` will in it's turn create some users in Gitea.
+
+Let's wait until the job is complete or times out after 120s with the following command:
+
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+oc wait --for=condition=complete --timeout=120s job/gitea-setup -n gitea-system
+----
+
+Copy the next url and open it in a new tab, please use these credentials:
+
+- *USERNAME:* user1
+- *PASSWORD:* openshift
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/user/login
+----
+
+If you just want to create one user do this.
+
+include::partial$gitea-create-user.adoc[]

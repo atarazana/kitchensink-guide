@@ -5,4 +5,4 @@ A guide to the different existing methods for deploying a JBoss EAP application 
 ---
 Guide URL:
 
-https://atarazana.github.io/kitchensink-guide
+https://atarazana.github.io/kitchensink-guide?USERNAME=userXX&PASSWORD=yyyyyy&BASE_SUBDOMAIN=cluster-subdomain.com
