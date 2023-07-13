@@ -100,7 +100,7 @@
     <a class="nav-link" href="#checking-quay">Checking Quay</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#deploying-gitea">Deploying Gitea</a>
+    <a class="nav-link" href="#checking-gitea">Checking Gitea</a>
   </li>
 </ul>
   </li>
@@ -508,11 +508,8 @@ The first time you successfully log in you&#8217;ll see an Authorize Access requ
 </div>
 </div>
 <div class="sect1">
-<h2 id="deploying-gitea"><a class="anchor" href="#deploying-gitea"></a>Deploying Gitea</h2>
+<h2 id="checking-gitea"><a class="anchor" href="#checking-gitea"></a>Checking Gitea</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>Run this command to deploy the Gitea operator and Gitea itself in your OpenShift cluster.</p>
-</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -524,14 +521,6 @@ Gitea will be installed in <code>gitea-system</code> namespace
 </td>
 </tr>
 </table>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">until oc apply -k util/gitea/; do sleep 2; done</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The previous command will retry until it&#8217;s all installed but <strong>we still need to check if it all works properly</strong>.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s have a look to the Gitea deployment object.</p>
@@ -627,46 +616,6 @@ cache-control: private</code></pre>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/user/login</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If you just want to create one user do this.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Ignore error "Internal Server Error" user %USERNAME% should have been created.
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">GITEA_INSTALL_TOKEN=$(curl -k -s -XPOST -H "Content-Type: application/json" \
-  -d '{"name":"install"}' \
-  -u %USERNAME%:openshift \
-  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens</a> | jq -r .sha1)
-echo "GITEA_INSTALL_TOKEN=${GITEA_INSTALL_TOKEN}"
-
-curl -k -X 'POST' \
-    "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/admin/users?access_token=${GITEA_INSTALL_TOKEN}" \
-    -H 'accept: application/json' \
-    -H 'Content-Type: application/json' \
-    -d '{
-          "email": "%USERNAME%@example.com",
-          "full_name": "User %USERNAME%",
-          "login_name": "%USERNAME%",
-          "must_change_password": false,
-          "password": "openshift",
-          "send_notify": true,
-          "source_id": 0,
-          "username": "%USERNAME%",
-          "visibility" : "public"
-    }'</code></pre>
 </div>
 </div>
 </div>
