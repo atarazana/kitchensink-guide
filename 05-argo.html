@@ -168,7 +168,25 @@
     <a class="nav-link" href="08-helm.html">8. ArgoCD + Helm</a>
   </li>
   <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#create-root-account-in-quay">Create Quay Robot Acc.</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#deploying-cicd-pipelines">Deploying CICD Pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#create-git-secret">Create Git Secret</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#create-registry-secret">Create Registry Secret</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#grant-pull-permissions">Granting Pull Permissions</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
@@ -476,6 +494,23 @@ EOF</code></pre>
 <img src="_images/argocd-login.png" alt="Login">
 </div>
 </div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>If credentials are required use these:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>USERNAME:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>PASSWORD:</strong> %PASSWORD%</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 <div class="paragraph">
 <p>After logging in successfully and agreed to <code>Allow selected permissions</code> you will land in the <code>Applications</code> area and see the application you&#8217;ve just created.</p>
 </div>
@@ -492,8 +527,22 @@ EOF</code></pre>
 <pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/argo-%USERNAME%?view=graph</code></pre>
 </div>
 </div>
+<div class="exampleblock">
+<div class="content">
 <div class="paragraph">
-<p>You have created</p>
+<p>If credentials are required use these:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>USERNAME:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>PASSWORD:</strong> %PASSWORD%</p>
+</li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 </div>

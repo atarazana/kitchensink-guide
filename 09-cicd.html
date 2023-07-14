@@ -168,7 +168,25 @@
     <a class="nav-link" href="08-helm.html">8. ArgoCD + Helm</a>
   </li>
   <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#create-root-account-in-quay">Create Quay Robot Acc.</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#deploying-cicd-pipelines">Deploying CICD Pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#create-git-secret">Create Git Secret</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#create-registry-secret">Create Registry Secret</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#grant-pull-permissions">Granting Pull Permissions</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
@@ -282,6 +300,84 @@ It&#8217;s a best practice avoid storing secrets in a git repository even if it&
 </div>
 </div>
 <div class="sect1">
+<h2 id="create-root-account-in-quay"><a class="anchor" href="#create-root-account-in-quay"></a>Create a Robot Account in Quay</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Please copy and paste the following link and open it in a browser, then use this credentials and click on <code>Sign in to Red Hat Quay</code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Username:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>Password:</strong> openshift</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/quay-installed-login-userX.png" alt="Quay Login">
+</div>
+</div>
+<div class="paragraph">
+<p>Go to the robot accounts area by clicking on the robot icon as in the next picture.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/quay-installed-go-to-robot-accounts-userX.png" alt="Go to Repositories">
+</div>
+</div>
+<div class="paragraph">
+<p>Now click on the <code>Create Robot Account</code> button.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/quay-installed-create-robot-account-1-userX.png" alt="Go to Repositories">
+</div>
+</div>
+<div class="paragraph">
+<p>Now please use the following date and click on the <code>Create robot Account</code> button:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Name:</strong> cicd</p>
+</li>
+<li>
+<p><strong>Description:</strong> CICD robot account</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/quay-installed-create-robot-account-2-userX.png" alt="Go to Repositories">
+</div>
+</div>
+<div class="paragraph">
+<p>We have our robot account but no permissions have been granted to it, please click on <code>Set Repository Permissions</code>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/quay-installed-create-robot-account-3-userX.png" alt="Go to Repositories">
+</div>
+</div>
+<div class="paragraph">
+<p>Set permissions to <code>Write</code> on both repositories, then click on <code>Update permissions</code>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/quay-installed-create-robot-account-4-userX.png" alt="Go to Repositories">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="deploying-cicd-pipelines"><a class="anchor" href="#deploying-cicd-pipelines"></a>Deploying CICD Pipelines</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -358,6 +454,11 @@ EOF</code></pre>
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications?proj=&amp;sync=&amp;health=&amp;namespace=&amp;cluster=&amp;labels=kitchensink-cicd-app</code></pre>
 </div>
 </div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd-kitchensink-appset-cicd.png" alt="Apps">
+</div>
+</div>
 <div class="paragraph">
 <p>And go deeper by clicking on the <code>Application</code> object or using the next link.</p>
 </div>
@@ -366,12 +467,22 @@ EOF</code></pre>
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications/kitchensink-cicd-%USERNAME%</code></pre>
 </div>
 </div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd-kitchensink-appset-cicd-deep.png" alt="Apps">
+</div>
+</div>
 <div class="paragraph">
 <p>You can also have a look to the pipelines created in the OpenShift web console.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/dev-pipelines/ns/cicd-tekton-%USERNAME%</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ocp-kitchensink-cicd.png" alt="Apps">
 </div>
 </div>
 </div>
@@ -411,12 +522,35 @@ EOF</code></pre>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                 DISPLAY NAME   STATUS
-gramola-cicd-user1                  Active</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                DISPLAY NAME   STATUS
+cicd-tekton-user1                  Active</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Fine, the namespace is in place, <strong>it&#8217;s time to create the git secret our pipelines will use when cloning and also while creating Pull Requests</strong> which are the fuel for the CD part of the pipelines to promote from one environment to the next.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Now it&#8217;s time to use the token generated in the previous chapter <a href="#create-git-pat">[create-git-pat]</a>.</p>
+</div>
+<div class="paragraph">
+<p>Please make sure that the <code>GIT_PAT</code> environment variable has the correct value before you start creating the <code>Secret</code> with the following command.</p>
+</div>
+<div class="listingblock console-input">
+<div class="title">is this ok ¿?</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">echo "GIT_PAT=${GIT_PAT}"</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="listingblock console-input">
 <div class="content">
@@ -480,17 +614,17 @@ EOF</code></pre>
 <div class="paragraph">
 <p>Then click on the <code>%USERNAME%-cicd</code> link.</p>
 </div>
-<div class="imageblock unresolved">
+<div class="imageblock">
 <div class="content">
-<img src="quay-installed-view-credentials-robot-account-userX.png" alt="Robot Account Credentials">
+<img src="_images/quay-installed-view-credentials-robot-account-userX.png" alt="Robot Account Credentials">
 </div>
 </div>
 <div class="paragraph">
 <p>Then copy the token as in the next image.</p>
 </div>
-<div class="imageblock unresolved">
+<div class="imageblock">
 <div class="content">
-<img src="quay-installed-copy-credentials-robot-account-userX.png" alt="Robot Account Credentials">
+<img src="_images/quay-installed-copy-credentials-robot-account-userX.png" alt="Robot Account Credentials">
 </div>
 </div>
 <div class="paragraph">

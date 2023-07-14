@@ -168,7 +168,25 @@
     <a class="nav-link" href="08-helm.html">8. ArgoCD + Helm</a>
   </li>
   <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#create-root-account-in-quay">Create Quay Robot Acc.</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#deploying-cicd-pipelines">Deploying CICD Pipelines</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#create-git-secret">Create Git Secret</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#create-registry-secret">Create Registry Secret</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="09-cicd.html#grant-pull-permissions">Granting Pull Permissions</a>
+  </li>
+</ul>
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
@@ -319,6 +337,36 @@ EOF</code></pre>
 ...</code></pre>
 </div>
 </div>
+</div>
+</div>
+<div class="paragraph">
+<p>Check the deployment status in both Argo and OpenShift.</p>
+</div>
+<div class="paragraph">
+<p><strong>Argo</strong></p>
+</div>
+<div class="paragraph">
+<p>Open the following link to see the new Application objects you just created through the ApplicationSet in ArgoCD UI.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd-kitchensink-appset-helm.png" alt="Apps">
+</div>
+</div>
+<div class="paragraph">
+<p><strong>OpenShift</strong></p>
+</div>
+<div class="paragraph">
+<p>To see the progress of deployment you should go to namespace <code>helm-%USERNAME%</code> in the OpenShift web console or just copy the following link.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/helm-%USERNAME%?view=graph</code></pre>
 </div>
 </div>
 </div>
