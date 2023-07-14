@@ -5,6 +5,11 @@ In this chapter you're going to deploy CI and CD pipelines that will help to aut
 
 IMPORTANT: It's a best practice avoid storing secrets in a git repository even if it's private. There are several ways to deal with secrets in this kind of scenarios but in this case we're going to manage them manually for the sake of simplicity.
 
+[#create-root-account-in-quay]
+== Create a Robot Account in Quay
+
+include::partial$create-robot-account-in-quay.adoc[]
+
 [#deploying-cicd-pipelines]
 == Deploying CICD Pipelines
 
@@ -82,6 +87,8 @@ Let's go to ArgoCD console and see how it's going on. Please copy the next link 
 https://{argocd-server}/applications?proj=&sync=&health=&namespace=&cluster=&labels=kitchensink-cicd-app
 ----
 
+image::argocd-kitchensink-appset-cicd.png[Apps]
+
 And go deeper by clicking on the `Application` object or using the next link.
 
 [.console-input]
@@ -90,6 +97,8 @@ And go deeper by clicking on the `Application` object or using the next link.
 https://{argocd-server}/applications/kitchensink-cicd-{username}
 ----
 
+image::argocd-kitchensink-appset-cicd-deep.png[Apps]
+
 You can also have a look to the pipelines created in the OpenShift web console.
 
 [.console-input]
@@ -97,6 +106,8 @@ You can also have a look to the pipelines created in the OpenShift web console.
 ----
 https://{openshift-console-host}/dev-pipelines/ns/{cicd-namespace}-{username}
 ----
+
+image::ocp-kitchensink-cicd.png[Apps]
 
 [#create-git-secret]
 == Create Git Secret
@@ -126,11 +137,26 @@ You should see something like this:
 [.console-output]
 [source,bash, subs="+macros,+attributes"]
 ----
-NAME                 DISPLAY NAME   STATUS
-gramola-cicd-user1                  Active
+NAME                DISPLAY NAME   STATUS
+cicd-tekton-user1                  Active
 ----
 
 Fine, the namespace is in place, *it's time to create the git secret our pipelines will use when cloning and also while creating Pull Requests* which are the fuel for the CD part of the pipelines to promote from one environment to the next.
+
+[CAUTION]
+====
+Now it's time to use the token generated in the previous chapter <<create-git-pat>>.
+
+Please make sure that the `GIT_PAT` environment variable has the correct value before you start creating the `Secret` with the following command.
+
+.is this ok ¿?
+[.console-input]
+[source,bash, subs="+macros,+attributes"]
+----
+echo "GIT_PAT=${GIT_PAT}"
+----
+====
+
 
 [.console-input]
 [source,bash, subs="+macros,+attributes"]

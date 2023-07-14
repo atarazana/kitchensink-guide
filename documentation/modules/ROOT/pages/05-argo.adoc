@@ -166,6 +166,14 @@ Click on the `LOG IN VIA OPENSHIFT` button and use the credentials you've used b
 
 image::argocd-login.png[Login]
 
+[INFO]
+====
+If credentials are required use these:
+
+- *USERNAME:* {username}
+- *PASSWORD:* {password}
+====
+
 After logging in successfully and agreed to `Allow selected permissions` you will land in the `Applications` area and see the application you've just created.
 
 image::argocd-kitchensink.png[Apps]
@@ -178,4 +186,10 @@ To see the progress of deployment you should go to namespace `argo-{username}` i
 https://{openshift-console-host}/topology/ns/argo-{username}?view=graph
 ----
 
-You have created 
+[INFO]
+====
+If credentials are required use these:
+
+- *USERNAME:* {username}
+- *PASSWORD:* {password}
+====

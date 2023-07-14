@@ -11,39 +11,7 @@ https://{quay-server}
 
 image::quay-installed-login-userX.png[Quay Login]
 
-Now click on `UserX` as in the next picture to jump to the repositories section.
-
-image::quay-installed-repositories-userX.png[Go to Repositories]
-
-You have to create a repository for *events* and another one for *gateway*. Let's start with `gramola-events`, please click on `creating a new repository`.
-
-image::quay-installed-create-repository-1-userX.png[Create Repository]
-
-Type in `gramola-events` as the name of the repository and click on `Create Private Repository`.
-
-image::quay-installed-create-repository-2-userX.png[Create Repository]
-
-So, our private repository for *events* has been created, please click on `<- Repositories` on the upper left corner to create another repository.
-
-image::quay-installed-create-repository-3-userX.png[Create Repository]
-
-To create the next repository click on  `+ Create New Repository`.
-
-image::quay-installed-create-repository-4-userX.png[Create Repository]
-
-Type in `gramola-gateway` as the name of the repository and click on `Create Private Repository`.
-
-image::quay-installed-create-repository-5-userX.png[Create Repository]
-
-Ok, we're done creating repositories let's go back to the repositories area, please click on `<- Repositories` on the upper left corner.
-
-image::quay-installed-create-repository-6-userX.png[Create Repository]
-
-Let's go to the user details area.
-
-image::quay-installed-create-repository-7-userX.png[Repositories]
-
-Now go to the robot accounts area by clicking on the robot icon as in the next picture.
+Go to the robot accounts area by clicking on the robot icon as in the next picture.
 
 image::quay-installed-go-to-robot-accounts-userX.png[Go to Repositories]
 
@@ -65,4 +33,3 @@ image::quay-installed-create-robot-account-3-userX.png[Go to Repositories]
 Set permissions to `Write` on both repositories, then click on `Update permissions`.
 
 image::quay-installed-create-robot-account-4-userX.png[Go to Repositories]
-

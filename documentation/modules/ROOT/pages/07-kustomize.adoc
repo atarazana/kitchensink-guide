@@ -124,3 +124,35 @@ spec:
         targetRevision: main
 EOF
 ----
+
+We can check the deployment status in both Argo and OpenShift.
+
+**Argo**
+
+Open the following link to see the new Application objects you just created through the ApplicationSet in ArgoCD UI.
+
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{argocd-server}
+----
+
+image::argocd-kitchensink-appset-kustomize.png[Apps]
+
+**OpenShift**
+
+To see the progress of deployment you should go to namespace `kustomize-dev-{username}` and namespace `kustomize-test-{username}` in the OpenShift web console or just copy the following links.
+
+.kustomize-dev-{username}
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{openshift-console-host}/topology/ns/kustomize-dev-{username}?view=graph
+----
+
+.kustomize-test-{username}
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{openshift-console-host}/topology/ns/kustomize-test-{username}?view=graph
+----

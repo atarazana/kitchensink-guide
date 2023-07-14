@@ -57,3 +57,27 @@ Parameters that allow us to adjust descriptor templates to particular needs.
 ...
 ----
 --
+
+Check the deployment status in both Argo and OpenShift.
+
+**Argo**
+
+Open the following link to see the new Application objects you just created through the ApplicationSet in ArgoCD UI.
+
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{argocd-server}
+----
+
+image::argocd-kitchensink-appset-helm.png[Apps]
+
+**OpenShift**
+
+To see the progress of deployment you should go to namespace `helm-{username}` in the OpenShift web console or just copy the following link.
+
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{openshift-console-host}/topology/ns/helm-{username}?view=graph
+----
