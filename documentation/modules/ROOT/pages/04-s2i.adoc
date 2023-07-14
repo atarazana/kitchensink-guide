@@ -37,9 +37,18 @@ The two more important scripts are `assemble` and `run`:
 [#being-more-specific]
 === Being More Specific
 
-Ok, for now the explanation applies to any language/framework, let's get a bit deeper for our case.
+Ok, for now the explanation applies to any language/framework, but this lab has to do with a specific language, Java, and a specific runtime to deploy it on, JBoss EAP, so let's go a bit deeper.
 
-First, you will be using a JBoss EAP builder image => `registry.redhat.io/jboss-eap-7/eap72-openshift:latest`
+First, *you will be using a specific builder image* for JBoss EAP instead of the plain Java builder image. Specifically in this lab you will use this image:
+
+[attributes]
+====
+*`registry.redhat.io/jboss-eap-7/eap72-openshift:latest`*
+====
+
+Second, the `assemble` and `run` scripts are crafted to help you avoiding substituting the `standalone.xml` file that comes with the image. Don't take this wrong, you still can substitute it but it's usually a better practice to adapt the file during the `assemble` and `run` stages using well defined procedures, this there are more chances that you will build the image for application across minor upgrades of JBoss EAP without making any changes to the configuration of S2I. 
+
+You can find more information about building images for JBoss EAP using S2I link:https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.4/html/getting_started_with_jboss_eap_for_openshift_container_platform/configuring_eap_openshift_image[here].
 
 [#getting-started]
 == Let's get started
