@@ -342,7 +342,7 @@ The <strong>main advantages</strong> of using S2I for building images are the <s
 </ul>
 </div>
 <div class="paragraph">
-<p>The two more important scripts are <code>assemble</code> and <code>run</code>:</p>
+<p>The two most important scripts are <code>assemble</code> and <code>run</code>:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -358,10 +358,101 @@ The <strong>main advantages</strong> of using S2I for building images are the <s
 <div class="sect2">
 <h3 id="being-more-specific"><a class="anchor" href="#being-more-specific"></a>Being More Specific</h3>
 <div class="paragraph">
-<p>Ok, for now the explanation applies to any language/framework, let&#8217;s get a bit deeper for our case.</p>
+<p>Ok, for now the explanation applies to any language/framework, but this lab has to do with a specific language, Java, and a specific runtime to deploy it on, JBoss EAP, so let&#8217;s go a bit deeper.</p>
 </div>
 <div class="paragraph">
-<p>First, you will be using a JBoss EAP builder image &#8658; <code>registry.redhat.io/jboss-eap-7/eap72-openshift:latest</code></p>
+<p>First, <strong>you will be using a specific builder image</strong> for JBoss EAP instead of the plain Java builder image. This image contains maven, JDK and JBoss EAP 7.2 Specifically in this lab you will use this image:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p><strong><code>registry.redhat.io/jboss-eap-7/eap72-openshift:latest</code></strong></p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Second, the <code>assemble</code> and <code>run</code> scripts are there to help you avoiding substituting the <code>standalone.xml</code> file that comes with the image. Don&#8217;t take this wrong, you still can substitute it but it&#8217;s usually a better practice to adapt the file during the <code>assemble</code> and <code>run</code> stages using well defined procedures.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Using the procedures explained in this guide there are more chances that you will build the image for your application across minor upgrades of JBoss EAP without making any changes to the configuration of S2I.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In a nutshell the <code>assemble</code> script:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Compiles and generates a <code>WAR/JAR/EAR</code> file using <code>maven</code></p>
+</li>
+<li>
+<p>Copies the output of the previous step to the JBoss deployments path (/deployments)</p>
+</li>
+<li>
+<p>Checks if <code>CUSTOM_INSTALL_DIRECTORIES</code> environment variable has been defined. The content of this environment variable should be a list of source directories.</p>
+</li>
+<li>
+<p>If <code>CUSTOM_INSTALL_DIRECTORIES</code> is defined, then <strong>for each of those directories look for a file called <code>install.sh</code></strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>If there is an <code>install.sh</code> script executes it</p>
+<div class="paragraph">
+<p>Here you are an <code>install.sh</code> script example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">#!/bin/bash
+
+injected_dir=$1
+source /usr/local/s2i/install-common.sh
+install_deployments ${injected_dir}/injected-deployments.war
+install_modules ${injected_dir}/modules
+configure_drivers ${injected_dir}/drivers.env</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Else the following artifact directories will be copied to their respective destinations in the built image:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>modules/* copied to $JBOSS_HOME/modules/system/layers/openshift</p>
+</li>
+<li>
+<p>configuration/* copied to $JBOSS_HOME/standalone/configuration</p>
+</li>
+<li>
+<p>deployments/* copied to $JBOSS_HOME/standalone/deployments</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Once at runtime, the <code>run</code> script comes into play and it will look for execution hooks ()</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>En ejecución se ejecutará el fichero <code>postconfigure.sh</code> antes de arrancar JBoss</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>You can find more information about building images for JBoss EAP using S2I <a href="https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.2/html/getting_started_with_jboss_eap_for_openshift_container_platform/configuring_eap_openshift_image#s2i_modules_drivers_deployments">here</a>.</p>
+</div>
+</blockquote>
 </div>
 </div>
 </div>
