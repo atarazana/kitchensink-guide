@@ -3,10 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Create Pipeline Webhooks :: Kitchensink Guide</title>
-    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/11-pipeline-webhooks.html">
-    <link rel="prev" href="10-helm-kustomized.html">
-    <link rel="next" href="12-test-cicd-pipelines.html">
+    <title>Upgrade JBoss EAP Version :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/14-upgrade-jboss-version.html">
+    <link rel="prev" href="13-end-to-end-test.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -203,7 +202,7 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="11-pipeline-webhooks.html">11. Pipeline Webhooks</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -242,7 +241,7 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="14-upgrade-jboss-version.html">14. Upgrade JBoss EAP version</a>
   </li>
 </ul>
@@ -275,156 +274,169 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Kitchensink Guide</a></li>
-    <li><a href="11-pipeline-webhooks.html">11. Pipeline Webhooks</a></li>
+    <li><a href="14-upgrade-jboss-version.html">14. Upgrade JBoss EAP version</a></li>
   </ul>
 </nav>
   <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
 </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Create Pipeline Webhooks</h1>
-<div class="sect1">
-<h2 id="pipeline-webhooks"><a class="anchor" href="#pipeline-webhooks"></a>Pipeline Webhooks</h2>
+<h1 class="page">Upgrade JBoss EAP Version</h1>
+<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>In the previous chapter we learn about <strong>EventListeners</strong>, <strong>TriggerBindings</strong>, etc. also the role played by webhooks. Don&#8217;t forget that webhooks are generic but the way you create them and also potentially the payload of events are specific to the git provider.</p>
+<p>Since you started this guide you&#8217;ve been deploying Kitchensink on JBoss EAP 7.2, in different ways and namespaces, always using S2I to build the image starting from the source code of the Jakarta EE application.</p>
 </div>
 <div class="paragraph">
-<p>In this guide you&#8217;re going to create the webhooks you need to trigger the CI and CD pipelines for both <strong>Events</strong> and <strong>Gateway</strong> microservices, namely:</p>
+<p>One of the reasons we think S2I is awesome is that this framework should help you whenever you upgrade JBoss itself. The idea is that because you&#8217;re using S2I extensions mechanism which rely on JBoss scripts of S2I helper scripts, you don&#8217;t care about the underneath <code>standalone.xml</code> file&#8230;&#8203; <strong>almost</strong>. In this lab you will upgrade JBoss from 7.2 to 7.4, let&#8217;s deal with this <strong>almost</strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="whats-different"><a class="anchor" href="#whats-different"></a>What&#8217;s Different</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Well there are a number of things different in 7.4 with regards to 7.2 but we only care about one for this lab. The PostgreSQL driver definition is missing.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You should always consult the <a href="https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.4/html/7.4.0_release_notes/index">release notes</a> for a deeper understanding of changes between versions.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This means that you have to make a change in your <code>extension/install.sh</code> script in order to install the needed driver you will do this later, before you do, let&#8217;s upgrade the builder image from 7.2 to 7.4.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="upgrade-builder-image-version"><a class="anchor" href="#upgrade-builder-image-version"></a>Upgrade Builder Image Version</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are two location where we have to upgrade the builder image:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Kitchensink CI Push:</strong> this webhook will send events only when changes are pushed to the source code repository</p>
+<p>kitchensink-conf/basic/base/kitchensink-bc.yaml</p>
 </li>
 <li>
-<p><strong>Kitchensink CD PullRequest:</strong> this webhook will send events only if a PullRequest is merged into the Gramola configuration repository</p>
+<p>kitchensink-conf/advanced/helm_base/values.yaml</p>
 </li>
 </ul>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="create-ci-webhooks"><a class="anchor" href="#create-ci-webhooks"></a>Create CI Webhooks</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>Before you can create the webhooks you need a <strong>Personal Access Token</strong> (PAT), which probably has been lost&#8230;&#8203; no problem following this instruction to generate another one.</p>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>You&#8217;ll need this token later you can copy it somewhere just in case you close the terminal window or run this command again and generate a new token.</p>
-</div>
-</td>
-</tr>
-</table>
+<p>Please copy and paste the following link and open it in a browser. It will take you to file <code>kitchensink-conf/basic/base/kitchensink-bc.yaml</code> where you have to do the following change.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">GIT_PAT=$(curl -k -s -XPOST -H "Content-Type: application/json" \
-  -d '{"name":"cicd'"${RANDOM}"'","scopes": ["repo"]}' \
-  -u %USERNAME%:openshift \
-  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens</a> | jq -r .sha1)
-echo "GIT_PAT=${GIT_PAT}"</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/_edit/main/basic/base/kitchensink-bc.yaml#27</code></pre>
 </div>
-</div>
-<div class="sect2">
-<h3 id="kitchensink-ci-webhook"><a class="anchor" href="#kitchensink-ci-webhook"></a>Kitchensink CI Webhook</h3>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">KITCHENSINK_CI_EL_LISTENER_HOST=$(oc get route/el-kitchensink-ci-pl-push-gitea-listener -n cicd-tekton-%USERNAME% -o jsonpath='{.status.ingress[0].host}')
-
-curl -k -X 'POST' "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/repos/%USERNAME%/kitchensink/hooks" \
-  -H "accept: application/json" \
-  -H "Authorization: token ${GIT_PAT}" \
-  -H "Content-Type: application/json" \
-  -d '{
-  "active": true,
-  "branch_filter": "*",
-  "config": {
-     "content_type": "json",
-     "url": "http://'"${KITCHENSINK_CI_EL_LISTENER_HOST}"'"
-  },
-  "events": [
-    "push" <i class="conum" data-value="1"></i><b>(1)</b>
-  ],
-  "type": "gitea"
-}'</code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Only <code>push</code> events</td>
-</tr>
-</table>
 </div>
 <div class="paragraph">
-<p>Expected output:</p>
+<p>Once there, you have to change this:</p>
 </div>
-<div class="listingblock console-output">
+<div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"id":1,"type":"gitea","config":{"content_type":"json","url":"<a href="http://"},"events":">"push"</a>,"active":true,"updated_at":"2021-11-12T10:14:15Z","created_at":"2021-11-12T10:14:15Z"}</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">name: 'jboss-eap72-openshift:1.2'</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>With this</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">name: 'jboss-eap74-openjdk8-openshift:7.4.0'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
+</div>
+<div class="paragraph">
+<p>Next link will take you to file <code>kitchensink-conf/advanced/helm_base/values.yaml</code> where you have to do the following change.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/_edit/main/advanced/helm_base/values.yaml#L6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once there, you have to change this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">builderImage: jboss-eap72-openshift:1.2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">builderImage: jboss-eap74-openjdk8-openshift:7.4.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="create-cd-webhooks"><a class="anchor" href="#create-cd-webhooks"></a>Create CD Webhooks</h2>
+<h2 id="update-install-script"><a class="anchor" href="#update-install-script"></a>Update <code>install.sh</code></h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="kitchensink-cd-webhook"><a class="anchor" href="#kitchensink-cd-webhook"></a>Kitchensink CD Webhook</h3>
+<div class="paragraph">
+<p>Please copy and paste the following link and open it in a browser. It will take you to file <code>kitchensink/extensions/install.sh</code> where you have to uncomment the line where the script configures the PostgreSQL driver. As usual, in case you forgot, use this credentials to log in.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Username:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>Password:</strong> openshift</p>
+</li>
+</ul>
+</div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">KITCHENSINK_CD_EL_LISTENER_HOST=$(oc get route/el-kitchensink-cd-pl-pr-gitea-listener -n cicd-tekton-%USERNAME% -o jsonpath='{.status.ingress[0].host}')
-
-curl -k -X 'POST' "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/repos/%USERNAME%/kitchensink-conf/hooks" \
-  -H "accept: application/json" \
-  -H "Authorization: token ${GIT_PAT}" \
-  -H "Content-Type: application/json" \
-  -d '{
-  "active": true,
-  "branch_filter": "*",
-  "config": {
-     "content_type": "json",
-     "url": "http://'"${KITCHENSINK_CD_EL_LISTENER_HOST}"'"
-  },
-  "events": [
-    "pull_request" <i class="conum" data-value="1"></i><b>(1)</b>
-  ],
-  "type": "gitea"
-}'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink/_edit/main/extensions/install.sh#L12</code></pre>
 </div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Only <code>pull_request</code> events</td>
-</tr>
-</table>
 </div>
 <div class="paragraph">
-<p>Expected output:</p>
+<p>Once there, you have to change this:</p>
 </div>
-<div class="listingblock console-output">
+<div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"id":3,"type":"gitea","config":{"content_type":"json","url":"<a href="http://"},"events":">"pull_request","pull_request_assign","pull_request_label","pull_request_milestone","pull_request_comment","pull_request_review_approved","pull_request_review_rejected","pull_request_review_comment","pull_request_sync"</a>,"active":true,"updated_at":"2021-11-12T10:16:31Z","created_at":"2021-11-12T10:16:31Z"}</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml"># configure_drivers ${injected_dir}/driver-postgresql.env</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">configure_drivers ${injected_dir}/driver-postgresql.env</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="refresh-applications-in-argocd"><a class="anchor" href="#refresh-applications-in-argocd"></a>Refresh Applications in ArgoCD</h2>
+<div class="sectionbody">
+
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="10-helm-kustomized.html" class="query-params-link">10. ArgoCD + Helm + Kustomize</a></span>
-  <span class="next"><a href="12-test-cicd-pipelines.html" class="query-params-link">12. Check Pipeline Webhooks</a></span>
+  <span class="prev"><a href="13-end-to-end-test.html" class="query-params-link">13. End to End Test</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

@@ -242,6 +242,9 @@
   </li>
 </ul>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="14-upgrade-jboss-version.html">14. Upgrade JBoss EAP version</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -504,97 +507,6 @@ Don&#8217;t forget to refresh your browser.
 </div>
 </div>
 <div class="sect1">
-<h2 id="clone-repos-locally"><a class="anchor" href="#clone-repos-locally"></a>Clone Repos Locally</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.</p>
-</div>
-<div class="paragraph">
-<p>Before we start setting up the environment, let’s clone the tutorial sources and set the <code>TUTORIAL_HOME</code> environment variable to point to the root directory of the tutorial:</p>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p><strong>If you choose to use web-terminal, stick to that decision throughout the guide.</strong></p>
-</div>
-<div class="paragraph">
-<p>Next, <strong>open the following link</strong>, <strong>create a new project</strong> called: <code>terminal-%USERNAME%</code> and <strong>click on <code>Start</code></strong>. If credentials are required use these:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>USERNAME:</strong> %USERNAME%</p>
-</li>
-<li>
-<p><strong>PASSWORD:</strong> %PASSWORD%</p>
-</li>
-</ul>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/terminal</code></pre>
-</div>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="tabset is-loading">
-<div class="ulist tabs">
-<ul>
-<li>
-<p><a id="tabset1_laptop"></a>laptop</p>
-</li>
-<li>
-<p><a id="tabset1_web-terminal"></a>web-terminal</p>
-</li>
-</ul>
-</div>
-<div class="content">
-<div class="tab-pane" aria-labelledby="tabset1_laptop">
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone {tutorial-url} {folder}</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/{folder}"</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
-</div>
-</div>
-</div>
-<div class="tab-pane" aria-labelledby="tabset1_web-terminal">
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd ~/scratch &amp;&amp; git clone {tutorial-url} {folder}</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/{folder}"</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="prepare-devfile"><a class="anchor" href="#prepare-devfile"></a>Prepare Devfile</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -717,6 +629,97 @@ If you&#8217;re running the guide in a laptop, you don&#8217;t need to do this.
 <div class="imageblock">
 <div class="content">
 <img src="_images/devspaces-04.png" alt="Allow Paste Permission">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="clone-repos-locally"><a class="anchor" href="#clone-repos-locally"></a>Clone Repos Locally</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.</p>
+</div>
+<div class="paragraph">
+<p>Before we start setting up the environment, let’s clone the tutorial sources and set the <code>TUTORIAL_HOME</code> environment variable to point to the root directory of the tutorial:</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>If you choose to use web-terminal, stick to that decision throughout the guide.</strong></p>
+</div>
+<div class="paragraph">
+<p>Next, <strong>open the following link</strong>, <strong>create a new project</strong> called: <code>terminal-%USERNAME%</code> and <strong>click on <code>Start</code></strong>. If credentials are required use these:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>USERNAME:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>PASSWORD:</strong> %PASSWORD%</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/terminal</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tabset is-loading">
+<div class="ulist tabs">
+<ul>
+<li>
+<p><a id="tabset1_laptop"></a>laptop</p>
+</li>
+<li>
+<p><a id="tabset1_web-terminal"></a>web-terminal</p>
+</li>
+</ul>
+</div>
+<div class="content">
+<div class="tab-pane" aria-labelledby="tabset1_laptop">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone {tutorial-url} {folder}</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/{folder}"</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
+</div>
+</div>
+</div>
+<div class="tab-pane" aria-labelledby="tabset1_web-terminal">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd ~/scratch &amp;&amp; git clone {tutorial-url} {folder}</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/{folder}"</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>

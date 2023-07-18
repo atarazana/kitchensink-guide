@@ -242,6 +242,9 @@
   </li>
 </ul>
   </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="14-upgrade-jboss-version.html">14. Upgrade JBoss EAP version</a>
+  </li>
 </ul>
   </li>
 </ul>
@@ -284,12 +287,12 @@
 <h2 id="overview"><a class="anchor" href="#overview"></a>Simplification, git-based automation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We have seen ways to deploy manually, but &#8230;&#8203;</p>
+<p>We have deployed Kitchensink manually using <strong>S2I</strong>, but &#8230;&#8203;</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>How repeatable are these processes?</p>
+<p>How repeatable is this procedure?</p>
 </li>
 <li>
 <p>Auditable?</p>
@@ -300,7 +303,7 @@
 </ul>
 </div>
 <div class="paragraph">
-<p>... then GitOps to the rescue !!!</p>
+<p><strong>No worries GitOps to the rescue !!!</strong></p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -309,10 +312,60 @@
 <div class="title">Figure 1. What is GitOps ?</div>
 </div>
 <div class="paragraph">
-<p>GitOps helps provide infrastructure as code using git repositories as the only source of truth.</p>
+<p>GitOps provides infrastructure as code by using git repositories as the only source of truth that defines de desired cluster state, but GitOps is just an idea, a concept. So in order to use this idea you need an implementation. Red Hat contributes heavily on an community project called <a href="https://argo-cd.readthedocs.io/en/stable/">Argo CD</a>.</p>
 </div>
 <div class="paragraph">
-<p>We are going to deploy the same application in different ways using <code>ArgoCD</code>.</p>
+<p>Argo CD can extract the cluster state in a number of ways, directly as files from a folder or by using a plugin.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="git-repositories-involved"><a class="anchor" href="#git-repositories-involved"></a>Git Repositories Involved</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you remember at the beginning of this guide you migrated a couple of repositories, one was for code, <strong>kitchensink</strong>, the other was for configuration, <strong>kitchensink-conf</strong>.</p>
+</div>
+<div class="paragraph">
+<p>In this lab you will experience different ways of deploying the application you already know <strong>Kitchesink</strong> in increasing complexity. We have structure the descriptors in <strong>kitchesink-conf</strong> so that these different ways of deployment using Argo CD and live in the same repository.</p>
+</div>
+<div class="paragraph">
+<p>There are four main directories, namely:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>basic/base:</strong> here you can find plain yaml descriptors</p>
+<div class="paragraph">
+<p>&#8658; In this case <mark><strong>No plugin</strong> is needed</mark></p>
+</div>
+</li>
+<li>
+<p><strong>kustomized/</strong>*: here you will find two subdirectories (<strong><em>dev and test</em></strong>) which are <strong><em>overlays or environments</em></strong> which relies in a kustomization.yaml file at <strong>basic</strong></p>
+<div class="paragraph">
+<p>&#8658; For this case you will rely on the <mark><strong>kustomize</strong> plugin</mark></p>
+</div>
+</li>
+<li>
+<p><strong>advanced/helm_base:</strong> at this location you can find a helm chart</p>
+<div class="paragraph">
+<p>&#8658; here, the <mark><strong>helm</strong> plugin is needed</mark></p>
+</div>
+</li>
+<li>
+<p><strong>advanced/overlays/</strong>:* as in kustomize/* here you will find <strong><em>dev and test overlays</em></strong> but this time overlays look for resources in <strong>advanced/helm_base</strong> and, as already explained, those resources will be in the shape of a helm chart.</p>
+<div class="paragraph">
+<p>&#8658; This case is special, it relies both on helm and kustomized so a <mark><strong>custom plugin</strong> will be needed</mark></p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="application-keystone-of-argocd"><a class="anchor" href="#application-keystone-of-argocd"></a><code>Application</code>: Keystone of Argo CD</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>Application</code> CRD is the Kubernetes resource object representing a deployed application instance in an environment.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -345,9 +398,6 @@ spec:
     syncOptions:
       - CreateNamespace=true</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>The <code>Application</code> CRD is the Kubernetes resource object representing a deployed application instance in an environment.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s explain the key parts:</p>
@@ -410,6 +460,62 @@ spec:
 </div>
 </div>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="fix-buildconfigs-repo-url"><a class="anchor" href="#fix-buildconfigs-repo-url"></a>Fix BuildConfigs Repo URL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As we have explained <a href="04-s2i.html#overview" class="xref page">before</a> in this lab <code>BuildConfig</code> objects are in charge of cloning a code repository, compile the code and build a container image with that. Well, in this lab, this means that because you migrated the repo those <code>BuildConfigs</code> point to the original repo.</p>
+</div>
+<div class="paragraph">
+<p><strong>Let&#8217;s fix that!</strong></p>
+</div>
+<div class="paragraph">
+<p>Please copy and paste the following link and open it in a browser. It will take you to file <code>basic/base/kitchensink-bc.yaml</code> where you have to change the git url to match the one of the previously migrated repository of code. Use this credentials to log in.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Username:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>Password:</strong> openshift</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/_edit/main/basic/base/kitchensink-bc.yaml#L40</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once there, you have to change this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  source:
+    type: Git
+    git:
+      uri: 'https://github.com/atarazana/kitchensink'
+      ref: main</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  source:
+    type: Git
+    git:
+      uri: 'https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink'
+      ref: main</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
 </div>
 </div>
 </div>
