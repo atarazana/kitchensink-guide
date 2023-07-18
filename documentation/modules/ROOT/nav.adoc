@@ -60,3 +60,5 @@ endif::[]
 ** xref:13-end-to-end-test.adoc#run-ci-pipeline[Ⓒ Run CI pipeline]
 ** xref:13-end-to-end-test.adoc#running-cd-pipeline-dev[Ⓓ Run CD pipeline (`dev`)]
 ** xref:13-end-to-end-test.adoc#running-cd-pipeline-test[Ⓔ Run CD pipeline (`test`)]]
+
+* xref:14-upgrade-jboss-version.adoc[14. Upgrade JBoss EAP version]

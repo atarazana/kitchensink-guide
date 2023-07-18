@@ -1,6 +1,46 @@
 = ArgoCD + Kustomize
 include::_attributes.adoc[]
 
+As we have already explained; for GitOps the git repository is the only source of truth with regards to the cluster state, that is, the descriptors deployed in kubernetes.
+
+Argo CD can extract the cluster state directly as files from a folder or by using one plugin. In this chapter you will rely on the `helm` plugin to extract descriptors from the configuration repo.
+
+[#buildconfig-in-advanced-deployments]
+== BuildConfig In Advanced
+
+We have to do the same with this file `advanced/helm_base/templates/kitchensink-bc.yaml` as we did before for the basic deployments. Please copy and paste the following link and open it in a browser.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/advanced/helm_base/templates/kitchensink-bc.yaml#L40
+----
+
+Once there, you have to change this:
+
+[source,yaml,subs="attributes+,+macros"]
+----
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/atarazana/kitchensink'
+      ref: main
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+  source:
+    type: Git
+    git:
+      uri: 'https://{gitea-host}/{username}/kitchensink'
+      ref: main
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
 [#deploy]
 == Deploy Kitchensink app with ArgoCD + Helm
 

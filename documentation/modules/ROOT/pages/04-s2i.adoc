@@ -106,7 +106,9 @@ oc login -u {username} -p {password} --server=https://api.{api-domain}
 [#deploy]
 == Deploying a JBOSS EAP 7.2 application manually
 
-Let's deploy the Kitchensink App!
+Once `BuildConfigs` are pointing to the right repo we can go on.
+
+*Let's deploy the Kitchensink manually using S2I!*
 
 [IMPORTANT]
 ====

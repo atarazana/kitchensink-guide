@@ -3,13 +3,6 @@ include::_attributes.adoc[]
 
 include::partial$prepare-repositories.adoc[]
 
-[#clone-repos-locally]
-== Clone Repos Locally
-
-Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.
-
-include::partial$download-sources.adoc[]
-
 [#prepare-devfile]
 == Prepare Devfile
 
@@ -86,3 +79,10 @@ image::devspaces-03.png[New Terminal]
 Should you be prompted to give/deny the paste permission as in the next picture while trying to paste commands in a DevSpaces terminal window, please allow it.
 
 image::devspaces-04.png[Allow Paste Permission]
+
+[#clone-repos-locally]
+== Clone Repos Locally
+
+Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.
+
+include::partial$download-sources.adoc[]

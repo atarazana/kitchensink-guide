@@ -4,20 +4,47 @@ include::_attributes.adoc[]
 [#overview]
 == Simplification, git-based automation
 
-We have seen ways to deploy manually, but ...
+We have deployed Kitchensink manually using *S2I*, but ...
 
-* How repeatable are these processes? 
+* How repeatable is this procedure? 
 * Auditable? 
 * Simple at first, but what about in the long run?
 
-\... then GitOps to the rescue !!!
+*No worries GitOps to the rescue !!!*
 
 .What is GitOps ?
 image::gitops.png[] 
 
-GitOps helps provide infrastructure as code using git repositories as the only source of truth.
+GitOps provides infrastructure as code by using git repositories as the only source of truth that defines de desired cluster state, but GitOps is just an idea, a concept. So in order to use this idea you need an implementation. Red Hat contributes heavily on an community project called link:https://argo-cd.readthedocs.io/en/stable/[Argo CD].
 
-We are going to deploy the same application in different ways using ``ArgoCD``.
+Argo CD can extract the cluster state in a number of ways, directly as files from a folder or by using a plugin.
+
+[#git-repositories-involved]
+== Git Repositories Involved
+
+If you remember at the beginning of this guide you migrated a couple of repositories, one was for code, *kitchensink*, the other was for configuration, *kitchensink-conf*.
+
+In this lab you will experience different ways of deploying the application you already know *Kitchesink* in increasing complexity. We have structure the descriptors in *kitchesink-conf* so that these different ways of deployment using Argo CD and live in the same repository.
+
+There are four main directories, namely:
+
+* *basic/base:* here you can find plain yaml descriptors
++
+=> In this case #*No plugin* is needed#
+* *kustomized/**: here you will find two subdirectories (*_dev and test_*) which are *_overlays or environments_* which relies in a kustomization.yaml file at *basic*
++
+=> For this case you will rely on the #*kustomize* plugin#
+* *advanced/helm_base:* at this location you can find a helm chart
++
+=> here, the #*helm* plugin is needed#
+* *advanced/overlays/*:* as in kustomize/* here you will find *_dev and test overlays_* but this time overlays look for resources in *advanced/helm_base* and, as already explained, those resources will be in the shape of a helm chart.
++
+=> This case is special, it relies both on helm and kustomized so a #*custom plugin* will be needed#
+
+[#application-keystone-of-argocd]
+== `Application`: Keystone of Argo CD
+
+The ``Application`` CRD is the Kubernetes resource object representing a deployed application instance in an environment.
 
 [source, yaml,subs="+macros,+attributes"]
 ----
@@ -50,8 +77,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ----
-
-The ``Application`` CRD is the Kubernetes resource object representing a deployed application instance in an environment.
 
 Let's explain the key parts:
 
@@ -105,6 +130,49 @@ Synchronization settings
       selfHeal: true
 ----
 --
+
+[#fix-buildconfigs-repo-url]
+== Fix BuildConfigs Repo URL
+
+As we have explained xref:04-s2i.adoc#overview[before] in this lab `BuildConfig` objects are in charge of cloning a code repository, compile the code and build a container image with that. Well, in this lab, this means that because you migrated the repo those `BuildConfigs` point to the original repo.
+
+*Let's fix that!*
+
+Please copy and paste the following link and open it in a browser. It will take you to file `basic/base/kitchensink-bc.yaml` where you have to change the git url to match the one of the previously migrated repository of code. Use this credentials to log in.
+
+- *Username:* {username}
+- *Password:* {static-password}
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/basic/base/kitchensink-bc.yaml#L40
+----
+
+Once there, you have to change this:
+
+[source,yaml,subs="attributes+,+macros"]
+----
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/atarazana/kitchensink'
+      ref: main
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+  source:
+    type: Git
+    git:
+      uri: 'https://{gitea-host}/{username}/kitchensink'
+      ref: main
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
 
 [#deploy]
 == Deploy Kitchensink app with ArgoCD

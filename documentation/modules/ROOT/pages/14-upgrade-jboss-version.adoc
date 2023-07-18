@@ -1,0 +1,108 @@
+= Upgrade JBoss EAP Version
+include::_attributes.adoc[]
+
+Since you started this guide you've been deploying Kitchensink on JBoss EAP 7.2, in different ways and namespaces, always using S2I to build the image starting from the source code of the Jakarta EE application.
+
+One of the reasons we think S2I is awesome is that this framework should help you whenever you upgrade JBoss itself. The idea is that because you're using S2I extensions mechanism which rely on JBoss scripts of S2I helper scripts, you don't care about the underneath `standalone.xml` file... *almost*. In this lab you will upgrade JBoss from 7.2 to 7.4, let's deal with this *almost*.
+
+[#whats-different]
+== What's Different
+
+Well there are a number of things different in 7.4 with regards to 7.2 but we only care about one for this lab. The PostgreSQL driver definition is missing.
+
+TIP: You should always consult the link:https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.4/html/7.4.0_release_notes/index[release notes] for a deeper understanding of changes between versions.
+
+This means that you have to make a change in your `extension/install.sh` script in order to install the needed driver you will do this later, before you do, let's upgrade the builder image from 7.2 to 7.4.
+
+[#upgrade-builder-image-version]
+== Upgrade Builder Image Version
+
+There are two location where we have to upgrade the builder image:
+
+* kitchensink-conf/basic/base/kitchensink-bc.yaml
+* kitchensink-conf/advanced/helm_base/values.yaml
+
+Please copy and paste the following link and open it in a browser. It will take you to file `kitchensink-conf/basic/base/kitchensink-bc.yaml` where you have to do the following change.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/basic/base/kitchensink-bc.yaml#27
+----
+
+Once there, you have to change this:
+
+[source,yaml,subs="attributes+,+macros"]
+----
+name: 'jboss-eap72-openshift:1.2'
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+name: 'jboss-eap74-openjdk8-openshift:7.4.0'
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
+Next link will take you to file `kitchensink-conf/advanced/helm_base/values.yaml` where you have to do the following change.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/advanced/helm_base/values.yaml#L6
+----
+
+Once there, you have to change this:
+
+[source,yaml,subs="attributes+,+macros"]
+----
+builderImage: jboss-eap72-openshift:1.2
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+builderImage: jboss-eap74-openjdk8-openshift:7.4.0
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
+[#update-install-script]
+== Update `install.sh`
+
+Please copy and paste the following link and open it in a browser. It will take you to file `kitchensink/extensions/install.sh` where you have to uncomment the line where the script configures the PostgreSQL driver. As usual, in case you forgot, use this credentials to log in.
+
+- *Username:* {username}
+- *Password:* {static-password}
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink/_edit/main/extensions/install.sh#L12
+----
+
+Once there, you have to change this:
+
+[source,yaml,subs="attributes+,+macros"]
+----
+# configure_drivers ${injected_dir}/driver-postgresql.env
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+configure_drivers ${injected_dir}/driver-postgresql.env
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
+[#refresh-applications-in-argocd]
+== Refresh Applications in ArgoCD
+
