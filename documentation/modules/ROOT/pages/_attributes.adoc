@@ -1,3 +1,5 @@
+include::partial$versions.adoc[]
+
 :experimental:
 :source-highlighter: highlightjs
 

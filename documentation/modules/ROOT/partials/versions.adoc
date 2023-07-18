@@ -2,3 +2,4 @@
 :oc-version: 4.12
 :argocd-version: v2.3.17
 :yq-version: 4.19.1
+:jboss-version: 7.2

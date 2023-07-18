@@ -18,37 +18,67 @@ image::s2i.png[]
 
 Well as you can see in the previous image building an image that runs your code comprises three phases:
 
-- *Build App:* Compiling code, this is language specific and can imply downloading dependencies, compiling, linking, etc. All the tools needed should be present at the builder image. The output of this phase is a binary file or a jar, along with libraries if necessary, etc.
-- *Build Image:* In this phase we put the output of the previous phase in a known location inside the image so that it can be run later as a container. The output of this phase is an image based on the builder image or a specific image with the minimum required components for running and your application.
-- *Deploy:* Finally we need to deploy our image to a kubernetes cluster and this means referring to our application image from a *Deployment*, *DeploymentConfig*, *StatefulSet*, *DaemonSet*, *Job*, etc.
+* *Build App:* Compiling code, this is language specific and can imply downloading dependencies, compiling, linking, etc. All the tools needed should be present at the builder image. The output of this phase is a binary file or a jar, along with libraries if necessary, etc.
+* *Build Image:* In this phase we put the output of the previous phase in a known location inside the image so that it can be run later as a container. The output of this phase is an image based on the builder image or a specific image with the minimum required components for running and your application.
+* *Deploy:* Finally we need to deploy our image to a kubernetes cluster and this means referring to our application image from a *Deployment*, *DeploymentConfig*, *StatefulSet*, *DaemonSet*, *Job*, etc.
 
-Let's go a bit deeper with the explanation, in order to build your application you will need a builder image designed according to the S2I framework. In general, you will use a supported image by Red Hat, it can be for Java, Python, .Net, etc. go link:https://docs.openshift.com/container-platform/4.12/openshift_images/using_images/using-s21-images.html[here] but if you need or want to create your own builder image you can go link:https://access.redhat.com/documentation/en-us/openshift_container_platform/4.12/html/images/creating-images#images-create-s2i-scripts_create-images[here] to learn all you need to do it.
+Let's go a bit deeper with the explanation, in order to build your application you will need a builder image designed according to the S2I framework. In general, you will use a supported image by Red Hat, it can be for Java, Python, .Net, etc. go link:https://docs.openshift.com/container-platform/{oc-version}/openshift_images/using_images/using-s21-images.html[here] but if you need or want to create your own builder image you can go link:https://access.redhat.com/documentation/en-us/openshift_container_platform/{oc-version}/html/images/creating-images#images-create-s2i-scripts_create-images[here] to learn all you need to do it.
 
 In a nutshell a builder image is an image that includes:
 
-- *All the tools you need to compile*, download dependencies, etc. for a given programming language.
-- *Source-to-image scripts:* You can write source-to-image (S2I) scripts in any programming language, as long as the scripts are executable inside the builder image. S2I supports multiple options providing `assemble/run/save-artifacts` scripts.
+* *All the tools you need to compile*, download dependencies, etc. for a given programming language.
+* *Source-to-image scripts:* You can write source-to-image (S2I) scripts in any programming language, as long as the scripts are executable inside the builder image. S2I supports multiple options providing `assemble/run/save-artifacts` scripts.
 
-The two more important scripts are `assemble` and `run`:
+The two most important scripts are `assemble` and `run`:
 
-- *`assemble`* -> The assemble script builds the application artifacts from a source and places them into appropriate directories inside the image. This script is required.
-- *`run`* ->  The run script executes your application. This script is required.
+* *`assemble`* -> The assemble script builds the application artifacts from a source and places them into appropriate directories inside the image. This script is required.
+* *`run`* ->  The run script executes your application. This script is required.
 
 [#being-more-specific]
 === Being More Specific
 
 Ok, for now the explanation applies to any language/framework, but this lab has to do with a specific language, Java, and a specific runtime to deploy it on, JBoss EAP, so let's go a bit deeper.
 
-First, *you will be using a specific builder image* for JBoss EAP instead of the plain Java builder image. Specifically in this lab you will use this image:
+First, *you will be using a specific builder image* for JBoss EAP instead of the plain Java builder image. This image contains maven, JDK and JBoss EAP {jboss-version} Specifically in this lab you will use this image:
 
 [attributes]
 ====
 *`registry.redhat.io/jboss-eap-7/eap72-openshift:latest`*
 ====
 
-Second, the `assemble` and `run` scripts are crafted to help you avoiding substituting the `standalone.xml` file that comes with the image. Don't take this wrong, you still can substitute it but it's usually a better practice to adapt the file during the `assemble` and `run` stages using well defined procedures, this there are more chances that you will build the image for application across minor upgrades of JBoss EAP without making any changes to the configuration of S2I. 
+Second, the `assemble` and `run` scripts are there to help you avoiding substituting the `standalone.xml` file that comes with the image. Don't take this wrong, you still can substitute it but it's usually a better practice to adapt the file during the `assemble` and `run` stages using well defined procedures.
 
-You can find more information about building images for JBoss EAP using S2I link:https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.4/html/getting_started_with_jboss_eap_for_openshift_container_platform/configuring_eap_openshift_image[here].
+NOTE: Using the procedures explained in this guide there are more chances that you will build the image for your application across minor upgrades of JBoss EAP without making any changes to the configuration of S2I. 
+
+In a nutshell the `assemble` script:
+
+* Compiles and generates a `WAR/JAR/EAR` file using `maven`
+* Copies the output of the previous step to the JBoss deployments path (/deployments)
+* Checks if `CUSTOM_INSTALL_DIRECTORIES` environment variable has been defined. The content of this environment variable should be a list of source directories.
+* If `CUSTOM_INSTALL_DIRECTORIES` is defined, then *for each of those directories look for a file called `install.sh`*
+** If there is an `install.sh` script executes it
++
+Here you are an `install.sh` script example:
++
+[source,bash]
+----
+#!/bin/bash
+
+injected_dir=$1
+source /usr/local/s2i/install-common.sh
+install_deployments ${injected_dir}/injected-deployments.war
+install_modules ${injected_dir}/modules
+configure_drivers ${injected_dir}/drivers.env
+----
+** Else the following artifact directories will be copied to their respective destinations in the built image:
+*** modules/* copied to $JBOSS_HOME/modules/system/layers/openshift
+*** configuration/* copied to $JBOSS_HOME/standalone/configuration
+*** deployments/* copied to $JBOSS_HOME/standalone/deployments
+* Once at runtime, the `run` script comes into play and it will look for execution hooks ()
+
+En ejecución se ejecutará el fichero `postconfigure.sh` antes de arrancar JBoss
+
+> You can find more information about building images for JBoss EAP using S2I link:https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/{jboss-version}/html/getting_started_with_jboss_eap_for_openshift_container_platform/configuring_eap_openshift_image#s2i_modules_drivers_deployments[here].
 
 [#getting-started]
 == Let's get started
@@ -123,8 +153,8 @@ oc label deployment/kitchensink-db app.openshift.io/runtime=postgresql --overwri
 ====
 The ``oc label`` commands adds decoration to our deployment (used for the #Topology view#):
 
-- ``app.openshift.io/runtime``: Icon displayed in the node
-- ``app.kubernetes.io/part-of``: App grouping
+* ``app.openshift.io/runtime``: Icon displayed in the node
+* ``app.kubernetes.io/part-of``: App grouping
 ====
 +
 . Deploy the kitchensink app:
