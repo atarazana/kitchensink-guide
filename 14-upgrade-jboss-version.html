@@ -319,17 +319,23 @@ You should always consult the <a href="https://access.redhat.com/documentation/e
 <h2 id="upgrade-builder-image-version"><a class="anchor" href="#upgrade-builder-image-version"></a>Upgrade Builder Image Version</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are two location where we have to upgrade the builder image:</p>
+<p>There are two locations where we have to upgrade the builder image:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>kitchensink-conf/basic/base/kitchensink-bc.yaml</p>
+<p>kitchensink-conf/<strong>basic</strong>/base/kitchensink-bc.yaml</p>
 </li>
 <li>
-<p>kitchensink-conf/advanced/helm_base/values.yaml</p>
+<p>kitchensink-conf/<strong>advanced</strong>/helm_base/values.yaml</p>
+</li>
+<li>
+<p>kitchensink-conf/<strong>cicd</strong>/values.yaml</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p><mark>&#8658; kitchensink-conf/<strong>basic</strong>/base/kitchensink-bc.yaml</mark></p>
 </div>
 <div class="paragraph">
 <p>Please copy and paste the following link and open it in a browser. It will take you to file <code>kitchensink-conf/basic/base/kitchensink-bc.yaml</code> where you have to do the following change.</p>
@@ -359,6 +365,9 @@ You should always consult the <a href="https://access.redhat.com/documentation/e
 <p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
 </div>
 <div class="paragraph">
+<p><mark>&#8658; kitchensink-conf/<strong>advanced</strong>/helm_base/values.yaml</mark></p>
+</div>
+<div class="paragraph">
 <p>Next link will take you to file <code>kitchensink-conf/advanced/helm_base/values.yaml</code> where you have to do the following change.</p>
 </div>
 <div class="listingblock console-input">
@@ -384,6 +393,57 @@ You should always consult the <a href="https://access.redhat.com/documentation/e
 </div>
 <div class="paragraph">
 <p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
+</div>
+<div class="paragraph">
+<p><mark>&#8658; kitchensink-conf/<strong>cicd</strong>/values.yaml</mark></p>
+</div>
+<div class="paragraph">
+<p>Finally, the following link will take you to file <code>kitchensink-conf/cicd/values.yaml</code> where you have to do the following change.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/_edit/main/cicd/values.yaml#L19</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once there, you have to change this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">kitchensinkBuilderImage: jboss-eap72-openshift:1.2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">kitchensinkBuilderImage: jboss-eap74-openjdk8-openshift:7.4.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="refresh-applications-in-argocd"><a class="anchor" href="#refresh-applications-in-argocd"></a>Refresh Applications in ArgoCD</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now let&#8217;s force the refresh of all our applications at once before we make the last change which will trigger the CI pipeline. To do that you have to go to Argo CD and click on <code>REFRESH APPS</code> then click on <code>ALL</code> as in the next picture.</p>
+</div>
+<div class="imageblock unresolved">
+<div class="content">
+<img src="argocd-refresh-all-apps.png" alt="Apps">
+</div>
+</div>
+<div class="paragraph">
+<p>Use this link to open Argo CD and see all applications then proceed as explained.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -427,12 +487,6 @@ You should always consult the <a href="https://access.redhat.com/documentation/e
 <div class="paragraph">
 <p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="refresh-applications-in-argocd"><a class="anchor" href="#refresh-applications-in-argocd"></a>Refresh Applications in ArgoCD</h2>
-<div class="sectionbody">
-
 </div>
 </div>
 <nav class="pagination">
