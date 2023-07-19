@@ -54,23 +54,30 @@ cat <<EOF | oc apply -n {root-apps-namespace} -f -
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kitchensink-helm-app-$\{USERNAME}
+  name: kitchensink-helm-app-{username}
   namespace: openshift-gitops
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
     kitchensink-root-app: 'true'
-    username: $\{USERNAME}    
+    username: {username}    
 spec:
   destination:
     name: in-cluster
-    namespace: helm-$\{USERNAME}
+    namespace: helm-{username}
+  ignoreDifferences:
+    - group: apps
+      jqPathExpressions:
+        - '.spec.template.spec.containers[].image'
+      kind: Deployment
   project: default
   source:
     helm:
       parameters:
+        - name: debug
+          value: 'true'
         - name: baseNamespace
-          value: helm-$\{USERNAME}
+          value: 'helm-{username}'
     path: advanced/helm_base
     repoURL: "https://{gitea-host}/{username}/kitchensink-conf"
     targetRevision: main

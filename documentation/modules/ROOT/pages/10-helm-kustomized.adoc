@@ -73,7 +73,7 @@ With this:
 [.console-input]
 [source,yaml,subs="attributes+,+macros"]
 ----
-- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+- name: image-registry.openshift-image-registry.svc:5000/{cicd-namespace}-{username}/kitchensink:latest
     newName: image-registry.openshift-image-registry.svc:5000/{cicd-namespace}-{username}/kitchensink
     newTag: latest
 ----
@@ -117,7 +117,7 @@ With this:
 [.console-input]
 [source,yaml,subs="attributes+,+macros"]
 ----
-- name: image-registry.openshift-image-registry.svc:5000/demo-6/kitchensink:latest
+- name: image-registry.openshift-image-registry.svc:5000/{cicd-namespace}-{username}/kitchensink:latest
     newName: image-registry.openshift-image-registry.svc:5000/{cicd-namespace}-{username}/kitchensink
     newTag: latest
 ----
@@ -181,6 +181,8 @@ spec:
           env:
             - name: DEBUG
               value: 'false'
+            - name: BASE_NAMESPACE
+              value: '{cicd-namespace}-{username}'
           name: kustomized-helm
 EOF
 ----

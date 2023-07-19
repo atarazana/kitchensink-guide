@@ -17,10 +17,13 @@ This means that you have to make a change in your `extension/install.sh` script 
 [#upgrade-builder-image-version]
 == Upgrade Builder Image Version
 
-There are two location where we have to upgrade the builder image:
+There are two locations where we have to upgrade the builder image:
 
-* kitchensink-conf/basic/base/kitchensink-bc.yaml
-* kitchensink-conf/advanced/helm_base/values.yaml
+* kitchensink-conf/*basic*/base/kitchensink-bc.yaml
+* kitchensink-conf/*advanced*/helm_base/values.yaml
+* kitchensink-conf/*cicd*/values.yaml
+
+#=> kitchensink-conf/*basic*/base/kitchensink-bc.yaml#
 
 Please copy and paste the following link and open it in a browser. It will take you to file `kitchensink-conf/basic/base/kitchensink-bc.yaml` where you have to do the following change.
 
@@ -47,6 +50,8 @@ name: 'jboss-eap74-openjdk8-openshift:7.4.0'
 
 Once you have made the changes scroll down and click on `Commit Changes`.
 
+#=> kitchensink-conf/*advanced*/helm_base/values.yaml#
+
 Next link will take you to file `kitchensink-conf/advanced/helm_base/values.yaml` where you have to do the following change.
 
 [.console-input]
@@ -71,6 +76,48 @@ builderImage: jboss-eap74-openjdk8-openshift:7.4.0
 ----
 
 Once you have made the changes scroll down and click on `Commit Changes`.
+
+#=> kitchensink-conf/*cicd*/values.yaml#
+
+Finally, the following link will take you to file `kitchensink-conf/cicd/values.yaml` where you have to do the following change.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/cicd/values.yaml#L19
+----
+
+Once there, you have to change this:
+
+[source,yaml,subs="attributes+,+macros"]
+----
+kitchensinkBuilderImage: jboss-eap72-openshift:1.2
+----
+
+With this
+
+[.console-input]
+[source,yaml,subs="attributes+,+macros"]
+----
+kitchensinkBuilderImage: jboss-eap74-openjdk8-openshift:7.4.0
+----
+
+Once you have made the changes scroll down and click on `Commit Changes`.
+
+[#refresh-applications-in-argocd]
+== Refresh Applications in ArgoCD
+
+Now let's force the refresh of all our applications at once before we make the last change which will trigger the CI pipeline. To do that you have to go to Argo CD and click on `REFRESH APPS` then click on `ALL` as in the next picture.
+
+image::argocd-refresh-all-apps.png[Apps]
+
+Use this link to open Argo CD and see all applications then proceed as explained.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{argocd-server}/applications
+----
 
 [#update-install-script]
 == Update `install.sh`
@@ -102,7 +149,4 @@ configure_drivers ${injected_dir}/driver-postgresql.env
 ----
 
 Once you have made the changes scroll down and click on `Commit Changes`.
-
-[#refresh-applications-in-argocd]
-== Refresh Applications in ArgoCD
 
