@@ -12,7 +12,9 @@ Well there are a number of things different in 7.4 with regards to 7.2 but we on
 
 TIP: You should always consult the link:https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.4/html/7.4.0_release_notes/index[release notes] for a deeper understanding of changes between versions.
 
-This means that you have to make a change in your `extension/install.sh` script in order to install the needed driver you will do this later, before you do, let's upgrade the builder image from 7.2 to 7.4.
+This means that you have to make a change in your `extension/install.sh` script in order to install the needed driver. You will do this later, but before you do.
+
+*Let's upgrade the builder image from 7.2 to 7.4*.
 
 [#upgrade-builder-image-version]
 == Upgrade Builder Image Version
@@ -30,7 +32,7 @@ Please copy and paste the following link and open it in a browser. It will take 
 [.console-input]
 [source,bash, subs="+attributes"]
 ----
-https://{gitea-host}/{username}/kitchensink-conf/_edit/main/basic/base/kitchensink-bc.yaml#27
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/basic/base/kitchensink-bc.yaml#L27
 ----
 
 Once there, you have to change this:
@@ -84,7 +86,7 @@ Finally, the following link will take you to file `kitchensink-conf/cicd/values.
 [.console-input]
 [source,bash, subs="+attributes"]
 ----
-https://{gitea-host}/{username}/kitchensink-conf/_edit/main/cicd/values.yaml#L19
+https://{gitea-host}/{username}/kitchensink-conf/_edit/main/cicd/values.yaml#L21
 ----
 
 Once there, you have to change this:
@@ -103,21 +105,6 @@ kitchensinkBuilderImage: jboss-eap74-openjdk8-openshift:7.4.0
 ----
 
 Once you have made the changes scroll down and click on `Commit Changes`.
-
-[#refresh-applications-in-argocd]
-== Refresh Applications in ArgoCD
-
-Now let's force the refresh of all our applications at once before we make the last change which will trigger the CI pipeline. To do that you have to go to Argo CD and click on `REFRESH APPS` then click on `ALL` as in the next picture.
-
-image::argocd-refresh-all-apps.png[Apps]
-
-Use this link to open Argo CD and see all applications then proceed as explained.
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{argocd-server}/applications
-----
 
 [#update-install-script]
 == Update `install.sh`
@@ -150,3 +137,99 @@ configure_drivers ${injected_dir}/driver-postgresql.env
 
 Once you have made the changes scroll down and click on `Commit Changes`.
 
+[#refresh-applications-in-argocd]
+== Refresh Applications in ArgoCD
+
+Now let's force the refresh of all our applications at once before we make the last change which will trigger the CI pipeline. To do that you have to go to Argo CD and click on `REFRESH APPS` then click on `ALL` as in the next picture.
+
+image::argocd-refresh-all-apps.png[Apps]
+
+Use this link to open Argo CD and see all applications then proceed as explained.
+
+TIP: The following link has a query parameter `search` which will show only the applications of *{username}*.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{argocd-server}/applications?search={username}
+----
+
+[#rebuild-images]
+== Rebuild Images
+
+Rebuild all images expect for the ones in projects:
+
+* helm-kustomize-dev-{username}
+* helm-kustomize-test-{username}.
+
+*Why?* Because for those projects the mechanism to update the images is base on the pipeline you already know.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+PROJECT_BASE_LIST="argo appset-a appset-b kustomize-dev kustomize-test helm helm-kustomize-dev helm-kustomize-test s2i"
+for base in ${PROJECT_BASE_LIST};
+do
+  PROJECT_NAME=${base}-{username}
+  oc start-build bc/kitchensink -n ${PROJECT_NAME}
+done
+----
+
+[#final-tests]
+== Final Tests
+
+You have made changes in install.sh which should have trigger the CI pipeline you tested before. 
+
+Let's check the version of JBoss before approving the *Pull Request* in *kitchensink-conf*.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+oc logs deployment/kitchensink -n helm-kustomize-dev-{username} | grep -e "JBoss EAP 7"
+----
+
+You should expect something like:
+
+[.console-output]
+[source,bash, subs="+attributes"]
+----
+17:51:03,635 INFO  [org.jboss.as] (MSC service thread 1-1) WFLYSRV0049: JBoss EAP 7.2.9.GA (WildFly Core 6.0.30.Final-redhat-00001) starting
+17:51:09,121 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: JBoss EAP 7.2.9.GA (WildFly Core 6.0.30.Final-redhat-00001) started in 5894ms - Started 65 of 86 services (30 services are lazy, passive or on-demand)
+17:51:09,667 INFO  [org.jboss.as] (MSC service thread 1-1) WFLYSRV0050: JBoss EAP 7.2.9.GA (WildFly Core 6.0.30.Final-redhat-00001) stopped in 37ms
+17:51:11,987 INFO  [org.jboss.as] (MSC service thread 1-1) WFLYSRV0049: JBoss EAP 7.2.9.GA (WildFly Core 6.0.30.Final-redhat-00001) starting
+17:51:48,114 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: JBoss EAP 7.2.9.GA (WildFly Core 6.0.30.Final-redhat-00001) started in 37487ms - Started 581 of 824 services (481 services are lazy, passive or on-demand)
+----
+
+Now you have to do the same, you know, go to *kitchensink-conf*, look for new *Pull Requests*, approve it and wait until the new image has been deployed in *dev*.
+
+Once the new image has been rolled out, you could open the link to the UI, as you have done before... and then check in the logs if the new version is 7.4.*. You can do it with the next command.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+oc logs deployment/kitchensink -n helm-kustomize-dev-{username} | grep -e "JBoss EAP 7"
+----
+
+You should expect something like:
+
+[.console-output]
+[source,bash, subs="+attributes"]
+----
+8:13:17,374 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0049: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) starting
+18:13:19,474 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) started in 3238ms - Started 75 of 99 services (38 services are lazy, passive or on-demand)
+18:13:22,327 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0049: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) starting
+18:13:24,585 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) started in 2480ms - Started 59 of 90 services (38 services are lazy, passive or on-demand)
+18:13:24,930 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0050: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) stopped in 25ms
+18:13:27,534 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0050: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) stopped in 36ms
+18:13:27,535 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0049: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) starting
+18:13:38,480 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) started in 10944ms - Started 595 of 869 services (525 services are lazy, passive or on-demand)
+----
+
+Then do the same with the new *Pull Request* and wait until the new image has been deployed in *test*.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+POD_NAME=$(oc get pod -n helm-kustomize-test-{username} --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}')
+oc logs ${POD_NAME} -n helm-kustomize-test-{username} | grep -e "JBoss EAP 7"
+----

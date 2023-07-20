@@ -59,7 +59,7 @@ With this
 namespace: helm-kustomize-dev-{username}
 ----
 
-Now you have to also change this around line 20:
+Additionally you have make the next change (this is around line 20):
 
 [source,yaml,subs="attributes+,+macros"]
 ----
@@ -103,7 +103,7 @@ With this
 namespace: helm-kustomize-test-{username}
 ----
 
-Now you have to also change this around line 20:
+Don't forget to make the following change (this is around line 20):
 
 [source,yaml,subs="attributes+,+macros"]
 ----

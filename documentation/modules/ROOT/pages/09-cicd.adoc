@@ -5,10 +5,10 @@ In this chapter you're going to deploy CI and CD pipelines that will help to aut
 
 IMPORTANT: It's a best practice avoid storing secrets in a git repository even if it's private. There are several ways to deal with secrets in this kind of scenarios but in this case we're going to manage them manually for the sake of simplicity.
 
-[#create-root-account-in-quay]
-== Create a Robot Account in Quay
+// [#create-root-account-in-quay]
+// == Create a Robot Account in Quay
 
-include::partial$create-robot-account-in-quay.adoc[]
+// include::partial$create-robot-account-in-quay.adoc[]
 
 [#deploying-cicd-pipelines]
 == Deploying CICD Pipelines
@@ -143,20 +143,12 @@ cicd-tekton-user1                  Active
 
 Fine, the namespace is in place, *it's time to create the git secret our pipelines will use when cloning and also while creating Pull Requests* which are the fuel for the CD part of the pipelines to promote from one environment to the next.
 
-[CAUTION]
-====
-Now it's time to use the token generated in the previous chapter <<create-git-pat>>.
+Let's create a PAT here, don't worry if you created one before.
 
-Please make sure that the `GIT_PAT` environment variable has the correct value before you start creating the `Secret` with the following command.
+include::partial$gitea-create-pat.adoc[]
 
-.is this ok ¿?
-[.console-input]
-[source,bash, subs="+macros,+attributes"]
-----
-echo "GIT_PAT=${GIT_PAT}"
-----
-====
 
+Create the actual secret which embeds the PAT you just created using the next command:
 
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
@@ -176,7 +168,7 @@ stringData:
 EOF
 ----
 
-We need to annotate the secret so that it can actually be used by the pipeline.
+You have to annotate the secret so that it can actually be used by the pipeline.
 
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
@@ -185,117 +177,119 @@ oc annotate -n {cicd-namespace}-{username} secret {git-pat-secret-name} \
   "tekton.dev/git-0=https://{gitea-host}"
 ----
 
-[#create-registry-secret]
-== Create Registry Secret
+Now that the secret is in place and annotated you can proceed to the next chapter.
 
-As we have explained before, in this section we will deploy both CI and CD pipelines for the microservices that compose Gramola. If you have just created a secret so that the CI and CD pipelines can create Pull Requests, this time you are going to create a secret with the credentials needed to push images to the container images registry.
+// [#create-registry-secret]
+// == Create Registry Secret
 
-The next set of commands will ask you for the *username* and *password* of the container registry account you already had or created above in this chapter or in your own registry.
+// As we have explained before, in this section we will deploy both CI and CD pipelines for the microservices that compose Gramola. If you have just created a secret so that the CI and CD pipelines can create Pull Requests, this time you are going to create a secret with the credentials needed to push images to the container images registry.
 
-If you have followed all the instructions then copy and paste the next command and run it. If you have chosen to use your own registry, change accordingly.
+// The next set of commands will ask you for the *username* and *password* of the container registry account you already had or created above in this chapter or in your own registry.
 
-*USERNAME*
-[.console-input]
-[source,bash, subs="+macros,+attributes"]
-----
-export CONTAINER_REGISTRY_USERNAME="{username}+cicd"
-----
+// If you have followed all the instructions then copy and paste the next command and run it. If you have chosen to use your own registry, change accordingly.
 
-*TOKEN*
+// *USERNAME*
+// [.console-input]
+// [source,bash, subs="+macros,+attributes"]
+// ----
+// export CONTAINER_REGISTRY_USERNAME="{username}+cicd"
+// ----
 
-Please use the next link to open the details of your robot account.
+// *TOKEN*
 
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{quay-server}/user/{username}?tab=robots
-----
+// Please use the next link to open the details of your robot account.
 
-Then click on the `{username}-cicd` link.
+// [.console-input]
+// [source,bash, subs="+attributes"]
+// ----
+// https://{quay-server}/user/{username}?tab=robots
+// ----
 
-image::quay-installed-view-credentials-robot-account-userX.png[Robot Account Credentials]
+// Then click on the `{username}-cicd` link.
 
-Then copy the token as in the next image.
+// image::quay-installed-view-credentials-robot-account-userX.png[Robot Account Credentials]
 
-image::quay-installed-copy-credentials-robot-account-userX.png[Robot Account Credentials]
+// Then copy the token as in the next image.
 
-Then pasted when you run the following command.
+// image::quay-installed-copy-credentials-robot-account-userX.png[Robot Account Credentials]
 
-[.console-input]
-[source,bash, subs="+macros,+attributes"]
-----
-echo "CONTAINER_REGISTRY_PASSWORD: " && read -s CONTAINER_REGISTRY_PASSWORD
-----
+// Then pasted when you run the following command.
 
-Now that we have gather all the needed information let's create the secret.
+// [.console-input]
+// [source,bash, subs="+macros,+attributes"]
+// ----
+// echo "CONTAINER_REGISTRY_PASSWORD: " && read -s CONTAINER_REGISTRY_PASSWORD
+// ----
 
-NOTE: As we did with the git secret we have to annotate it so that Tekton know it has to use this and no other.
+// Now that we have gather all the needed information let's create the secret.
 
-[.console-input]
-[source,bash, subs="+macros,+attributes"]
-----
-export CONTAINER_REGISTRY_SECRET_NAME={container-registry-secret-name}
+// NOTE: As we did with the git secret we have to annotate it so that Tekton know it has to use this and no other.
 
-if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] && [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
-    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
-else
-oc create -n {cicd-namespace}-{username} secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
-  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
-  --docker-username=$CONTAINER_REGISTRY_USERNAME \
-  --docker-password=$CONTAINER_REGISTRY_PASSWORD
-oc annotate -n {cicd-namespace}-{username} secret ${CONTAINER_REGISTRY_SECRET_NAME} \
-  "tekton.dev/docker-0=https://${CONTAINER_REGISTRY_SERVER}"
-fi
-----
+// [.console-input]
+// [source,bash, subs="+macros,+attributes"]
+// ----
+// export CONTAINER_REGISTRY_SECRET_NAME={container-registry-secret-name}
 
-[#grant-pull-permissions]
-== Granting Pull Permissions
+// if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] && [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
+//     echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
+// else
+// oc create -n {cicd-namespace}-{username} secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
+//   --docker-server=https://$CONTAINER_REGISTRY_SERVER \
+//   --docker-username=$CONTAINER_REGISTRY_USERNAME \
+//   --docker-password=$CONTAINER_REGISTRY_PASSWORD
+// oc annotate -n {cicd-namespace}-{username} secret ${CONTAINER_REGISTRY_SECRET_NAME} \
+//   "tekton.dev/docker-0=https://${CONTAINER_REGISTRY_SERVER}"
+// fi
+// ----
 
-Additionally we have to create the same secret in `dev` and `test` and link it to the default `ServiceAccount` for pulling images from a private registry.
+// [#grant-pull-permissions]
+// == Granting Pull Permissions
 
-IMPORTANT: If you don't do this the deployment won't be able to run because they lack permissions to pull the image from the private repository.
+// Additionally we have to create the same secret in `dev` and `test` and link it to the default `ServiceAccount` for pulling images from a private registry.
 
-[.console-input]
-[source,bash, subs="+macros,+attributes"]
-----
-export CONTAINER_REGISTRY_SECRET_NAME={container-registry-secret-name}
+// IMPORTANT: If you don't do this the deployment won't be able to run because they lack permissions to pull the image from the private repository.
 
-if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] && [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
-    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
-else
-oc create -n helm-kustomize-dev-{username} secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
-  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
-  --docker-username=$CONTAINER_REGISTRY_USERNAME \
-  --docker-password=$CONTAINER_REGISTRY_PASSWORD
-oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n helm-kustomize-dev-{username}
-oc create -n helm-kustomize-test-{username} secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
-  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
-  --docker-username=$CONTAINER_REGISTRY_USERNAME \
-  --docker-password=$CONTAINER_REGISTRY_PASSWORD
-oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n helm-kustomize-test-{username}
-fi
-----
+// [.console-input]
+// [source,bash, subs="+macros,+attributes"]
+// ----
+// export CONTAINER_REGISTRY_SECRET_NAME={container-registry-secret-name}
 
-CAUTION: *If you have an additional cluster* you *HAVE* to run the following command too.
+// if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] && [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
+//     echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
+// else
+// oc create -n helm-kustomize-dev-{username} secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
+//   --docker-server=https://$CONTAINER_REGISTRY_SERVER \
+//   --docker-username=$CONTAINER_REGISTRY_USERNAME \
+//   --docker-password=$CONTAINER_REGISTRY_PASSWORD
+// oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n helm-kustomize-dev-{username}
+// oc create -n helm-kustomize-test-{username} secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
+//   --docker-server=https://$CONTAINER_REGISTRY_SERVER \
+//   --docker-username=$CONTAINER_REGISTRY_USERNAME \
+//   --docker-password=$CONTAINER_REGISTRY_PASSWORD
+// oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n helm-kustomize-test-{username}
+// fi
+// ----
 
-[.console-input]
-[source,bash, subs="+macros,+attributes"]
-----
-export ADDITIONAL_API_SERVER_TOKEN=%ADDITIONAL_API_SERVER_TOKEN%
-export ADDITIONAL_API_SERVER_MANAGED=api.%ADDITIONAL_BASE_SUBDOMAIN%:6443
-oc login --token=${ADDITIONAL_API_SERVER_TOKEN} --server=https://${ADDITIONAL_API_SERVER_MANAGED} --insecure-skip-tls-verify=true
+// CAUTION: *If you have an additional cluster* you *HAVE* to run the following command too.
 
-export CONTAINER_REGISTRY_SECRET_NAME=$(yq eval '.containerRegistrySecretName' ./apps/cicd/values.yaml)
+// [.console-input]
+// [source,bash, subs="+macros,+attributes"]
+// ----
+// export ADDITIONAL_API_SERVER_TOKEN=%ADDITIONAL_API_SERVER_TOKEN%
+// export ADDITIONAL_API_SERVER_MANAGED=api.%ADDITIONAL_BASE_SUBDOMAIN%:6443
+// oc login --token=${ADDITIONAL_API_SERVER_TOKEN} --server=https://${ADDITIONAL_API_SERVER_MANAGED} --insecure-skip-tls-verify=true
 
-if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] && [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
-    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
-else
-oc create -n gramola-test-{username} secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
-  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
-  --docker-username=$CONTAINER_REGISTRY_USERNAME \
-  --docker-password=$CONTAINER_REGISTRY_PASSWORD
-oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n gramola-test-{username}
-fi
+// export CONTAINER_REGISTRY_SECRET_NAME=$(yq eval '.containerRegistrySecretName' ./apps/cicd/values.yaml)
 
-oc login -u {username} -p {password} --server=https://api.{api-domain} --insecure-skip-tls-verify=true
-----
+// if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] && [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
+//     echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
+// else
+// oc create -n gramola-test-{username} secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
+//   --docker-server=https://$CONTAINER_REGISTRY_SERVER \
+//   --docker-username=$CONTAINER_REGISTRY_USERNAME \
+//   --docker-password=$CONTAINER_REGISTRY_PASSWORD
+// oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n gramola-test-{username}
+// fi
+
+// oc login -u {username} -p {password} --server=https://api.{api-domain} --insecure-skip-tls-verify=true
+// ----
