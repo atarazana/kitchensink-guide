@@ -303,84 +303,6 @@ It&#8217;s a best practice avoid storing secrets in a git repository even if it&
 </div>
 </div>
 <div class="sect1">
-<h2 id="create-root-account-in-quay"><a class="anchor" href="#create-root-account-in-quay"></a>Create a Robot Account in Quay</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Please copy and paste the following link and open it in a browser, then use this credentials and click on <code>Sign in to Red Hat Quay</code>.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Username:</strong> %USERNAME%</p>
-</li>
-<li>
-<p><strong>Password:</strong> openshift</p>
-</li>
-</ul>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-login-userX.png" alt="Quay Login">
-</div>
-</div>
-<div class="paragraph">
-<p>Go to the robot accounts area by clicking on the robot icon as in the next picture.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-go-to-robot-accounts-userX.png" alt="Go to Repositories">
-</div>
-</div>
-<div class="paragraph">
-<p>Now click on the <code>Create Robot Account</code> button.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-create-robot-account-1-userX.png" alt="Go to Repositories">
-</div>
-</div>
-<div class="paragraph">
-<p>Now please use the following date and click on the <code>Create robot Account</code> button:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Name:</strong> cicd</p>
-</li>
-<li>
-<p><strong>Description:</strong> CICD robot account</p>
-</li>
-</ul>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-create-robot-account-2-userX.png" alt="Go to Repositories">
-</div>
-</div>
-<div class="paragraph">
-<p>We have our robot account but no permissions have been granted to it, please click on <code>Set Repository Permissions</code>.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-create-robot-account-3-userX.png" alt="Go to Repositories">
-</div>
-</div>
-<div class="paragraph">
-<p>Set permissions to <code>Write</code> on both repositories, then click on <code>Update permissions</code>.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-create-robot-account-4-userX.png" alt="Go to Repositories">
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="deploying-cicd-pipelines"><a class="anchor" href="#deploying-cicd-pipelines"></a>Deploying CICD Pipelines</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -532,28 +454,34 @@ cicd-tekton-user1                  Active</code></pre>
 <div class="paragraph">
 <p>Fine, the namespace is in place, <strong>it&#8217;s time to create the git secret our pipelines will use when cloning and also while creating Pull Requests</strong> which are the fuel for the CD part of the pipelines to promote from one environment to the next.</p>
 </div>
-<div class="admonitionblock caution">
+<div class="paragraph">
+<p>Let&#8217;s create a PAT here, don&#8217;t worry if you created one before.</p>
+</div>
+<div class="admonitionblock tip">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
+<i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Now it&#8217;s time to use the token generated in the previous chapter <a href="#create-git-pat">[create-git-pat]</a>.</p>
-</div>
-<div class="paragraph">
-<p>Please make sure that the <code>GIT_PAT</code> environment variable has the correct value before you start creating the <code>Secret</code> with the following command.</p>
-</div>
-<div class="listingblock console-input">
-<div class="title">is this ok ¿?</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">echo "GIT_PAT=${GIT_PAT}"</code></pre>
-</div>
+<p>You can run this command as often as needed</p>
 </div>
 </td>
 </tr>
 </table>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">GIT_PAT=$(curl -k -s -XPOST -H "Content-Type: application/json" \
+  -d '{"name":"cicd'"${RANDOM}"'","scopes": ["repo"]}' \
+  -u %USERNAME%:openshift \
+  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens</a> | jq -r .sha1)
+echo "GIT_PAT=${GIT_PAT}"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create the actual secret which embeds the PAT you just created using the next command:</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
@@ -573,7 +501,7 @@ EOF</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>We need to annotate the secret so that it can actually be used by the pipeline.</p>
+<p>You have to annotate the secret so that it can actually be used by the pipeline.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
@@ -581,166 +509,8 @@ EOF</code></pre>
   "tekton.dev/git-0=https://repository-gitea-system.apps.%BASE_SUBDOMAIN%"</code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="create-registry-secret"><a class="anchor" href="#create-registry-secret"></a>Create Registry Secret</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>As we have explained before, in this section we will deploy both CI and CD pipelines for the microservices that compose Gramola. If you have just created a secret so that the CI and CD pipelines can create Pull Requests, this time you are going to create a secret with the credentials needed to push images to the container images registry.</p>
-</div>
-<div class="paragraph">
-<p>The next set of commands will ask you for the <strong>username</strong> and <strong>password</strong> of the container registry account you already had or created above in this chapter or in your own registry.</p>
-</div>
-<div class="paragraph">
-<p>If you have followed all the instructions then copy and paste the next command and run it. If you have chosen to use your own registry, change accordingly.</p>
-</div>
-<div class="paragraph">
-<p><strong>USERNAME</strong></p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_USERNAME="%USERNAME%+cicd"</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>TOKEN</strong></p>
-</div>
-<div class="paragraph">
-<p>Please use the next link to open the details of your robot account.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%/user/%USERNAME%?tab=robots</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Then click on the <code>%USERNAME%-cicd</code> link.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-view-credentials-robot-account-userX.png" alt="Robot Account Credentials">
-</div>
-</div>
-<div class="paragraph">
-<p>Then copy the token as in the next image.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-copy-credentials-robot-account-userX.png" alt="Robot Account Credentials">
-</div>
-</div>
-<div class="paragraph">
-<p>Then pasted when you run the following command.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">echo "CONTAINER_REGISTRY_PASSWORD: " &amp;&amp; read -s CONTAINER_REGISTRY_PASSWORD</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Now that we have gather all the needed information let&#8217;s create the secret.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-As we did with the git secret we have to annotate it so that Tekton know it has to use this and no other.
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_SECRET_NAME=container-registry-secret
-
-if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] &amp;&amp; [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
-    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
-else
-oc create -n cicd-tekton-%USERNAME% secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
-  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
-  --docker-username=$CONTAINER_REGISTRY_USERNAME \
-  --docker-password=$CONTAINER_REGISTRY_PASSWORD
-oc annotate -n cicd-tekton-%USERNAME% secret ${CONTAINER_REGISTRY_SECRET_NAME} \
-  "tekton.dev/docker-0=https://${CONTAINER_REGISTRY_SERVER}"
-fi</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="grant-pull-permissions"><a class="anchor" href="#grant-pull-permissions"></a>Granting Pull Permissions</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Additionally we have to create the same secret in <code>dev</code> and <code>test</code> and link it to the default <code>ServiceAccount</code> for pulling images from a private registry.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-If you don&#8217;t do this the deployment won&#8217;t be able to run because they lack permissions to pull the image from the private repository.
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export CONTAINER_REGISTRY_SECRET_NAME=container-registry-secret
-
-if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] &amp;&amp; [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
-    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
-else
-oc create -n helm-kustomize-dev-%USERNAME% secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
-  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
-  --docker-username=$CONTAINER_REGISTRY_USERNAME \
-  --docker-password=$CONTAINER_REGISTRY_PASSWORD
-oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n helm-kustomize-dev-%USERNAME%
-oc create -n helm-kustomize-test-%USERNAME% secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
-  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
-  --docker-username=$CONTAINER_REGISTRY_USERNAME \
-  --docker-password=$CONTAINER_REGISTRY_PASSWORD
-oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n helm-kustomize-test-%USERNAME%
-fi</code></pre>
-</div>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<strong>If you have an additional cluster</strong> you <strong>HAVE</strong> to run the following command too.
-</td>
-</tr>
-</table>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export ADDITIONAL_API_SERVER_TOKEN=%ADDITIONAL_API_SERVER_TOKEN%
-export ADDITIONAL_API_SERVER_MANAGED=api.%ADDITIONAL_BASE_SUBDOMAIN%:6443
-oc login --token=${ADDITIONAL_API_SERVER_TOKEN} --server=https://${ADDITIONAL_API_SERVER_MANAGED} --insecure-skip-tls-verify=true
-
-export CONTAINER_REGISTRY_SECRET_NAME=$(yq eval '.containerRegistrySecretName' ./apps/cicd/values.yaml)
-
-if [ -z "${CONTAINER_REGISTRY_USERNAME}" ] &amp;&amp; [ -z "${CONTAINER_REGISTRY_PASSWORD}" ]; then
-    echo "You should provide a value for CONTAINER_REGISTRY_USERNAME and CONTAINER_REGISTRY_PASSWORD"
-else
-oc create -n gramola-test-%USERNAME% secret docker-registry ${CONTAINER_REGISTRY_SECRET_NAME} \
-  --docker-server=https://$CONTAINER_REGISTRY_SERVER \
-  --docker-username=$CONTAINER_REGISTRY_USERNAME \
-  --docker-password=$CONTAINER_REGISTRY_PASSWORD
-oc secrets link default ${CONTAINER_REGISTRY_SECRET_NAME} --for=pull -n gramola-test-%USERNAME%
-fi
-
-oc login -u %USERNAME% -p %PASSWORD% --server=https://api.%BASE_SUBDOMAIN%:6443 --insecure-skip-tls-verify=true</code></pre>
-</div>
+<p>Now that the secret is in place and annotated you can proceed to the next chapter.</p>
 </div>
 </div>
 </div>
