@@ -74,33 +74,32 @@ Once you have made the changes scroll down and click on `Commit Changes`.
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
 ----
-export USERNAME="{username}"
 cat <<EOF | oc apply -n {root-apps-namespace} -f -
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: kitchensink-kustomize-$\{USERNAME}
+  name: kitchensink-kustomize-{username}
   namespace: openshift-gitops
   labels:
     argocd-root-app: "true"
-    username: $\{USERNAME}
+    username: {username}
 spec:
   generators:
   - list:
       elements:
       - env: dev
-        ns: kustomize-dev-$\{USERNAME}
+        ns: kustomize-dev-{username}
         desc: "Kustomize Dev"
       - env: test
-        ns: kustomize-test-$\{USERNAME}
+        ns: kustomize-test-{username}
         desc: "Kustomize Test"
   template:
     metadata:
-      name: kitchensink-kustomize-app-{{ env }}-$\{USERNAME}
+      name: kitchensink-kustomize-app-{{ env }}-{username}
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"
-        username: $\{USERNAME}
+        username: {username}
       finalizers:
       - resources-finalizer.argocd.argoproj.io
     spec:
