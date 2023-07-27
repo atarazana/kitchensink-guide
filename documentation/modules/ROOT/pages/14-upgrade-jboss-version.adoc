@@ -19,7 +19,7 @@ This means that you have to make a change in your `extension/install.sh` script 
 [#upgrade-builder-image-version]
 == Upgrade Builder Image Version
 
-There are two locations where we have to upgrade the builder image:
+There are some locations where we have to upgrade the builder image:
 
 * kitchensink-conf/*basic*/base/kitchensink-bc.yaml
 * kitchensink-conf/*advanced*/helm_base/values.yaml
