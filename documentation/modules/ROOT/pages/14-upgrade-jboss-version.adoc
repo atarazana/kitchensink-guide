@@ -14,74 +14,18 @@ TIP: You should always consult the link:https://access.redhat.com/documentation/
 
 This means that you have to make a change in your `extension/install.sh` script in order to install the needed driver. You will do this later, but before you do.
 
-*Let's upgrade the builder image from 7.2 to 7.4*.
+*Let's upgrade the builder image from 7.2 to 7.4 BUT only helm-kustomize-dev and helm-kustomize-test for simplicity*.
 
 [#upgrade-builder-image-version]
 == Upgrade Builder Image Version
 
 There are some locations where we have to upgrade the builder image:
 
-* kitchensink-conf/*basic*/base/kitchensink-bc.yaml
-* kitchensink-conf/*advanced*/helm_base/values.yaml
 * kitchensink-conf/*cicd*/values.yaml
-
-#=> kitchensink-conf/*basic*/base/kitchensink-bc.yaml#
-
-Please copy and paste the following link and open it in a browser. It will take you to file `kitchensink-conf/basic/base/kitchensink-bc.yaml` where you have to do the following change.
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{gitea-host}/{username}/kitchensink-conf/_edit/main/basic/base/kitchensink-bc.yaml#L27
-----
-
-Once there, you have to change this:
-
-[source,yaml,subs="attributes+,+macros"]
-----
-name: 'jboss-eap72-openshift:1.2'
-----
-
-With this
-
-[.console-input]
-[source,yaml,subs="attributes+,+macros"]
-----
-name: 'jboss-eap74-openjdk8-openshift:7.4.0'
-----
-
-Once you have made the changes scroll down and click on `Commit Changes`.
-
-#=> kitchensink-conf/*advanced*/helm_base/values.yaml#
-
-Next link will take you to file `kitchensink-conf/advanced/helm_base/values.yaml` where you have to do the following change.
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{gitea-host}/{username}/kitchensink-conf/_edit/main/advanced/helm_base/values.yaml#L6
-----
-
-Once there, you have to change this:
-
-[source,yaml,subs="attributes+,+macros"]
-----
-builderImage: jboss-eap72-openshift:1.2
-----
-
-With this
-
-[.console-input]
-[source,yaml,subs="attributes+,+macros"]
-----
-builderImage: jboss-eap74-openjdk8-openshift:7.4.0
-----
-
-Once you have made the changes scroll down and click on `Commit Changes`.
 
 #=> kitchensink-conf/*cicd*/values.yaml#
 
-Finally, the following link will take you to file `kitchensink-conf/cicd/values.yaml` where you have to do the following change.
+The following link will take you to file `kitchensink-conf/cicd/values.yaml` where you have to do the following change.
 
 [.console-input]
 [source,bash, subs="+attributes"]
@@ -105,6 +49,23 @@ kitchensinkBuilderImage: jboss-eap74-openjdk8-openshift:7.4.0
 ----
 
 Once you have made the changes scroll down and click on `Commit Changes`.
+
+[#refresh-applications-in-argocd]
+== Refresh Applications in ArgoCD
+
+Now let's force the refresh of all our applications at once before we make the last change which will trigger the CI pipeline. To do that you have to go to Argo CD and click on `REFRESH APPS` then click on `ALL` as in the next picture.
+
+image::argocd-refresh-all-apps.png[Apps]
+
+Use this link to open Argo CD and see all applications then proceed as explained.
+
+TIP: The following link has a query parameter `search` which will show only the applications of *{username}*.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{argocd-server}/applications?search={username}
+----
 
 [#update-install-script]
 == Update `install.sh`
@@ -137,43 +98,14 @@ configure_drivers ${injected_dir}/driver-postgresql.env
 
 Once you have made the changes scroll down and click on `Commit Changes`.
 
-[#refresh-applications-in-argocd]
-== Refresh Applications in ArgoCD
+[#what-did-just-happen]
+== What Did Just Happen?
 
-Now let's force the refresh of all our applications at once before we make the last change which will trigger the CI pipeline. To do that you have to go to Argo CD and click on `REFRESH APPS` then click on `ALL` as in the next picture.
+Remember, you have committed and push a change in the *CODE* of *kitchensink*, because `install.sh` is *CODE* only that is _code_ to adapt the image to your needs, but *CODE*!
 
-image::argocd-refresh-all-apps.png[Apps]
+As with all changes to code there is a webhook that will trigger the CI pipeline and also remember that the last action in that pipeline generates a Pull Request, it doesn't deploy the new image yet!
 
-Use this link to open Argo CD and see all applications then proceed as explained.
-
-TIP: The following link has a query parameter `search` which will show only the applications of *{username}*.
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{argocd-server}/applications?search={username}
-----
-
-[#rebuild-images]
-== Rebuild Images
-
-Rebuild all images expect for the ones in projects:
-
-* helm-kustomize-dev-{username}
-* helm-kustomize-test-{username}.
-
-*Why?* Because for those projects the mechanism to update the images is base on the pipeline you already know.
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-PROJECT_BASE_LIST="argo appset-a appset-b kustomize-dev kustomize-test helm helm-kustomize-dev helm-kustomize-test s2i"
-for base in ${PROJECT_BASE_LIST};
-do
-  PROJECT_NAME=${base}-{username}
-  oc start-build bc/kitchensink -n ${PROJECT_NAME}
-done
-----
+image::ci-pl-run.png[CI PL Run]
 
 [#final-tests]
 == Final Tests
