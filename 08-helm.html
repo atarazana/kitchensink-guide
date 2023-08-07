@@ -291,46 +291,6 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="buildconfig-in-advanced-deployments"><a class="anchor" href="#buildconfig-in-advanced-deployments"></a>BuildConfig In Advanced</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>We have to do the same with this file <code>advanced/helm_base/templates/kitchensink-bc.yaml</code> as we did before for the basic deployments. Please copy and paste the following link and open it in a browser.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/_edit/main/advanced/helm_base/templates/kitchensink-bc.yaml#L40</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Once there, you have to change this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  source:
-    type: Git
-    git:
-      uri: 'https://github.com/atarazana/kitchensink'
-      ref: main</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>With this</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  source:
-    type: Git
-    git:
-      uri: 'https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink'
-      ref: main</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Once you have made the changes scroll down and click on <code>Commit Changes</code>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy Kitchensink app with ArgoCD + Helm</h2>
 <div class="sectionbody">
 <div class="paragraph">
