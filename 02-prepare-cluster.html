@@ -6,7 +6,7 @@
     <title>Prepare Cluster :: Kitchensink Guide</title>
     <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/02-prepare-cluster.html">
     <link rel="prev" href="01-setup.html">
-    <link rel="next" href="03-prepare-repositories.html">
+    <link rel="next" href="03-prepare-devspaces.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -106,19 +106,16 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="03-prepare-repositories.html">3. Prepare Repositories</a>
+    <a class="nav-link" href="03-prepare-devspaces.html">3. Prepare Devspaces</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-repositories.html#source-of-truth">Source Of Truth</a>
+    <a class="nav-link" href="03-prepare-devspaces.html#create-workspace">Create Workspace</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-repositories.html#explore-gitea-console">Explore Gitea console</a>
+    <a class="nav-link" href="03-prepare-devspaces.html#opening-a-terminal-window">Opening a Terminal Window</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-repositories.html#create-git-pat">Create Git PAT</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-repositories.html#migrate-repositories">Migrate Repositories</a>
+    <a class="nav-link" href="03-prepare-devspaces.html#allow-paste-from-clipboard">Allow Paste From Clipboard</a>
   </li>
 </ul>
   </li>
@@ -302,7 +299,7 @@
 </td>
 <td class="content">
 <div class="paragraph">
-<p><strong>Run this section only if you&#8217;re preparing the lab environment</strong> and as a <code>cluster-admin</code> user. If you just want to run the lab then proceed to the  <a href="03-prepare-repositories.html" class="xref page">next section</a>.</p>
+<p><strong>Run this section only if you&#8217;re preparing the lab environment</strong> and as a <code>cluster-admin</code> user. If you just want to run the lab then proceed to the  <a href="#03-prepare-repositories.adoc" class="xref unresolved">next section</a>.</p>
 </div>
 </td>
 </tr>
@@ -492,43 +489,6 @@ The first time you successfully log in you&#8217;ll see an Authorize Access requ
 </div>
 </div>
 <div class="sect1">
-<h2 id="checking-quay"><a class="anchor" href="#checking-quay"></a>Checking Quay</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>First of, open the OpenShift console and go to the topology view of namespace <code>quay-system</code>, use the following link.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/k8s/cluster/projects/quay-system/workloads?view=graph</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You should see something similar to this:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-topology.png" alt="Quay Topology">
-</div>
-</div>
-<div class="paragraph">
-<p>Please open Quay Console in another tab or browser window.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You should see something like this:</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/quay-installed-login.png" alt="Quay Login">
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="checking-gitea"><a class="anchor" href="#checking-gitea"></a>Checking Gitea</h2>
 <div class="sectionbody">
 <div class="admonitionblock note">
@@ -643,7 +603,7 @@ cache-control: private</code></pre>
 </div>
 <nav class="pagination">
   <span class="prev"><a href="01-setup.html" class="query-params-link">1. Setup</a></span>
-  <span class="next"><a href="03-prepare-repositories.html" class="query-params-link">3. Prepare Repositories</a></span>
+  <span class="next"><a href="03-prepare-devspaces.html" class="query-params-link">3. Prepare Devspaces</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">

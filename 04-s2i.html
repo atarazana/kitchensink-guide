@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Deploy JBoss EAP Application with S2I :: Kitchensink Guide</title>
     <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/04-s2i.html">
-    <link rel="prev" href="03-prepare-repositories.html">
+    <link rel="prev" href="03-prepare-devspaces.html">
     <link rel="next" href="05-argo.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
@@ -106,19 +106,16 @@
   </li>
   <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="03-prepare-repositories.html">3. Prepare Repositories</a>
+    <a class="nav-link" href="03-prepare-devspaces.html">3. Prepare Devspaces</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-repositories.html#source-of-truth">Source Of Truth</a>
+    <a class="nav-link" href="03-prepare-devspaces.html#create-workspace">Create Workspace</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-repositories.html#explore-gitea-console">Explore Gitea console</a>
+    <a class="nav-link" href="03-prepare-devspaces.html#opening-a-terminal-window">Opening a Terminal Window</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-repositories.html#create-git-pat">Create Git PAT</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-repositories.html#migrate-repositories">Migrate Repositories</a>
+    <a class="nav-link" href="03-prepare-devspaces.html#allow-paste-from-clipboard">Allow Paste From Clipboard</a>
   </li>
 </ul>
   </li>
@@ -388,8 +385,11 @@ Using the procedures explained in this guide there are more chances that you wil
 </tr>
 </table>
 </div>
+</div>
+<div class="sect2">
+<h3 id="assemble-script"><a class="anchor" href="#assemble-script"></a>Assemble Script</h3>
 <div class="paragraph">
-<p>In a nutshell the <code>assemble</code> script:</p>
+<p>In short, the <code>assemble</code> script:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -408,6 +408,28 @@ Using the procedures explained in this guide there are more chances that you wil
 <ul>
 <li>
 <p>If there is an <code>install.sh</code> script executes it</p>
+</li>
+<li>
+<p>Else the following artifact directories will be copied to their respective destinations in the built image:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>modules/</strong>* copied to <strong>$JBOSS_HOME/modules/system/layers/openshift</strong></p>
+</li>
+<li>
+<p><strong>configuration/</strong>* copied to <strong>$JBOSS_HOME/standalone/configuration</strong></p>
+</li>
+<li>
+<p><strong>deployments/</strong>* copied to <strong>$JBOSS_HOME/standalone/deployments</strong></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
 <div class="paragraph">
 <p>Here you are an <code>install.sh</code> script example:</p>
 </div>
@@ -422,33 +444,161 @@ install_modules ${injected_dir}/modules
 configure_drivers ${injected_dir}/drivers.env</code></pre>
 </div>
 </div>
-</li>
-<li>
-<p>Else the following artifact directories will be copied to their respective destinations in the built image:</p>
+<div class="paragraph">
+<p>In our guide you can find an <code>install.sh</code> script at <code>extensions/install.sh</code>. Have a look to the contents below.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">#!/bin/bash
+echo "&gt;&gt;&gt;&gt;&gt;&gt;&gt; Running install.sh &lt;&lt;&lt;&lt;&lt;&lt;"
+echo ${injected_dir}
+if [ "${SCRIPT_DEBUG}" = "true" ] ; then
+    set -x
+    echo "Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed"
+fi
+
+injected_dir=$1
+source /usr/local/s2i/install-common.sh <i class="conum" data-value="1"></i><b>(1)</b>
+configure_drivers ${injected_dir}/driver-oracle.env <i class="conum" data-value="2"></i><b>(2)</b>
+# configure_drivers ${injected_dir}/driver-postgresql.env <i class="conum" data-value="3"></i><b>(3)</b>
+
+# copy any needed files into the target build.
+cp -rf ${injected_dir} $JBOSS_HOME/extensions <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Load functions like <code>configure_drivers</code>, <code>install_deployments</code> or <code>install_modules</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Install Oracle driver which is not installed by default</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>In 7.2 PostgreSQL driver is already installed but this is not the case in 7.4</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Our <code>extensions</code> folder is installed by copying it to <code>$JBOSS_HOME/extensions</code></td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="run-script"><a class="anchor" href="#run-script"></a>Run Script</h3>
+<div class="paragraph">
+<p>Once at runtime, the <code>run</code> script comes into play and it will look for execution hooks which are executed, if available, from <code>$JBOSS_HOME/bin/launch/configure.sh</code>.</p>
+</div>
+<div class="paragraph">
+<p>Configuration occurs over three basic phases: preConfigure, configure and postConfigure.</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>modules/* copied to $JBOSS_HOME/modules/system/layers/openshift</p>
+<p><strong>preConfigure:</strong> invoked before any configuration takes place.  Use this to manipulate the environment prior to configuration.</p>
 </li>
 <li>
-<p>configuration/* copied to $JBOSS_HOME/standalone/configuration</p>
+<p><strong>configure:</strong> invoked to configure based on the execution environment.</p>
 </li>
 <li>
-<p>deployments/* copied to $JBOSS_HOME/standalone/deployments</p>
+<p><strong>postConfigure:</strong> invoked after all configuration has been completed.</p>
 </li>
 </ul>
 </div>
-</li>
-</ul>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>In addition to the execution environment, users may specify additional configuration details through environment scripts specified through the ENV_FILES variable.  The processing of env files is similar to the process for the execution environment, with the addition of a prepareEnv method, which is used to clean the environment before processing the env contributed by a file.  This is to help ensure that duplicate configurations are not created when processing env files.</p>
 </div>
-</li>
-<li>
-<p>Once at runtime, the <code>run</code> script comes into play and it will look for execution hooks ()</p>
-</li>
-</ul>
+</blockquote>
 </div>
 <div class="paragraph">
-<p>En ejecución se ejecutará el fichero <code>postconfigure.sh</code> antes de arrancar JBoss</p>
+<p>In our guide you can find a postConfigure script at <code>extensions/postconfigure.sh</code>. You can also find the content the file copied below.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>postconfigure.sh</code> executes the <code>extensions/setup.cli</code> JBoss CLI script to set the JBoss up for <code>kitchensink</code>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">#!/usr/bin/env bash
+echo "&gt;&gt;&gt;&gt;&gt;&gt; Executing postconfigure.sh &lt;&lt;&lt;&lt;&lt;&lt;&lt;"
+
+if [ "${SCRIPT_DEBUG}" = "true" ] ; then
+    set -x
+    echo "Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed"
+fi
+
+echo "&gt;&gt;&gt;&gt;&gt;&gt; Executing setup.cli &lt;&lt;&lt;&lt;&lt;&lt;&lt;"
+$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/extensions/setup.cli <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>You can find this script below</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s have a look to the <code>extensions/setup.cli</code> script.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">embed-server --std-out=echo --server-config=standalone-openshift.xml <i class="conum" data-value="1"></i><b>(1)</b>
+
+/subsystem=datasources/data-source=kitchensink:add( \ <i class="conum" data-value="2"></i><b>(2)</b>
+  jndi-name="java:jboss/jdbc/kitchensink", \
+  connection-url="jdbc:postgresql://${env.DB_HOST}:${env.DB_PORT:5432}/${env.DB_NAME:kitchensink}", \ <i class="conum" data-value="3"></i><b>(3)</b>
+  driver-name=postgresql, \ <i class="conum" data-value="4"></i><b>(4)</b>
+  user-name=${env.DB_USERNAME},password=${env.DB_PASSWORD}, \ <i class="conum" data-value="5"></i><b>(5)</b>
+  validate-on-match=true, \
+  valid-connection-checker-class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker",exception-sorter-class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" \
+)
+
+if (outcome == success) of /subsystem=datasources/jdbc-driver=mysql:read-attribute(name=driver-name)
+    # Remove Driver
+    /subsystem=datasources/jdbc-driver=mysql:remove
+end-if
+
+quit</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Script runs on an embed server and results are applied to <code>standalone-openshift.xml</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Adding a new data source</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Connection string</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Driver</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Credentials</td>
+</tr>
+</table>
 </div>
 <div class="quoteblock">
 <blockquote>
@@ -521,10 +671,7 @@ configure_drivers ${injected_dir}/drivers.env</code></pre>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>This template deploys our application using a <code>DeploymentConfig</code> instead of the kubernetes <code>Deployment</code> object, starting in chapter <code>ArgoCD + Helm</code> you will see that we&#8217;ve moved from <code>DeploymentConfig</code> to <code>Deployment</code>.</p>
-</div>
-<div class="paragraph">
-<p><mark>TODO</mark></p>
+<p>This template deploys our application using a <code>DeploymentConfig</code> instead of the kubernetes <code>Deployment</code> object, starting in chapter <code>ArgoCD + Helm</code> you will see that we&#8217;ve moved from <code>DeploymentConfig</code> to <code>Deployment</code>. In any case S2I has nothing to do with the type of deployment descriptor we choose!</p>
 </div>
 </td>
 </tr>
@@ -600,6 +747,18 @@ oc label deployment/kitchensink-db app.openshift.io/runtime=postgresql --overwri
 </li>
 <li>
 <p>Deploy the kitchensink app:</p>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Run <code>oc get template -n openshift | grep eap</code> to find other JBoss EAP related templates
+</td>
+</tr>
+</table>
+</div>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-app --template=eap72-basic-s2i \
@@ -664,6 +823,8 @@ oc annotate dc/kitchensink \
 </li>
 </ol>
 </div>
+<div class="sect2">
+<h3 id="checking-build-config"><a class="anchor" href="#checking-build-config"></a>Checking BuildConfig</h3>
 <div class="paragraph">
 <p>Open the next link and click on the <code>in progress</code> icon to see the log of the building process.</p>
 </div>
@@ -678,16 +839,26 @@ oc annotate dc/kitchensink \
 </div>
 </div>
 <div class="paragraph">
-<p>Eventually you will see a trace like this &#8658; <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; Running install.sh &lt;&lt;&lt;&lt;&lt;&lt;</code>. This is a sign that the S2I building process has detected our script to prepare the image as desired.</p>
+<p>Eventually you will see a trace like this:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>&#8658; <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; Running install.sh &lt;&lt;&lt;&lt;&lt;&lt;</code></p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>This is a sign that the S2I building process has detected our script to prepare the image as desired. We already talked about the <code>install.sh</code> script above in this chapter. Remember that S2I <code>assemble</code> script will look for an environment variable <code>CUSTOM_INSTALL_DIRECTORIES</code> which in its turn points to the <code>extensions</code> folder where we have an <code>install.sh</code> which sets drivers, and copies all the needed files to run <strong>kitchensink</strong>.</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="_images/s2i-02.png" alt="Build Log">
 </div>
 </div>
-<div class="paragraph">
-<p><mark>Explain this better and according to the explanations given before in this chapter</mark></p>
 </div>
+<div class="sect2">
+<h3 id="checking-the-application"><a class="anchor" href="#checking-the-application"></a>Checking the Application</h3>
 <div class="paragraph">
 <p>After the building process has finished the image is pushed and the <code>DeploymentConfig</code> object is updated accordingly to use the new image. If you go the <code>Topology</code> view you should see this.</p>
 </div>
@@ -697,7 +868,26 @@ oc annotate dc/kitchensink \
 </div>
 </div>
 <div class="paragraph">
-<p>Time to check if our application works as expected. Please click on the route icon.</p>
+<p>You have seen in the traces while building the container image that the <code>assemble</code> scripts is executed and in its turn runs our <code>install.sh</code> script. Now let&#8217;s have a look at the traces of the image while running. In this case it is the <code>run</code> script which is executed and if everything worked as expected out <code>postconfigure.sh</code> script should have been run <em>before</em> JBoss actually runs.</p>
+</div>
+<div class="paragraph">
+<p>Run this command to have a look to the pod logs.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc logs dc/kitchensink -n s2i-%USERNAME% | grep A5 B5 -e "postconfigure.sh"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Time to check if our application works as expected. Go back to the <code>Topology View</code>.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/s2i-%USERNAME%?view=graph</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, please click on the route icon.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -710,6 +900,7 @@ oc annotate dc/kitchensink \
 <div class="imageblock">
 <div class="content">
 <img src="_images/s2i-06.png" alt="Result">
+</div>
 </div>
 </div>
 </div>
@@ -830,7 +1021,7 @@ oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war</code></pre>
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="03-prepare-repositories.html" class="query-params-link">3. Prepare Repositories</a></span>
+  <span class="prev"><a href="03-prepare-devspaces.html" class="query-params-link">3. Prepare Devspaces</a></span>
   <span class="next"><a href="05-argo.html" class="query-params-link">5. Deploy JBoss EAP Application with ArgoCD</a></span>
 </nav>
 </article>

@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Setup :: Kitchensink Guide</title>
-    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/01-setup.html">
-    <link rel="prev" href="index.html">
-    <link rel="next" href="02-prepare-cluster.html">
+    <title>Prepare DevSpaces :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/03-prepare-devspaces.html">
+    <link rel="prev" href="02-prepare-cluster.html">
+    <link rel="next" href="04-s2i.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -71,18 +71,18 @@
 <ul class="nav-list">
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="01-setup.html">1. Setup</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#prerequisite">Prerequisites</a>
+    <a class="nav-link" href="01-setup.html#prerequisite">Prerequisites</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#openshift">Setup OpenShift 4</a>
+    <a class="nav-link" href="01-setup.html#openshift">Setup OpenShift 4</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#download-tutorial">Get tutorial sources</a>
+    <a class="nav-link" href="01-setup.html#download-tutorial">Get tutorial sources</a>
   </li>
 </ul>
   </li>
@@ -104,18 +104,18 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="03-prepare-devspaces.html">3. Prepare Devspaces</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-devspaces.html#create-workspace">Create Workspace</a>
+    <a class="nav-link" href="#create-workspace">Create Workspace</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-devspaces.html#opening-a-terminal-window">Opening a Terminal Window</a>
+    <a class="nav-link" href="#opening-a-terminal-window">Opening a Terminal Window</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="03-prepare-devspaces.html#allow-paste-from-clipboard">Allow Paste From Clipboard</a>
+    <a class="nav-link" href="#allow-paste-from-clipboard">Allow Paste From Clipboard</a>
   </li>
 </ul>
   </li>
@@ -272,21 +272,24 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Kitchensink Guide</a></li>
-    <li><a href="01-setup.html">1. Setup</a></li>
+    <li><a href="03-prepare-devspaces.html">3. Prepare Devspaces</a></li>
   </ul>
 </nav>
   <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
 </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">Setup</h1>
-<div class="sect1">
-<h2 id="prerequisite"><a class="anchor" href="#prerequisite"></a>Prerequisite CLI tools</h2>
+<h1 class="page">Prepare DevSpaces</h1>
+<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>The following CLI tools are required for running the exercises in this tutorial.
-Please have them installed and configured before you get started with any of the tutorial chapters.</p>
+<p>This chapter only applies if you choose DevSpaces as the IDE to use throughout this guide.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-workspace"><a class="anchor" href="#create-workspace"></a>Create Workspace</h2>
+<div class="sectionbody">
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -294,223 +297,76 @@ Please have them installed and configured before you get started with any of the
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-It is also necessary to have a working <mark>Java</mark> and <mark>Maven</mark> environment (at least for the s2i chapter).
+If you&#8217;re running the guide in a laptop, you don&#8217;t need to do this.
 </td>
 </tr>
 </table>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-center valign-top"><strong>Tool</strong></th>
-<th class="tableblock halign-center valign-top"><strong>macOS</strong></th>
-<th class="tableblock halign-center valign-top"><strong>Fedora</strong></th>
-<th class="tableblock halign-center valign-top"><strong>windows</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>git</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com/download/mac">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com/download/linux">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com/download/win">Download</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>oc 4.12</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/openshift-client-mac.tar.gz">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/openshift-client-linux.tar.gz">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/openshift-client-windows.zip">Download</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>argocd v2.3.17</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/argoproj/argo-cd/releases/download/v2.3.17/argocd-darwin-amd64">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/argoproj/argo-cd/releases/download/v2.3.17/argocd-linux-amd64">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/argoproj/argo-cd/releases/download/v2.3.17/argocd-windows-amd64.exe">Download</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/mikefarah/yq">yq 4.19.1</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/mikefarah/yq/releases/download/v4.19.1/yq_darwin_amd64">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/mikefarah/yq/releases/download/v4.19.1/yq_linux_amd64">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/mikefarah/yq/releases/download/v4.19.1/yq_windows_amd64.exe">Download</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/stedolan/jq">jq v1.6.0</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/stedolan/jq/releases/download/jq-1.6/jq-osx-amd64">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64">Download</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe">Download</a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect1">
-<h2 id="openshift"><a class="anchor" href="#openshift"></a>Setup OpenShift 4</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>To run this guide <strong>you need to have at least one OpenShift cluster</strong> provisioned <strong>and be cluster admin</strong>. For instance using <a href="https://try.openshift.com">try.openshift.com</a>, or can use any existing OpenShift4 cluster(s). Once you have your cluster, you can download the latest OpenShift client (oc) from <a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/">here</a> and add it to your path.</p>
-</div>
-<div class="paragraph">
-<p>You can check the OpenShift version using:</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc version</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The output should show oc version 4.12+:</p>
-</div>
-<div class="listingblock console-output">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">Client Version: 4.12
-...</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Then login into the OpenShift cluster using <code>oc login</code></p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="which-terminal"><a class="anchor" href="#which-terminal"></a>Which Terminal</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Throughout the lab you will have to run commands in a terminal, you can choose to run everything in your computer or in a web-terminal and web-ide. Whichever decision is fine but you have to honor that decision for the whole lab or redo some commands if you change, in this case&#8230;&#8203; you will be on your own.</p>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p><strong>If you choose to use web-terminal, stick to that decision throughout the whole guide.</strong></p>
-</div>
-<div class="paragraph">
-<p>Next, <strong>open the following link</strong>, <strong>create a new project</strong> called: <code>terminal-%USERNAME%</code> and <strong>click on <code>Start</code></strong>. If credentials are required use these:</p>
+<p>Please copy and paste the following link and open it in a browser. It will take you to a Red Hat DevSpaces deployment in the OpenShift cluster you&#8217;re interacting with in this lab. Use this credentials to log in and click on <code>Allow selected permissions</code>.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>USERNAME:</strong> %USERNAME%</p>
+<p><strong>Username:</strong> %USERNAME%</p>
 </li>
 <li>
-<p><strong>PASSWORD:</strong> %PASSWORD%</p>
+<p><strong>Password:</strong> %PASSWORD%</p>
 </li>
 </ul>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/terminal</code></pre>
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://devspaces.apps.%BASE_SUBDOMAIN%/#/https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink/raw/main/devfile.yaml</code></pre>
 </div>
 </div>
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>After some seconds you will see that the devfile has been loaded and that your workspace is been created.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/devspaces-01.png" alt="Creation">
+</div>
+</div>
+<div class="paragraph">
+<p>After a minute or two you&#8217;ll have the workspaces prepared and you&#8217;ll be prompted to answer this question: <code>Do you trust the authors of the files in this folder?</code>. Click on <code>Yes, I trust the authors&#8230;&#8203;</code>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/devspaces-02.png" alt="Question">
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="download-tutorial"><a class="anchor" href="#download-tutorial"></a>Get tutorial sources</h2>
+<h2 id="opening-a-terminal"><a class="anchor" href="#opening-a-terminal"></a>Opening a Terminal Window</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.</p>
+<p>Go to the hamburger menu on the left, hover on <code>Terminal</code> then on <code>New Terminal</code> and click. As in this picture.</p>
 </div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/devspaces-03.png" alt="New Terminal">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="allow-paste-from-clipboard"><a class="anchor" href="#allow-paste-from-clipboard"></a>Allow Paste From Clipboard</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Before we start setting up the environment, let’s clone the tutorial sources and set the <code>TUTORIAL_HOME</code> environment variable to point to the root directory of the tutorial:</p>
+<p>Should you be prompted to give/deny the paste permission as in the next picture while trying to paste commands in a DevSpaces terminal window, please allow it.</p>
 </div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p><strong>If you choose to use web-terminal, stick to that decision throughout the guide.</strong></p>
-</div>
-<div class="paragraph">
-<p>Next, <strong>open the following link</strong>, <strong>create a new project</strong> called: <code>terminal-%USERNAME%</code> and <strong>click on <code>Start</code></strong>. If credentials are required use these:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>USERNAME:</strong> %USERNAME%</p>
-</li>
-<li>
-<p><strong>PASSWORD:</strong> %PASSWORD%</p>
-</li>
-</ul>
-</div>
-<div class="listingblock console-input">
+<div class="imageblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/terminal</code></pre>
-</div>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="tabset is-loading">
-<div class="ulist tabs">
-<ul>
-<li>
-<p><a id="tabset1_laptop"></a>laptop</p>
-</li>
-<li>
-<p><a id="tabset1_web-terminal"></a>web-terminal</p>
-</li>
-</ul>
-</div>
-<div class="content">
-<div class="tab-pane" aria-labelledby="tabset1_laptop">
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://github.com/atarazana/kitchensink-conf.git" class="bare">https://github.com/atarazana/kitchensink-conf.git</a> kitchensink-guides</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/kitchensink-guides"</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
-</div>
-</div>
-</div>
-<div class="tab-pane" aria-labelledby="tabset1_web-terminal">
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd ~/scratch &amp;&amp; git clone <a href="https://github.com/atarazana/kitchensink-conf.git" class="bare">https://github.com/atarazana/kitchensink-conf.git</a> kitchensink-guides</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/kitchensink-guides"</code></pre>
-</div>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
-</div>
-</div>
-</div>
+<img src="_images/devspaces-04.png" alt="Allow Paste Permission">
 </div>
 </div>
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="index.html" class="query-params-link">Kitchensink Guide</a></span>
-  <span class="next"><a href="02-prepare-cluster.html" class="query-params-link">2. Prepare Cluster</a></span>
+  <span class="prev"><a href="02-prepare-cluster.html" class="query-params-link">2. Prepare Cluster</a></span>
+  <span class="next"><a href="04-s2i.html" class="query-params-link">4. Deploy JBoss EAP Application with S2I</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
