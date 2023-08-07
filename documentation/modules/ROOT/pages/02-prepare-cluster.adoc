@@ -116,7 +116,7 @@ Finally if all went well you should land in the ArgoCD console and see this.
 
 image::argocd-console.png[ArgoCD Console]
 
-ifeval::["{use-quay-io}" != "true"]
+ifeval::["{use-quay}" == "true"]
 [#checking-quay]
 == Checking Quay
 

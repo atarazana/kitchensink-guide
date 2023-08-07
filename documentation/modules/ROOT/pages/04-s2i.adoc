@@ -50,16 +50,23 @@ Second, the `assemble` and `run` scripts are there to help you avoiding substitu
 
 NOTE: Using the procedures explained in this guide there are more chances that you will build the image for your application across minor upgrades of JBoss EAP without making any changes to the configuration of S2I. 
 
-In a nutshell the `assemble` script:
+[#assemble-script]
+=== Assemble Script
+
+In short, the `assemble` script:
 
 * Compiles and generates a `WAR/JAR/EAR` file using `maven`
 * Copies the output of the previous step to the JBoss deployments path (/deployments)
 * Checks if `CUSTOM_INSTALL_DIRECTORIES` environment variable has been defined. The content of this environment variable should be a list of source directories.
 * If `CUSTOM_INSTALL_DIRECTORIES` is defined, then *for each of those directories look for a file called `install.sh`*
 ** If there is an `install.sh` script executes it
-+
+** Else the following artifact directories will be copied to their respective destinations in the built image:
+*** *modules/** copied to *$JBOSS_HOME/modules/system/layers/openshift*
+*** *configuration/** copied to *$JBOSS_HOME/standalone/configuration*
+*** *deployments/** copied to *$JBOSS_HOME/standalone/deployments*
+
 Here you are an `install.sh` script example:
-+
+
 [source,bash]
 ----
 #!/bin/bash
@@ -70,13 +77,91 @@ install_deployments ${injected_dir}/injected-deployments.war
 install_modules ${injected_dir}/modules
 configure_drivers ${injected_dir}/drivers.env
 ----
-** Else the following artifact directories will be copied to their respective destinations in the built image:
-*** modules/* copied to $JBOSS_HOME/modules/system/layers/openshift
-*** configuration/* copied to $JBOSS_HOME/standalone/configuration
-*** deployments/* copied to $JBOSS_HOME/standalone/deployments
-* Once at runtime, the `run` script comes into play and it will look for execution hooks ()
 
-En ejecución se ejecutará el fichero `postconfigure.sh` antes de arrancar JBoss
+In our guide you can find an `install.sh` script at `extensions/install.sh`. Have a look to the contents below.
+
+[source,sh, subs="+macros,+attributes"]
+----
+#!/bin/bash
+echo ">>>>>>> Running install.sh <<<<<<"
+echo ${injected_dir}
+if [ "${SCRIPT_DEBUG}" = "true" ] ; then
+    set -x
+    echo "Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed"
+fi
+
+injected_dir=$1
+source /usr/local/s2i/install-common.sh <1>
+configure_drivers ${injected_dir}/driver-oracle.env <2>
+# configure_drivers ${injected_dir}/driver-postgresql.env <3>
+
+# copy any needed files into the target build.
+cp -rf ${injected_dir} $JBOSS_HOME/extensions <4>
+----
+<1> Load functions like `configure_drivers`, `install_deployments` or `install_modules`
+<2> Install Oracle driver which is not installed by default
+<3> In 7.2 PostgreSQL driver is already installed but this is not the case in 7.4
+<4> Our `extensions` folder is installed by copying it to `$JBOSS_HOME/extensions`
+
+[#run-script]
+=== Run Script
+
+Once at runtime, the `run` script comes into play and it will look for execution hooks which are executed, if available, from `$JBOSS_HOME/bin/launch/configure.sh`. 
+
+Configuration occurs over three basic phases: preConfigure, configure and postConfigure.
+
+* *preConfigure:* invoked before any configuration takes place.  Use this to manipulate the environment prior to configuration.
+* *configure:* invoked to configure based on the execution environment.
+* *postConfigure:* invoked after all configuration has been completed.
+
+> In addition to the execution environment, users may specify additional configuration details through environment scripts specified through the ENV_FILES variable.  The processing of env files is similar to the process for the execution environment, with the addition of a prepareEnv method, which is used to clean the environment before processing the env contributed by a file.  This is to help ensure that duplicate configurations are not created when processing env files.
+
+In our guide you can find a postConfigure script at `extensions/postconfigure.sh`. You can also find the content the file copied below.
+
+NOTE: `postconfigure.sh` executes the `extensions/setup.cli` JBoss CLI script to set the JBoss up for `kitchensink`
+
+[source,sh, subs="+macros,+attributes"]
+----
+#!/usr/bin/env bash
+echo ">>>>>> Executing postconfigure.sh <<<<<<<"
+
+if [ "${SCRIPT_DEBUG}" = "true" ] ; then
+    set -x
+    echo "Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed"
+fi
+
+echo ">>>>>> Executing setup.cli <<<<<<<"
+$JBOSS_HOME/bin/jboss-cli.sh --file=$JBOSS_HOME/extensions/setup.cli <1>
+----
+<1> You can find this script below
+
+Let's have a look to the `extensions/setup.cli` script.
+
+[source,text, subs="+macros,+attributes"]
+----
+embed-server --std-out=echo --server-config=standalone-openshift.xml <1>
+
+/subsystem=datasources/data-source=kitchensink:add( \ <2>
+  jndi-name="java:jboss/jdbc/kitchensink", \
+  connection-url="jdbc:postgresql://${env.DB_HOST}:${env.DB_PORT:5432}/${env.DB_NAME:kitchensink}", \ <3>
+  driver-name=postgresql, \ <4>
+  user-name=${env.DB_USERNAME},password=${env.DB_PASSWORD}, \ <5>
+  validate-on-match=true, \
+  valid-connection-checker-class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker",exception-sorter-class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" \
+)
+
+if (outcome == success) of /subsystem=datasources/jdbc-driver=mysql:read-attribute(name=driver-name)
+    # Remove Driver
+    /subsystem=datasources/jdbc-driver=mysql:remove
+end-if
+
+quit
+----
+<1> Script runs on an embed server and results are applied to `standalone-openshift.xml`
+<2> Adding a new data source
+<3> Connection string
+<4> Driver
+<5> Credentials
 
 > You can find more information about building images for JBoss EAP using S2I link:https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/{jboss-version}/html/getting_started_with_jboss_eap_for_openshift_container_platform/configuring_eap_openshift_image#s2i_modules_drivers_deployments[here].
 
@@ -112,9 +197,7 @@ Once `BuildConfigs` are pointing to the right repo we can go on.
 
 [IMPORTANT]
 ====
-This template deploys our application using a `DeploymentConfig` instead of the kubernetes `Deployment` object, starting in chapter `ArgoCD + Helm` you will see that we've moved from `DeploymentConfig` to `Deployment`.
-
-#TODO#
+This template deploys our application using a `DeploymentConfig` instead of the kubernetes `Deployment` object, starting in chapter `ArgoCD + Helm` you will see that we've moved from `DeploymentConfig` to `Deployment`. In any case S2I has nothing to do with the type of deployment descriptor we choose!
 ====
 
 . First of all, create the project that will host the application:
@@ -161,6 +244,8 @@ The ``oc label`` commands adds decoration to our deployment (used for the #Topol
 +
 . Deploy the kitchensink app:
 +
+TIP: Run `oc get template -n openshift | grep eap` to find other JBoss EAP related templates 
++
 [.console-input]
 [source, bash,subs="+macros,+attributes"]
 ----
@@ -203,6 +288,9 @@ oc annotate dc/kitchensink \
 The ``app.openshift.io/connects-to`` annotation is used to connect the nodes.
 ====
 
+[#checking-build-config]
+=== Checking BuildConfig
+
 Open the next link and click on the `in progress` icon to see the log of the building process.
 
 [.console-input]
@@ -213,17 +301,40 @@ https://{openshift-console-host}/topology/ns/s2i-{username}?view=graph
 
 image::s2i-01.png[Build Config link]
 
-Eventually you will see a trace like this => `>>>>>>> Running install.sh <<<<<<`. This is a sign that the S2I building process has detected our script to prepare the image as desired.
+Eventually you will see a trace like this:
+
+> => `>>>>>>> Running install.sh <<<<<<`
+
+This is a sign that the S2I building process has detected our script to prepare the image as desired. We already talked about the `install.sh` script above in this chapter. Remember that S2I `assemble` script will look for an environment variable `CUSTOM_INSTALL_DIRECTORIES` which in its turn points to the `extensions` folder where we have an `install.sh` which sets drivers, and copies all the needed files to run *kitchensink*.
 
 image::s2i-02.png[Build Log]
 
-#Explain this better and according to the explanations given before in this chapter#
+[#checking-the-application]
+=== Checking the Application
 
 After the building process has finished the image is pushed and the `DeploymentConfig` object is updated accordingly to use the new image. If you go the `Topology` view you should see this.
 
 image::s2i-04.png[Deployed]
 
-Time to check if our application works as expected. Please click on the route icon.
+You have seen in the traces while building the container image that the `assemble` scripts is executed and in its turn runs our `install.sh` script. Now let's have a look at the traces of the image while running. In this case it is the `run` script which is executed and if everything worked as expected out `postconfigure.sh` script should have been run _before_ JBoss actually runs.
+
+Run this command to have a look to the pod logs.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+oc logs dc/kitchensink -n s2i-{username} | grep A5 B5 -e "postconfigure.sh"
+----
+
+Time to check if our application works as expected. Go back to the `Topology View`.
+
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{openshift-console-host}/topology/ns/s2i-{username}?view=graph
+----
+
+Now, please click on the route icon.
 
 image::s2i-05.png[Checking]
 

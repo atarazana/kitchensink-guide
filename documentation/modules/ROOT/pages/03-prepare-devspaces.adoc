@@ -1,0 +1,42 @@
+= Prepare DevSpaces
+include::_attributes.adoc[]
+
+This chapter only applies if you choose DevSpaces as the IDE to use throughout this guide.
+
+[#create-workspace]
+== Create Workspace
+
+NOTE: If you're running the guide in a laptop, you don't need to do this.
+
+Please copy and paste the following link and open it in a browser. It will take you to a Red Hat DevSpaces deployment in the OpenShift cluster you're interacting with in this lab. Use this credentials to log in and click on `Allow selected permissions`.
+
+- *Username:* {username}
+- *Password:* {password}
+
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{devspaces-server}/#/https://{gitea-host}/{username}/kitchensink/raw/main/devfile.yaml
+----
+
+After some seconds you will see that the devfile has been loaded and that your workspace is been created.
+
+image::devspaces-01.png[Creation]
+
+After a minute or two you'll have the workspaces prepared and you'll be prompted to answer this question: `Do you trust the authors of the files in this folder?`. Click on `Yes, I trust the authors...`.
+
+image::devspaces-02.png[Question]
+
+[#opening-a-terminal]
+== Opening a Terminal Window
+
+Go to the hamburger menu on the left, hover on `Terminal` then on `New Terminal` and click. As in this picture.
+
+image::devspaces-03.png[New Terminal]
+
+[#allow-paste-from-clipboard]
+== Allow Paste From Clipboard 
+
+Should you be prompted to give/deny the paste permission as in the next picture while trying to paste commands in a DevSpaces terminal window, please allow it.
+
+image::devspaces-04.png[Allow Paste Permission]
