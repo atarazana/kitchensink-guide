@@ -131,49 +131,6 @@ Synchronization settings
 ----
 --
 
-[#fix-buildconfigs-repo-url]
-== Fix BuildConfigs Repo URL
-
-As we have explained xref:04-s2i.adoc#overview[before] in this lab `BuildConfig` objects are in charge of cloning a code repository, compile the code and build a container image with that. Well, in this lab, this means that because you migrated the repo those `BuildConfigs` point to the original repo.
-
-*Let's fix that!*
-
-Please copy and paste the following link and open it in a browser. It will take you to file `basic/base/kitchensink-bc.yaml` where you have to change the git url to match the one of the previously migrated repository of code. Use this credentials to log in.
-
-- *Username:* {username}
-- *Password:* {static-password}
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{gitea-host}/{username}/kitchensink-conf/_edit/main/basic/base/kitchensink-bc.yaml#L40
-----
-
-Once there, you have to change this:
-
-[source,yaml,subs="attributes+,+macros"]
-----
-  source:
-    type: Git
-    git:
-      uri: 'https://github.com/atarazana/kitchensink'
-      ref: main
-----
-
-With this
-
-[.console-input]
-[source,yaml,subs="attributes+,+macros"]
-----
-  source:
-    type: Git
-    git:
-      uri: 'https://{gitea-host}/{username}/kitchensink'
-      ref: main
-----
-
-Once you have made the changes scroll down and click on `Commit Changes`.
-
 [#deploy]
 == Deploy Kitchensink app with ArgoCD
 

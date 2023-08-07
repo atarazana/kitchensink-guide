@@ -9,65 +9,6 @@ Now we are going to deploy the same application in the same way, but instead of 
 . `dev` -> `kitchensink-dev-{username}`
 . `test` -> `kitchensink-test-{username}`
 
-Before you actually can deploy the application using kustomize you have to change the original target namespaces (`demo-5-dev` and `demo-5-test`) coming from the original repository you migrated from. In a nutshell you have to change:
-
-. `demo-5-dev` -> `kitchensink-dev-{username}`
-. `demo-5-test` -> `kitchensink-test-{username}`
-
-So, let's get started, please copy and paste the following link and open it in a browser. Use this credentials to log in.
-
-- *Username:* {username}
-- *Password:* {static-password}
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{gitea-host}/{username}/kitchensink-conf/_edit/main/kustomize/dev/kustomization.yml#L5
-----
-
-Once there, you have to change this (around line 5):
-
-[source,yaml,subs="attributes+,+macros"]
-----
-namespace: demo-5-dev
-----
-
-With this
-
-[.console-input]
-[source,yaml,subs="attributes+,+macros"]
-----
-namespace: kustomize-dev-{username}
-----
-
-Once you have made the changes scroll down and click on `Commit Changes`.
-
-
-Now it's the turn of the `test` namespace. Please open the next link.
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{gitea-host}/{username}/kitchensink-conf/_edit/main/kustomize/test/kustomization.yml#L5
-----
-
-Once there, you have to change this (around line 5):
-
-[source,yaml,subs="attributes+,+macros"]
-----
-namespace: demo-5-test
-----
-
-With this
-
-[.console-input]
-[source,yaml,subs="attributes+,+macros"]
-----
-namespace: kustomize-test-{username}
-----
-
-Once you have made the changes scroll down and click on `Commit Changes`.
-
 [#deploy-app]
 == Deploy Using Kustomize and an ApplicationSet
 
