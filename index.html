@@ -283,7 +283,28 @@
 <h2>Deploying JBoss EAP applications on OpenShift</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A guide to the different existing methods for deploying a JBoss EAP application on OpenShift.</p>
+<p>Are you a JBoss EAP fan but worried your apps are seen as legacy? Do you want to move your Jakarta EE (formerly Java EE) applications to kubernetes but have doubts and all those tutorials and workshops haven&#8217;t convinced you?</p>
+</div>
+<div class="paragraph">
+<p>Does your business rely on JBoss EAP? Did the latest deployment take longer than you expected - keeping you awake at night? Still reluctant to move to containers because you think it is not worth it?</p>
+</div>
+<div class="paragraph">
+<p>Afraid to move to the next JBoss version because you might break something or fearful of changing ‘standalone.xml’?</p>
+</div>
+<div class="paragraph">
+<p>Execute this hands-on lab, based on real customer use cases, learn how Red Hat OpenShift can help you to deploy your JBoss EAP applications mitigating risk and reducing deployment times.</p>
+</div>
+<div class="paragraph">
+<p>First you will deploy a Jakarta EE 8 application (featuring EJBs that connect to a database using JPA) on JBoss EAP 7.2 on OpenShift to mimic a plausible scenario where you&#8217;re still on a previous (and in some case close to end of support) version of JBoss.</p>
+</div>
+<div class="paragraph">
+<p>We will show you how to free yourself from maintaining <code>standalone.xml</code> by using OpenShift Source to Image (S2I). This way moving up 7.x versions will be a breeze.</p>
+</div>
+<div class="paragraph">
+<p>You will also learn how to deploy your application to multiple environments using GitOps and to promote your application into production using Tekton and Jenkins CICD pipelines.</p>
+</div>
+<div class="paragraph">
+<p>Finally you will upgrade your application from 7.2 &#8594; 7.4 and rest finally because your application is again in line with the lifecycle of your favorite Jakarta EE engine.</p>
 </div>
 <div class="paragraph">
 <p>Benefits of deploying JBoss EAP applications on OpenShift:</p>
@@ -291,7 +312,7 @@
 <div class="ulist">
 <ul>
 <li>
-<p>We deploy an immutable container image</p>
+<p>We deploy an immutable container image hence reducing risks and friction between Dev and Ops.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -304,7 +325,7 @@
 </div>
 </li>
 <li>
-<p>The image building process with <code>S2I</code> allows the customization of the default standalone file in a simple way and without the need to replace it.</p>
+<p>The image building process with <code>S2I</code> allows the customization of the default <code>standalone.xml</code> file in a simple way and without the need to replace it.</p>
 </li>
 <li>
 <p>Image building and deployment is an easily automated process as we will see later.</p>

@@ -284,7 +284,7 @@
 <h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><a href="https://github.com/openshift/source-to-image">Source-to-Image (S2I)</a> is a framework that makes it easy to build images starting from your source code. In reality S2I can start from your source code, a file (usually a binary), a bunch of files or a Dockerfile.</p>
+<p><a href="https://github.com/openshift/source-to-image" target="_blank" rel="noopener">Source-to-Image (S2I)</a> is a framework that makes it easy to build images starting from your source code. In reality S2I can start from your source code, a file (usually a binary), a bunch of files or a Dockerfile.</p>
 </div>
 <div class="paragraph">
 <p>Here we&#8217;re going to concentrate on the first strategy, building our application image starting from the code in a git repository.</p>
@@ -326,7 +326,7 @@ The <strong>main advantages</strong> of using S2I for building images are the <s
 </ul>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s go a bit deeper with the explanation, in order to build your application you will need a builder image designed according to the S2I framework. In general, you will use a supported image by Red Hat, it can be for Java, Python, .Net, etc. go <a href="https://docs.openshift.com/container-platform/{oc-version}/openshift_images/using_images/using-s21-images.html">here</a> but if you need or want to create your own builder image you can go <a href="https://access.redhat.com/documentation/en-us/openshift_container_platform/{oc-version}/html/images/creating-images#images-create-s2i-scripts_create-images">here</a> to learn all you need to do it.</p>
+<p>Let&#8217;s go a bit deeper with the explanation, in order to build your application you will need a builder image designed according to the S2I framework. In general, you will use a supported image by Red Hat, it can be for Java, Python, .Net, etc. go <a href="https://docs.openshift.com/container-platform/4.12/openshift_images/using_images/using-s21-images.html" target="_blank" rel="noopener">here</a> but if you need or want to create your own builder image you can go <a href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.12/html/images/creating-images#images-create-s2i-scripts_create-images" target="_blank" rel="noopener">here</a> to learn all you need to do it.</p>
 </div>
 <div class="paragraph">
 <p>In a nutshell a builder image is an image that includes:</p>
@@ -361,7 +361,7 @@ The <strong>main advantages</strong> of using S2I for building images are the <s
 <p>Ok, for now the explanation applies to any language/framework, but this lab has to do with a specific language, Java, and a specific runtime to deploy it on, JBoss EAP, so let&#8217;s go a bit deeper.</p>
 </div>
 <div class="paragraph">
-<p>First, <strong>you will be using a specific builder image</strong> for JBoss EAP instead of the plain Java builder image. This image contains maven, JDK and JBoss EAP {jboss-version} Specifically in this lab you will use this image:</p>
+<p>First, <strong>you will be using a specific builder image</strong> for JBoss EAP instead of the plain Java builder image. This image contains maven, JDK and JBoss EAP 7.2 Specifically in this lab you will use this image:</p>
 </div>
 <div class="exampleblock">
 <div class="content">
@@ -470,19 +470,19 @@ cp -rf ${injected_dir} $JBOSS_HOME/extensions <i class="conum" data-value="4"></
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Load functions like <code>configure_drivers</code>, <code>install_deployments</code> or <code>install_modules</code></td>
+<td>Load functions like <code>configure_drivers</code>, <code>install_deployments</code> or <code>install_modules</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Install Oracle driver which is not installed by default</td>
+<td>Install Oracle driver which is not installed by default. It&#8217;s not used in this guide but as an example variation.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>In 7.2 PostgreSQL driver is already installed but this is not the case in 7.4</td>
+<td>In 7.2 PostgreSQL driver is already installed but this is not the case in 7.4 as you will see in upgrade chapter.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Our <code>extensions</code> folder is installed by copying it to <code>$JBOSS_HOME/extensions</code></td>
+<td>Our <code>extensions</code> folder is installed by copying it to <code>$JBOSS_HOME/extensions</code>.</td>
 </tr>
 </table>
 </div>
@@ -603,7 +603,7 @@ quit</code></pre>
 <div class="quoteblock">
 <blockquote>
 <div class="paragraph">
-<p>You can find more information about building images for JBoss EAP using S2I <a href="https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/{jboss-version}/html/getting_started_with_jboss_eap_for_openshift_container_platform/configuring_eap_openshift_image#s2i_modules_drivers_deployments">here</a>.</p>
+<p>You can find more information about building images for JBoss EAP using S2I <a href="https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.2/html/getting_started_with_jboss_eap_for_openshift_container_platform/configuring_eap_openshift_image#s2i_modules_drivers_deployments" target="_blank" rel="noopener">here</a>.</p>
 </div>
 </blockquote>
 </div>
