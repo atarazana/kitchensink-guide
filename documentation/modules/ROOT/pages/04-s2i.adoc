@@ -4,7 +4,7 @@ include::_attributes.adoc[]
 [#overview]
 == Overview
 
-https://github.com/openshift/source-to-image[Source-to-Image (S2I)] is a framework that makes it easy to build images starting from your source code. In reality S2I can start from your source code, a file (usually a binary), a bunch of files or a Dockerfile.
+link:https://github.com/openshift/source-to-image[Source-to-Image (S2I)^] is a framework that makes it easy to build images starting from your source code. In reality S2I can start from your source code, a file (usually a binary), a bunch of files or a Dockerfile.
 
 Here we're going to concentrate on the first strategy, building our application image starting from the code in a git repository.
 
@@ -22,7 +22,7 @@ Well as you can see in the previous image building an image that runs your code 
 * *Build Image:* In this phase we put the output of the previous phase in a known location inside the image so that it can be run later as a container. The output of this phase is an image based on the builder image or a specific image with the minimum required components for running and your application.
 * *Deploy:* Finally we need to deploy our image to a kubernetes cluster and this means referring to our application image from a *Deployment*, *DeploymentConfig*, *StatefulSet*, *DaemonSet*, *Job*, etc.
 
-Let's go a bit deeper with the explanation, in order to build your application you will need a builder image designed according to the S2I framework. In general, you will use a supported image by Red Hat, it can be for Java, Python, .Net, etc. go link:https://docs.openshift.com/container-platform/{oc-version}/openshift_images/using_images/using-s21-images.html[here] but if you need or want to create your own builder image you can go link:https://access.redhat.com/documentation/en-us/openshift_container_platform/{oc-version}/html/images/creating-images#images-create-s2i-scripts_create-images[here] to learn all you need to do it.
+Let's go a bit deeper with the explanation, in order to build your application you will need a builder image designed according to the S2I framework. In general, you will use a supported image by Red Hat, it can be for Java, Python, .Net, etc. go link:https://docs.openshift.com/container-platform/{oc-version}/openshift_images/using_images/using-s21-images.html[here^] but if you need or want to create your own builder image you can go link:https://access.redhat.com/documentation/en-us/openshift_container_platform/{oc-version}/html/images/creating-images#images-create-s2i-scripts_create-images[here^] to learn all you need to do it.
 
 In a nutshell a builder image is an image that includes:
 
@@ -98,10 +98,10 @@ configure_drivers ${injected_dir}/driver-oracle.env <2>
 # copy any needed files into the target build.
 cp -rf ${injected_dir} $JBOSS_HOME/extensions <4>
 ----
-<1> Load functions like `configure_drivers`, `install_deployments` or `install_modules`
-<2> Install Oracle driver which is not installed by default
-<3> In 7.2 PostgreSQL driver is already installed but this is not the case in 7.4
-<4> Our `extensions` folder is installed by copying it to `$JBOSS_HOME/extensions`
+<1> Load functions like `configure_drivers`, `install_deployments` or `install_modules`.
+<2> Install Oracle driver which is not installed by default. It's not used in this guide but as an example variation.
+<3> In 7.2 PostgreSQL driver is already installed but this is not the case in 7.4 as you will see in upgrade chapter.
+<4> Our `extensions` folder is installed by copying it to `$JBOSS_HOME/extensions`.
 
 [#run-script]
 === Run Script
@@ -163,7 +163,7 @@ quit
 <4> Driver
 <5> Credentials
 
-> You can find more information about building images for JBoss EAP using S2I link:https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/{jboss-version}/html/getting_started_with_jboss_eap_for_openshift_container_platform/configuring_eap_openshift_image#s2i_modules_drivers_deployments[here].
+> You can find more information about building images for JBoss EAP using S2I link:https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/{jboss-version}/html/getting_started_with_jboss_eap_for_openshift_container_platform/configuring_eap_openshift_image#s2i_modules_drivers_deployments[here^].
 
 [#getting-started]
 == Let's get started

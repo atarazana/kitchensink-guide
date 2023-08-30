@@ -5,15 +5,29 @@
 [.text-center.strong]
 == Deploying JBoss EAP applications on OpenShift
 
-A guide to the different existing methods for deploying a JBoss EAP application on OpenShift.
+Are you a JBoss EAP fan but worried your apps are seen as legacy? Do you want to move your Jakarta EE (formerly Java EE) applications to kubernetes but have doubts and all those tutorials and workshops haven't convinced you?
+
+Does your business rely on JBoss EAP? Did the latest deployment take longer than you expected - keeping you awake at night? Still reluctant to move to containers because you think it is not worth it?
+
+Afraid to move to the next JBoss version because you might break something or fearful of changing ‘standalone.xml’?
+
+Execute this hands-on lab, based on real customer use cases, learn how Red Hat OpenShift can help you to deploy your JBoss EAP applications mitigating risk and reducing deployment times. 
+
+First you will deploy a Jakarta EE 8 application (featuring EJBs that connect to a database using JPA) on JBoss EAP 7.2 on OpenShift to mimic a plausible scenario where you're still on a previous (and in some case close to end of support) version of JBoss. 
+
+We will show you how to free yourself from maintaining `standalone.xml` by using OpenShift Source to Image (S2I). This way moving up 7.x versions will be a breeze.
+
+You will also learn how to deploy your application to multiple environments using GitOps and to promote your application into production using Tekton and Jenkins CICD pipelines.
+
+Finally you will upgrade your application from 7.2 -> 7.4 and rest finally because your application is again in line with the lifecycle of your favorite Jakarta EE engine.
 
 Benefits of deploying JBoss EAP applications on OpenShift:
 
-* We deploy an immutable container image
+* We deploy an immutable container image hence reducing risks and friction between Dev and Ops.
 
 ** What we test in DEV and PRE environments is deployed in production.
 ** Reducing risk and simplifying deployment.
 
-* The image building process with ``S2I`` allows the customization of the default standalone file in a simple way and without the need to replace it.
+* The image building process with ``S2I`` allows the customization of the default `standalone.xml` file in a simple way and without the need to replace it.
 
 * Image building and deployment is an easily automated process as we will see later.

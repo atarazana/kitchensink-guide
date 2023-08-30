@@ -176,8 +176,8 @@ EOF
 ----
 <1> Destination namespace
 <2> Destination cluster
-<3> Source #TODO#
-<4> Ignore differences #TODO#
+<3> Source repository and path
+<4> Ignore differences is a convenient way of telling ArgoCD not to take into account changes in a given path for certain objects. In this case because OpenShift by default changes the image string by one pointing to the hash not the tag hence generating a loop between OpenShift and ArgoCD.
 
 Open the next link to see how the Application object you just created is seen in ArgoCD UI.
 
