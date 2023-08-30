@@ -19,7 +19,7 @@ We will show you how to free yourself from maintaining `standalone.xml` by using
 
 You will also learn how to deploy your application to multiple environments using GitOps and to promote your application into production using Tekton and Jenkins CICD pipelines.
 
-Finally you will upgrade your application from 7.2 -> 7.4 and rest finally because your application is again in line with the lifecycle of your favorite Jakarta EE engine.
+Finally you will upgrade your application from JBoss EAP 7.2 to 7.4 and rest finally because your application is again in line with the lifecycle of your favorite Jakarta EE engine.
 
 Benefits of deploying JBoss EAP applications on OpenShift:
 

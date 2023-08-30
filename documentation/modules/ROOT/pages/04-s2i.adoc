@@ -100,7 +100,7 @@ cp -rf ${injected_dir} $JBOSS_HOME/extensions <4>
 ----
 <1> Load functions like `configure_drivers`, `install_deployments` or `install_modules`.
 <2> Install Oracle driver which is not installed by default. It's not used in this guide but as an example variation.
-<3> In 7.2 PostgreSQL driver is already installed but this is not the case in 7.4 as you will see in upgrade chapter.
+<3> In JBoss EAP 7.2 PostgreSQL driver is already installed but this is not the case in JBOSS EAP 7.4 as you will see in the upcoming chapter about upgrading JBoss.
 <4> Our `extensions` folder is installed by copying it to `$JBOSS_HOME/extensions`.
 
 [#run-script]
