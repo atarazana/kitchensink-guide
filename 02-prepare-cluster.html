@@ -97,9 +97,6 @@
     <a class="nav-link" href="#high-level-tests">High Level Tests</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#checking-quay">Checking Quay</a>
-  </li>
-  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="#checking-gitea">Checking Gitea</a>
   </li>
 </ul>
@@ -354,7 +351,7 @@ Use insecure connections? (y/n):</code></pre>
 <p><strong>Tekton</strong>, the <em>de facto</em> kubernetes native CICD pipelines system supported by Red Hat through the <strong>OpenShift Pipelines operator</strong></p>
 </li>
 <li>
-<p><strong>Quay</strong>, Red Hat&#8217;s container registry</p>
+<p><strong>*OPTIONAL: Quay</strong>, Red Hat&#8217;s container registry (you can use the SaaS service instead a local instance)</p>
 </li>
 </ul>
 </div>
@@ -376,8 +373,6 @@ namespace/gitea-system created
 namespace/kitchensink-infra created
 namespace/openshift-logging created
 namespace/openshift-operators-redhat created
-namespace/openshift-storage created
-namespace/quay-system created
 serviceaccount/guide-setup-job created
 serviceaccount/occli created
 serviceaccount/occli created
