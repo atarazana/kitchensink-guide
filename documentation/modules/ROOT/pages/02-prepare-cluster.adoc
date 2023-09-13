@@ -42,7 +42,7 @@ In order to run this guide we're going to need several components, more prominen
 
 - *ArgoCD*, the GitOps engine supported by Red Hat through the *OpenShift GitOps operator*
 - *Tekton*, the _de facto_ kubernetes native CICD pipelines system supported by Red Hat through the *OpenShift Pipelines operator*
-- *Quay*, Red Hat's container registry
+- **OPTIONAL: Quay*, Red Hat's container registry (you can use the SaaS service instead a local instance)
 
 Let's install all of them:
 
@@ -62,8 +62,6 @@ namespace/gitea-system created
 namespace/kitchensink-infra created
 namespace/openshift-logging created
 namespace/openshift-operators-redhat created
-namespace/openshift-storage created
-namespace/quay-system created
 serviceaccount/guide-setup-job created
 serviceaccount/occli created
 serviceaccount/occli created
