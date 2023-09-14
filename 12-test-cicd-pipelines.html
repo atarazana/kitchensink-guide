@@ -304,7 +304,7 @@ The <code>EventListener</code> expects a <code>push</code> event, hence because 
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST -k  http://$(oc get route/el-kitchensink-ci-pl-push-gitea-listener  -n $CICD_NAMESPACE -o jsonpath='{.spec.host}') \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST -k  http://$(oc get route/el-kitchensink-ci-pl-push-gitea-listener  -n cicd-tekton-%USERNAME% -o jsonpath='{.spec.host}') \
  -H 'X-GitHub-Event: dummy' -H 'X-GitHub-Event-Type: dummy' -H 'X-Gitea-Event: dummy' -H 'X-Gitea-Event-Type: dummy' \
  -H 'Content-Type: application/json' \
  --data '{ "dummy": "dummy"}'</code></pre>
@@ -323,9 +323,7 @@ The <code>EventListener</code> expects a <code>push</code> event, hence because 
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export USERNAME="%USERNAME%"
-export CICD_NAMESPACE="kitchensink-cicd-${USERNAME}"
-oc logs deployment/el-kitchensink-ci-pl-push-gitea-listener -n ${CICD_NAMESPACE} | grep dummy</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc logs deployment/el-kitchensink-ci-pl-push-gitea-listener -n cicd-tekton-%USERNAME% | grep dummy</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -349,7 +347,7 @@ oc logs deployment/el-kitchensink-ci-pl-push-gitea-listener -n ${CICD_NAMESPACE}
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST -k  http://$(oc get route/el-kitchensink-cd-pl-pr-gitea-listener  -n $CICD_NAMESPACE -o jsonpath='{.spec.host}') \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST -k  http://$(oc get route/el-kitchensink-cd-pl-pr-gitea-listener  -n cicd-tekton-%USERNAME% -o jsonpath='{.spec.host}') \
  -H 'X-GitHub-Event: dummy' -H 'X-GitHub-Event-Type: dummy' -H 'X-Gitea-Event: dummy' -H 'X-Gitea-Event-Type: dummy' \
  -H 'Content-Type: application/json' \
  --data '{ "dummy": "dummy"}'</code></pre>
@@ -360,9 +358,7 @@ oc logs deployment/el-kitchensink-ci-pl-push-gitea-listener -n ${CICD_NAMESPACE}
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export USERNAME="%USERNAME%"
-export CICD_NAMESPACE="kitchensink-cicd-${USERNAME}"
-oc logs deployment/el-kitchensink-cd-pl-pr-gitea-listener -n ${CICD_NAMESPACE} | grep dummy</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc logs deployment/el-kitchensink-cd-pl-pr-gitea-listener -n cicd-tekton-%USERNAME% | grep dummy</code></pre>
 </div>
 </div>
 </div>
