@@ -6,8 +6,8 @@ include::_attributes.adoc[]
 
 Now we are going to deploy the same application in the same way, but instead of using descriptors directly we are going to customize them for the corresponding environment (overlay) with ``kustomize``. You will deploy two environments (overlays in kustomize jargon) `dev` and `test` in two namespaces set by a list generator.
 
-. `dev` -> `kitchensink-dev-{username}`
-. `test` -> `kitchensink-test-{username}`
+. `dev` -> `kustomize-dev-{username}`
+. `test` -> `kustomize-test-{username}`
 
 [#deploy-app]
 == Deploy Using Kustomize and an ApplicationSet
