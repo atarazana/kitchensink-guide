@@ -13,7 +13,7 @@ NOTE: The `EventListener` expects a `push` event, hence because we're sending a 
 [.console-input]
 [source,bash, subs="+attributes"]
 ----
-curl -X POST -k  http://$(oc get route/el-kitchensink-ci-pl-push-{git-provider}-listener  -n $CICD_NAMESPACE -o jsonpath='{.spec.host}') \
+curl -X POST -k  http://$(oc get route/el-kitchensink-ci-pl-push-{git-provider}-listener  -n {cicd-namespace}-{username} -o jsonpath='{.spec.host}') \
  -H 'X-GitHub-Event: dummy' -H 'X-GitHub-Event-Type: dummy' -H 'X-Gitea-Event: dummy' -H 'X-Gitea-Event-Type: dummy' \
  -H 'Content-Type: application/json' \
  --data '{ "dummy": "dummy"}'
@@ -32,9 +32,7 @@ Now run this command to see what happened on the other end, the event listener:
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
 ----
-export USERNAME="{username}"
-export CICD_NAMESPACE="kitchensink-cicd-$\{USERNAME}"
-oc logs deployment/el-kitchensink-ci-pl-push-{git-provider}-listener -n ${CICD_NAMESPACE} | grep dummy
+oc logs deployment/el-kitchensink-ci-pl-push-{git-provider}-listener -n {cicd-namespace}-{username} | grep dummy
 ----
 
 This is the expected output, as you can see `event type dummy is not allowed`.
@@ -55,7 +53,7 @@ Send the `dummy` event to the Kitchensink CD web hook:
 [.console-input]
 [source,bash, subs="+attributes"]
 ----
-curl -X POST -k  http://$(oc get route/el-kitchensink-cd-pl-pr-{git-provider}-listener  -n $CICD_NAMESPACE -o jsonpath='{.spec.host}') \
+curl -X POST -k  http://$(oc get route/el-kitchensink-cd-pl-pr-{git-provider}-listener  -n {cicd-namespace}-{username} -o jsonpath='{.spec.host}') \
  -H 'X-GitHub-Event: dummy' -H 'X-GitHub-Event-Type: dummy' -H 'X-Gitea-Event: dummy' -H 'X-Gitea-Event-Type: dummy' \
  -H 'Content-Type: application/json' \
  --data '{ "dummy": "dummy"}'
@@ -66,7 +64,5 @@ Now run this command to see what happened on the other end, the event listener:
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
 ----
-export USERNAME="{username}"
-export CICD_NAMESPACE="kitchensink-cicd-$\{USERNAME}"
-oc logs deployment/el-kitchensink-cd-pl-pr-{git-provider}-listener -n ${CICD_NAMESPACE} | grep dummy
+oc logs deployment/el-kitchensink-cd-pl-pr-{git-provider}-listener -n {cicd-namespace}-{username} | grep dummy
 ----
