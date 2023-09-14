@@ -179,6 +179,8 @@ You should expect something like:
 18:13:38,480 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) started in 10944ms - Started 595 of 869 services (525 services are lazy, passive or on-demand)
 ----
 
+At this point you can check that the status of the Pipelines is as follows (or wait until you reach that state before continuing):
+
 image::cicd-pl-result.png[CI/CD Pipelines Status]
 
 The last task of the CD Pipeline generated a new PR in the *kitchensink-conf*. 
