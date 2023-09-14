@@ -316,14 +316,7 @@ You should always consult the <a href="https://access.redhat.com/documentation/e
 <h2 id="upgrade-builder-image-version"><a class="anchor" href="#upgrade-builder-image-version"></a>Upgrade Builder Image Version</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>There are some locations where we have to upgrade the builder image:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>kitchensink-conf/<strong>cicd</strong>/values.yaml</p>
-</li>
-</ul>
+<p>There is one location where we have to upgrade the builder image:</p>
 </div>
 <div class="paragraph">
 <p><mark>&#8658; kitchensink-conf/<strong>cicd</strong>/values.yaml</mark></p>
@@ -420,7 +413,7 @@ The following link has a query parameter <code>search</code> which will show onl
 </div>
 </div>
 <div class="paragraph">
-<p>With this</p>
+<p>With this (or just uncomment the line):</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
@@ -444,6 +437,19 @@ The following link has a query parameter <code>search</code> which will show onl
 <div class="imageblock">
 <div class="content">
 <img src="_images/ci-pl-run.png" alt="CI PL Run">
+</div>
+</div>
+<div class="paragraph">
+<p>You can follow the progress through the following link and clicking on the Pipeline Run:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/cicd-pl-plr.png" alt="CI PL Run Progress">
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/dev-pipelines/ns/cicd-tekton-%USERNAME%</code></pre>
 </div>
 </div>
 </div>
@@ -477,6 +483,27 @@ The following link has a query parameter <code>search</code> which will show onl
 <div class="paragraph">
 <p>Now you have to do the same, you know, go to <strong>kitchensink-conf</strong>, look for new <strong>Pull Requests</strong>, approve it and wait until the new image has been deployed in <strong>dev</strong>.</p>
 </div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/pulls</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Click on the <code>Create merge commit</code> button:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/gitea-pr-approve-1.png" alt="Gitea Approve PR">
+</div>
+</div>
+<div class="paragraph">
+<p>Before clicking the <code>Create</code> button, check the box to delete the branch after merging:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/gitea-pr-approve-2.png" alt="Gitea Approve PR">
+</div>
+</div>
 <div class="paragraph">
 <p>Once the new image has been rolled out, you could open the link to the UI, as you have done before&#8230;&#8203; and then check in the logs if the new version is 7.4.*. You can do it with the next command.</p>
 </div>
@@ -498,6 +525,19 @@ The following link has a query parameter <code>search</code> which will show onl
 18:13:27,534 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0050: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) stopped in 36ms
 18:13:27,535 INFO  [org.jboss.as] (MSC service thread 1-2) WFLYSRV0049: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) starting
 18:13:38,480 INFO  [org.jboss.as] (Controller Boot Thread) WFLYSRV0025: JBoss EAP 7.4.11.GA (WildFly Core 15.0.26.Final-redhat-00001) started in 10944ms - Started 595 of 869 services (525 services are lazy, passive or on-demand)</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/cicd-pl-result.png" alt="CI/CD Pipelines Status">
+</div>
+</div>
+<div class="paragraph">
+<p>The last task of the CD Pipeline generated a new PR in the <strong>kitchensink-conf</strong>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/cicd-pl-cd-tasks.png" alt="CD Pipeline Tasks">
 </div>
 </div>
 <div class="paragraph">
