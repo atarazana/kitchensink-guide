@@ -1,21 +1,5 @@
 Before we start setting up the environment, let’s clone the tutorial sources and set the `TUTORIAL_HOME` environment variable to point to the root directory of the tutorial:
 
-[CAUTION]
-====
-*If you choose to use web-terminal, stick to that decision throughout the guide.*
-
-Next, *open the following link*, *create a new project* called: `terminal-{username}` and *click on `Start`*. If credentials are required use these:
-
-- *USERNAME:* {username}
-- *PASSWORD:* {password}
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{openshift-console-host}/terminal
-----
-====
-
 [tabs]
 ====
 laptop::

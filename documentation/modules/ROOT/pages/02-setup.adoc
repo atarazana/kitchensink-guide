@@ -47,8 +47,8 @@ https://{openshift-console-host}/terminal
 [#download-tutorial]
 == Get tutorial sources
 
-Even though in a following chapter you will need to fork this repository you still need to clone it locally first to bootstrap the environment.
+If you prefer to use #OpenShift Dev Spaces# instead of your laptop (your own shell) or your browser (web-terminal) just go to the xref:03-prepare-devspaces.adoc[next section], otherwise:
 
-:tutorial-url: https://github.com/atarazana/kitchensink-conf.git
+:tutorial-url: https://{gitea-host}/{username}/kitchensink.git
 :folder: kitchensink-guides
 include::partial$download-sources.adoc[]

@@ -9,6 +9,9 @@ include::partial$versions.adoc[]
 :password: %PASSWORD%
 :static-password: openshift
 
+:github-kitchen-src: github.com/atarazana/kitchensink.git
+:github-kitchen-conf: github.com/atarazana/kitchensink-conf.git
+
 :base-domain: %BASE_SUBDOMAIN%
 :additional-base-domain: %ADDITIONAL_BASE_SUBDOMAIN%
 :api-domain: {base-domain}:6443
