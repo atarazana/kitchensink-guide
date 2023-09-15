@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>CI/CD pipelines to close the circle :: Kitchensink Guide</title>
-    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/09-cicd.html">
-    <link rel="prev" href="08-helm.html">
-    <link rel="next" href="10-helm-kustomized.html">
+    <title>Setup :: Kitchensink Guide</title>
+    <link rel="canonical" href="https://atarazana.github.io/kitchensink-guide/02-setup.html">
+    <link rel="prev" href="01-prepare-cluster.html">
+    <link rel="next" href="03-prepare-devspaces.html">
     <meta name="generator" content="Antora 3.0.0">
     <link rel="stylesheet" href="./_/css/site.css">
 <link rel="icon" href="./_/img/favicon.ico" type="image/x-icon">
@@ -86,18 +86,18 @@
   </li>
 </ul>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="02-setup.html">2. Setup</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-setup.html#prerequisite">Prerequisites</a>
+    <a class="nav-link" href="#prerequisite">Prerequisites</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-setup.html#openshift">Setup OpenShift 4</a>
+    <a class="nav-link" href="#openshift">Setup OpenShift 4</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="02-setup.html#download-tutorial">Get tutorial sources</a>
+    <a class="nav-link" href="#download-tutorial">Get tutorial sources</a>
   </li>
 </ul>
   </li>
@@ -161,24 +161,24 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="08-helm.html">8. ArgoCD + Helm</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <button class="nav-item-toggle"></button>
     <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#create-root-account-in-quay">Create Quay Robot Acc.</a>
+    <a class="nav-link" href="09-cicd.html#create-root-account-in-quay">Create Quay Robot Acc.</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#deploying-cicd-pipelines">Deploying CICD Pipelines</a>
+    <a class="nav-link" href="09-cicd.html#deploying-cicd-pipelines">Deploying CICD Pipelines</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#create-git-secret">Create Git Secret</a>
+    <a class="nav-link" href="09-cicd.html#create-git-secret">Create Git Secret</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#create-registry-secret">Create Registry Secret</a>
+    <a class="nav-link" href="09-cicd.html#create-registry-secret">Create Registry Secret</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#grant-pull-permissions">Granting Pull Permissions</a>
+    <a class="nav-link" href="09-cicd.html#grant-pull-permissions">Granting Pull Permissions</a>
   </li>
 </ul>
   </li>
@@ -269,148 +269,20 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">Kitchensink Guide</a></li>
-    <li><a href="09-cicd.html">9. CI/CD Pipelines</a></li>
+    <li><a href="02-setup.html">2. Setup</a></li>
   </ul>
 </nav>
   <div style="padding: 0 0.5rem 0 0.75rem;"><a href="https://github.com/atarazana" target="_blank" rel="noopener noreferrer"> © 2023 - Atarazana</a></div>
 </div>
   <div class="content">
 <article class="doc">
-<h1 class="page">CI/CD pipelines to close the circle</h1>
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>In this chapter you&#8217;re going to deploy CI and CD pipelines that will help to automate the processes of continuos integration and delivery. It&#8217;s made of three sections, the first one deploys an ArgoCD Application that will create not only the pipelines but all the necessary elements the other two will guide you to generate the secrets necessary to connect to the git repos and the container image registry.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-It&#8217;s a best practice avoid storing secrets in a git repository even if it&#8217;s private. There are several ways to deal with secrets in this kind of scenarios but in this case we&#8217;re going to manage them manually for the sake of simplicity.
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
+<h1 class="page">Setup</h1>
 <div class="sect1">
-<h2 id="deploying-cicd-pipelines"><a class="anchor" href="#deploying-cicd-pipelines"></a>Deploying CICD Pipelines</h2>
+<h2 id="prerequisite"><a class="anchor" href="#prerequisite"></a>Prerequisite CLI tools</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We are going to deploy another ArgoCD application, this time to deploy pipelines. Please run this command which will create an ApplicationSet to deploy our CICD pipelines.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat &lt;&lt;EOF | oc apply -n openshift-gitops -f -
-apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
-metadata:
-  name: kitchensink-cicd-%USERNAME%
-  namespace: openshift-gitops
-  labels:
-    kitchensink-cicd-appset: "true"
-spec:
-  generators:
-  - list:
-      elements:
-      - cluster: in-cluster
-        ns: "cicd-tekton-%USERNAME%"
-  template:
-    metadata:
-      name: kitchensink-cicd-%USERNAME%
-      namespace: openshift-gitops
-      labels:
-        kitchensink-cicd-app: "true"
-      finalizers:
-      - resources-finalizer.argocd.argoproj.io
-    spec:
-      destination:
-        namespace: '{{ ns }}'
-        name: '{{ cluster }}'
-      project: default
-      syncPolicy:
-        automated:
-          selfHeal: true
-      source:
-        helm:
-          parameters:
-            - name: kitchensinkRepoUrl
-              value: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink"
-            - name: kitchensinkRevision
-              value: "main"
-            - name: kitchensinkConfRepoUrl
-              value: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf"
-            - name: kitchensinkConfRevision
-              value: "main"
-            - name: username
-              value: "%USERNAME%"
-            - name: gitSslVerify
-              value: "true"
-            - name: cicdNamespace
-              value: "cicd-tekton-%USERNAME%"
-            - name: overlayDevNamespace
-              value: "helm-kustomize-dev-%USERNAME%"
-            - name: overlayTestNamespace
-              value: "helm-kustomize-test-%USERNAME%"
-            - name: containerRegistryServer
-              value: myregistry-quay-quay-system.apps.%BASE_SUBDOMAIN%
-            - name: containerRegistryOrg
-              value: %USERNAME%
-        path: cicd
-        repoURL: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf"
-        targetRevision: main
-EOF</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s go to ArgoCD console and see how it&#8217;s going on. Please copy the next link and open it in a new tab.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications?proj=&amp;sync=&amp;health=&amp;namespace=&amp;cluster=&amp;labels=kitchensink-cicd-app</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/argocd-kitchensink-appset-cicd.png" alt="Apps">
-</div>
-</div>
-<div class="paragraph">
-<p>And go deeper by clicking on the <code>Application</code> object or using the next link.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications/kitchensink-cicd-%USERNAME%</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/argocd-kitchensink-appset-cicd-deep.png" alt="Apps">
-</div>
-</div>
-<div class="paragraph">
-<p>You can also have a look to the pipelines created in the OpenShift web console.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/dev-pipelines/ns/cicd-tekton-%USERNAME%</code></pre>
-</div>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="_images/ocp-kitchensink-cicd.png" alt="Apps">
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="create-git-secret"><a class="anchor" href="#create-git-secret"></a>Create Git Secret</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>We are going to create secrets instead of storing them in the git repo, but before we do that let’s check that ArgoCD has created the namespace for us.</p>
+<p>The following CLI tools are required for running the exercises in this tutorial.
+Please have them installed and configured before you get started with any of the tutorial chapters.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -419,98 +291,191 @@ EOF</code></pre>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<div class="paragraph">
-<p>If the namespace is not there yet, you can check the sync status of the ArgoCD application with:</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">argocd app list | grep kitchensink-cicd-%USERNAME%</code></pre>
-</div>
-</div>
+It is also necessary to have a compatible <mark>Java</mark> and <mark>Maven</mark> environment (at least for the s2i chapter).
 </td>
 </tr>
 </table>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top"><strong>Tool</strong></th>
+<th class="tableblock halign-center valign-top"><strong>macOS</strong></th>
+<th class="tableblock halign-center valign-top"><strong>Fedora</strong></th>
+<th class="tableblock halign-center valign-top"><strong>windows</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>git</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com/download/mac">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com/download/linux">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://git-scm.com/download/win">Download</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>oc 4.12</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/openshift-client-mac.tar.gz">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/openshift-client-linux.tar.gz">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.12/openshift-client-windows.zip">Download</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>argocd v2.3.17</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/argoproj/argo-cd/releases/download/v2.3.17/argocd-darwin-amd64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/argoproj/argo-cd/releases/download/v2.3.17/argocd-linux-amd64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/argoproj/argo-cd/releases/download/v2.3.17/argocd-windows-amd64.exe">Download</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/mikefarah/yq">yq 4.19.1</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/mikefarah/yq/releases/download/v4.19.1/yq_darwin_amd64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/mikefarah/yq/releases/download/v4.19.1/yq_linux_amd64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/mikefarah/yq/releases/download/v4.19.1/yq_windows_amd64.exe">Download</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/stedolan/jq">jq v1.6.0</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/stedolan/jq/releases/download/jq-1.6/jq-osx-amd64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64">Download</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe">Download</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="openshift"><a class="anchor" href="#openshift"></a>Setup OpenShift 4</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run this guide <strong>you need to have at least one OpenShift cluster</strong> provisioned <strong>and be cluster admin</strong>. For instance using <a href="https://try.openshift.com">try.openshift.com</a>, or can use any existing OpenShift4 cluster(s). Once you have your cluster, you can download the latest OpenShift client (oc) from <a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/">here</a> and add it to your path.</p>
+</div>
+<div class="paragraph">
+<p>You can check the OpenShift version using:</p>
+</div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get project cicd-tekton-%USERNAME%</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc version</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You should see something like this:</p>
+<p>The output should show oc version 4.12+:</p>
 </div>
 <div class="listingblock console-output">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                DISPLAY NAME   STATUS
-cicd-tekton-user1                  Active</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">Client Version: 4.12
+...</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Fine, the namespace is in place, <strong>it&#8217;s time to create the git secret our pipelines will use when cloning and also while creating Pull Requests</strong> which are the fuel for the CD part of the pipelines to promote from one environment to the next.</p>
+<p>Then login into the OpenShift cluster using <code>oc login</code></p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="which-terminal"><a class="anchor" href="#which-terminal"></a>Which Terminal</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Let&#8217;s create a PAT here, don&#8217;t worry if you created one before.</p>
+<p>Throughout the lab you will have to run commands in a terminal, you can choose to run everything in your computer or in a web-terminal and web-ide. Whichever decision is fine but you have to honor that decision for the whole lab or redo some commands if you change, in this case&#8230;&#8203; you will be on your own.</p>
 </div>
-<div class="admonitionblock tip">
+<div class="admonitionblock caution">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
+<i class="fa icon-caution" title="Caution"></i>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>You can run this command as often as needed</p>
+<p><strong>If you choose to use web-terminal, stick to that decision throughout the whole guide.</strong></p>
+</div>
+<div class="paragraph">
+<p>Next, <strong>open the following link</strong>, <strong>create a new project</strong> called: <code>terminal-%USERNAME%</code> and <strong>click on <code>Start</code></strong>. If credentials are required use these:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>USERNAME:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>PASSWORD:</strong> %PASSWORD%</p>
+</li>
+</ul>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/terminal</code></pre>
+</div>
 </div>
 </td>
 </tr>
 </table>
 </div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">GIT_PAT=$(curl -k -s -XPOST -H "Content-Type: application/json" \
-  -d '{"name":"cicd'"${RANDOM}"'","scopes": ["repo"]}' \
-  -u %USERNAME%:openshift \
-  <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/users/%USERNAME%/tokens</a> | jq -r .sha1)
-echo "GIT_PAT=${GIT_PAT}"</code></pre>
 </div>
+</div>
+<div class="sect1">
+<h2 id="download-tutorial"><a class="anchor" href="#download-tutorial"></a>Get tutorial sources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you prefer to use <mark>OpenShift Dev Spaces</mark> instead of your laptop (your own shell) or your browser (web-terminal) just go to the <a href="03-prepare-devspaces.html" class="xref page">next section</a>, otherwise:</p>
 </div>
 <div class="paragraph">
-<p>Create the actual secret which embeds the PAT you just created using the next command:</p>
+<p>Before we start setting up the environment, let’s clone the tutorial sources and set the <code>TUTORIAL_HOME</code> environment variable to point to the root directory of the tutorial:</p>
 </div>
+<div class="tabset is-loading">
+<div class="ulist tabs">
+<ul>
+<li>
+<p><a id="tabset1_laptop"></a>laptop</p>
+</li>
+<li>
+<p><a id="tabset1_web-terminal"></a>web-terminal</p>
+</li>
+</ul>
+</div>
+<div class="content">
+<div class="tab-pane" aria-labelledby="tabset1_laptop">
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat &lt;&lt;EOF | oc apply -n cicd-tekton-%USERNAME% -f -
-apiVersion: v1
-kind: Secret
-metadata:
-  name: git-pat-secret
-  namespace: cicd-tekton-%USERNAME%
-type: kubernetes.io/basic-auth
-stringData:
-  user.name: %USERNAME%
-  user.email: "%USERNAME%@example.com"
-  username: %USERNAME%
-  password: ${GIT_PAT}
-EOF</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink.git" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink.git</a> kitchensink-guides</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>You have to annotate the secret so that it can actually be used by the pipeline.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc annotate -n cicd-tekton-%USERNAME% secret git-pat-secret \
-  "tekton.dev/git-0=https://repository-gitea-system.apps.%BASE_SUBDOMAIN%"</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/kitchensink-guides"</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Now that the secret is in place and annotated you can proceed to the next chapter.</p>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
+</div>
+</div>
+</div>
+<div class="tab-pane" aria-labelledby="tabset1_web-terminal">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd ~/scratch &amp;&amp; git clone <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink.git" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink.git</a> kitchensink-guides</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export TUTORIAL_HOME="$(pwd)/kitchensink-guides"</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cd $TUTORIAL_HOME</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <nav class="pagination">
-  <span class="prev"><a href="08-helm.html" class="query-params-link">8. ArgoCD + Helm</a></span>
-  <span class="next"><a href="10-helm-kustomized.html" class="query-params-link">10. ArgoCD + Helm + Kustomize</a></span>
+  <span class="prev"><a href="01-prepare-cluster.html" class="query-params-link">1. Prepare Cluster</a></span>
+  <span class="next"><a href="03-prepare-devspaces.html" class="query-params-link">3. Prepare Devspaces</a></span>
 </nav>
 </article>
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
