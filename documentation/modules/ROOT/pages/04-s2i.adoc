@@ -273,8 +273,8 @@ You can create a list of objects from a template using the CLI or, if a template
 [source, bash,subs="+macros,+attributes"]
 ----
 oc set env dc/kitchensink DB_HOST=kitchensink-db DB_PORT=5432 DB_NAME=kitchensink DB_USERNAME=luke DB_PASSWORD=secret && \
-oc set probe dc/kitchensink --readiness --initial-delay-seconds=90 --failure-threshold=5 && \
-oc set probe dc/kitchensink --liveness --initial-delay-seconds=90 --failure-threshold=5 && \
+oc set probe dc/kitchensink --readiness --initial-delay-seconds=70 --failure-threshold=15 --period-seconds=5 && \
+oc set probe dc/kitchensink --liveness --initial-delay-seconds=70 --failure-threshold=15 --period-seconds=5 && \
 oc rollout resume dc/kitchensink
 
 oc label dc/kitchensink app.kubernetes.io/part-of=kitchensink-app --overwrite=true && \
