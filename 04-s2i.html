@@ -784,8 +784,8 @@ oc rollout pause dc/kitchensink</code></pre>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc set env dc/kitchensink DB_HOST=kitchensink-db DB_PORT=5432 DB_NAME=kitchensink DB_USERNAME=luke DB_PASSWORD=secret &amp;&amp; \
-oc set probe dc/kitchensink --readiness --initial-delay-seconds=90 --failure-threshold=5 &amp;&amp; \
-oc set probe dc/kitchensink --liveness --initial-delay-seconds=90 --failure-threshold=5 &amp;&amp; \
+oc set probe dc/kitchensink --readiness --initial-delay-seconds=70 --failure-threshold=15 --period-seconds=5 &amp;&amp; \
+oc set probe dc/kitchensink --liveness --initial-delay-seconds=70 --failure-threshold=15 --period-seconds=5 &amp;&amp; \
 oc rollout resume dc/kitchensink
 
 oc label dc/kitchensink app.kubernetes.io/part-of=kitchensink-app --overwrite=true &amp;&amp; \
