@@ -281,7 +281,7 @@
 <h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Now we are going to deploy the same application in the same way, but in two namespaces at the same time.</p>
+<p>Now you&#8217;re going to deploy the same application using Argo CD, but this time into two namespaces at the same time.</p>
 </div>
 <div class="paragraph">
 <p>We will use an <code>ApplicationSet</code> for this.</p>
@@ -303,7 +303,7 @@ spec:
         desc: "Demo 4a"
       - env: demo-4b
         desc: "Demo 4b"
-  template:
+  template: <i class="conum" data-value="2"></i><b>(2)</b>
     metadata:
       name: kitchensink-basic-app-{{ env }}
       namespace: openshift-gitops
@@ -326,7 +326,7 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
-      source: <i class="conum" data-value="2"></i><b>(2)</b>
+      source:
         path: basic/base
         repoURL: "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf"
         targetRevision: main</code></pre>
@@ -343,11 +343,11 @@ spec:
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>We introduce the concept of <code>generators</code>. One Application per element.</td>
+<td>We introduce the concept of <strong>generators</strong>. One Application per element.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Being the source the same, what we will do is to deploy the same application in two different environments (in our case, 2 different projects/namespaces).</td>
+<td><strong>Template</strong> to create <code>Application</code> objects underneath</td>
 </tr>
 </table>
 </div>
@@ -363,7 +363,7 @@ spec:
 </div>
 <div class="sidebarblock">
 <div class="content">
-<div class="title">generators</div>
+<div class="title">1.- Generators</div>
 <div class="paragraph">
 <p><a href="https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/"><strong>Generators</strong></a>, definitions that allow you to generate objects defined with the <code>template</code>.</p>
 </div>
@@ -380,7 +380,7 @@ spec:
 </div>
 <div class="sidebarblock">
 <div class="content">
-<div class="title">template</div>
+<div class="title">2.- Template</div>
 <div class="paragraph">
 <p><strong>Template</strong> that uses the generator as a model to generate objects of type <code>Application</code>.</p>
 </div>
@@ -407,23 +407,22 @@ spec:
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export USERNAME="%USERNAME%"
-cat &lt;&lt;EOF | oc apply -n openshift-gitops -f -
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat &lt;&lt;EOF | oc apply -n openshift-gitops -f -
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: kitchensink-basic-${USERNAME}
+  name: kitchensink-basic-%USERNAME%
   namespace: openshift-gitops
   labels:
     argocd-root-app: "true"
-    username: ${USERNAME}
+    username: %USERNAME%
 spec:
   generators: <i class="conum" data-value="1"></i><b>(1)</b>
   - list:
       elements:
-      - env: appset-a-${USERNAME}
+      - env: appset-a-%USERNAME%
         desc: "ApplicationSet A"
-      - env: appset-b-${USERNAME}
+      - env: appset-b-%USERNAME%
         desc: "ApplicationSet B"
   template:
     metadata:
@@ -431,7 +430,7 @@ spec:
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"
-        username: ${USERNAME}
+        username: %USERNAME%
       finalizers:
       - resources-finalizer.argocd.argoproj.io
     spec:

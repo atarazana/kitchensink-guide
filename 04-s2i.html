@@ -695,7 +695,7 @@ quit</code></pre>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/s2i-%USERNAME%?view=graph</code></pre>
+<pre class="highlightjs highlight"><code class="language-console hljs" data-lang="console">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/s2i-%USERNAME%?view=graph</code></pre>
 </div>
 </div>
 </td>
@@ -763,7 +763,8 @@ Run <code>oc get template -n openshift | grep eap</code> to find other JBoss EAP
 -p MAVEN_ARGS_APPEND="-Dcom.redhat.xpaas.repo.jbossorg" \
 -p SOURCE_REPOSITORY_URL="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink" \
 -p SOURCE_REPOSITORY_REF=main \
--p CONTEXT_DIR=.</code></pre>
+-p CONTEXT_DIR=. &amp;&amp; \
+oc rollout pause dc/kitchensink</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -793,7 +794,8 @@ Run <code>oc get template -n openshift | grep eap</code> to find other JBoss EAP
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc set env dc/kitchensink DB_HOST=kitchensink-db DB_PORT=5432 DB_NAME=kitchensink DB_USERNAME=luke DB_PASSWORD=secret &amp;&amp; \
 oc set probe dc/kitchensink --readiness --initial-delay-seconds=90 --failure-threshold=5 &amp;&amp; \
-oc set probe dc/kitchensink --liveness --initial-delay-seconds=90 --failure-threshold=5
+oc set probe dc/kitchensink --liveness --initial-delay-seconds=90 --failure-threshold=5 &amp;&amp; \
+oc rollout resume dc/kitchensink
 
 oc label dc/kitchensink app.kubernetes.io/part-of=kitchensink-app --overwrite=true &amp;&amp; \
 oc label dc/kitchensink app.openshift.io/runtime=jboss --overwrite=true
@@ -868,11 +870,11 @@ oc annotate dc/kitchensink \
 <p>You have seen in the traces while building the container image that the <code>assemble</code> scripts is executed and in its turn runs our <code>install.sh</code> script. Now let&#8217;s have a look at the traces of the image while running. In this case it is the <code>run</code> script which is executed and if everything worked as expected out <code>postconfigure.sh</code> script should have been run <em>before</em> JBoss actually runs.</p>
 </div>
 <div class="paragraph">
-<p>Run this command to have a look to the pod logs.</p>
+<p>Run this command to have a look at the pod logs to find the expected trace including <code>postconfigure.sh</code>.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc logs dc/kitchensink -n s2i-%USERNAME% | grep A5 B5 -e "postconfigure.sh"</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc logs dc/kitchensink -n s2i-%USERNAME% | grep -A5 -B5 -e "postconfigure.sh"</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -903,7 +905,7 @@ oc annotate dc/kitchensink \
 </div>
 </div>
 <div class="sect1">
-<h2 id="redeploy"><a class="anchor" href="#redeploy"></a>Redeploying a JBOSS EAP application</h2>
+<h2 id="hot-redeploy"><a class="anchor" href="#hot-redeploy"></a>Hot redeploying a JBOSS EAP application</h2>
 <div class="sectionbody">
 <div class="admonitionblock caution">
 <table>
@@ -959,6 +961,19 @@ oc annotate dc/kitchensink \
 <div class="paragraph">
 <p>Then please, run these commands:</p>
 </div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc project s2i-%USERNAME%
+
+POD_NAME=$(oc get pod -l application=kitchensink -o json | jq -r .items[0].metadata.name)
+echo "POD_NAME=${POD_NAME}"
+
+mvn package -Popenshift</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally let&#8217;s replace <code>ROOT.war</code> inside the pod we just located:</p>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -975,14 +990,7 @@ oc annotate dc/kitchensink \
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc project s2i-%USERNAME%
-
-POD_NAME=$(oc get pod -l application=kitchensink -o json | jq -r .items[0].metadata.name)
-echo "POD_NAME=${POD_NAME}"
-
-mvn package -Popenshift
-
-oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war</code></pre>
 </div>
 </div>
 <div class="paragraph">

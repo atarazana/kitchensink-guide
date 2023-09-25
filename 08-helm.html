@@ -280,10 +280,37 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>As we have already explained; for GitOps the git repository is the only source of truth with regards to the cluster state, that is, the descriptors deployed in kubernetes.</p>
+<p>In the previous chapter you used <a href="https://kustomize.io/" target="_blank" rel="noopener">kustomize</a> to deploy your application to two different environments (or overlays). But there was a catch: What if you have to adapt the descriptors even more, different storage, different cloud vendor, &#8230;&#8203;?</p>
 </div>
 <div class="paragraph">
-<p>Argo CD can extract the cluster state directly as files from a folder or by using one plugin. In this chapter you will rely on the <code>helm</code> plugin to extract descriptors from the configuration repo.</p>
+<p>In this case <a href="https://helm.sh/" target="_blank" rel="noopener">helm</a> could fit the bill. With <strong>helm</strong> you can use templates to adapt the descriptor to almost anything. It&#8217;s true that with <strong>helm</strong> you can install and upgrade, but you can use it only if you want to use the template engine to generate the descriptors the way you need. This is exactly what Argo CD will do for you it will use the command <code>helm template</code> to generate kubernetes descriptors starting from a git repository.</p>
+</div>
+<div class="paragraph">
+<p>Please have a look at the next link:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-console hljs" data-lang="console">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/src/branch/main/advanced/helm_base/templates</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There you will find basically the same descriptors you should be already used to, like:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>kitchensink-deployment.yaml</strong> &#8658; deployment descriptor of kitchensink</p>
+</li>
+<li>
+<p><strong>kitchensink-db-deployment.yaml</strong> &#8658; deployment descriptor of the kitchensink database</p>
+</li>
+<li>
+<p><strong>kitchensink-bc.yaml</strong> &#8658; <code>BuildConfig</code> in charge of building our application image using S2I</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The only difference is that labels, namespace, etc. are not set all in the same way, <strong>there&#8217;s a greater degree of freedom because</strong> the <strong>helm template language is richer than the kustomize yaml directives</strong>.</p>
 </div>
 </div>
 </div>
@@ -381,6 +408,17 @@ EOF</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/helm-%USERNAME%?view=graph</code></pre>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-catch"><a class="anchor" href="#the-catch"></a>The catch</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This approach allows you to adjust descriptors with a greater degree of freedom at the expense of making it difficult to deploy in different environments which kustomize can do easily&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Wouldn&#8217;t if be perfect to use helm to generate the base descriptors for kustomize to put them into the right namespace with the right common labels, etc?</p>
 </div>
 </div>
 </div>

@@ -281,7 +281,10 @@
 <h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy Kitchensink app with ArgoCD + Kustomize</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Now we are going to deploy the same application in the same way, but instead of using descriptors directly we are going to customize them for the corresponding environment (overlay) with <code>kustomize</code>. You will deploy two environments (overlays in kustomize jargon) <code>dev</code> and <code>test</code> in two namespaces set by a list generator.</p>
+<p>Now we are going to deploy the same application in the same way, but instead of using descriptors directly we are going to customize them for the corresponding environment (overlay) using <a href="https://kustomize.io/" target="_blank" rel="noopener">kustomize</a>.</p>
+</div>
+<div class="paragraph">
+<p>In this case, you will deploy your application in two environments (overlays in kustomize jargon): <code>dev</code> and <code>test</code>. This two environments will map to two namespaces:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -292,6 +295,69 @@
 <p><code>test</code> &#8594; <code>kustomize-test-%USERNAME%</code></p>
 </li>
 </ol>
+</div>
+<div class="paragraph">
+<p>How does <code>kustomize</code> work? In a nutshell, you give kustomize a bunch of descriptors and it will put them in a certain namespace, set labels to all the objects and patch them if necessary. Ideal to deploy an application in a given environment isn&#8217;t it?</p>
+</div>
+<div class="paragraph">
+<p>At a lower level <code>kustomize</code> requires a <code>kustomization.yml</code> that points to the descriptors you want to deploy in a certain namespace (of course and adding labels, patching, etc.). Find below the kustomization.yml file corresponding to the <code>dev</code> environment:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+bases:
+  - ../../basic <i class="conum" data-value="1"></i><b>(1)</b>
+namespace: kustomize-dev-%USERNAME% <i class="conum" data-value="2"></i><b>(2)</b>
+commonLabels: <i class="conum" data-value="3"></i><b>(3)</b>
+  app.kubernetes.io/part-of: kitchensink-app
+  app.kubernetes.io/managed-by: argocd
+secretGenerator:
+  - name: kitchensink-database-secret
+    literals:
+      - DB_HOST=events-database
+      - DB_USER=luke
+      - DB_PASSWORD=secret
+      - DB_NAME=EVENTS
+patchesJson6902:
+  - target:
+      group: apps.openshift.io
+      version: v1
+      kind: DeploymentConfig
+      name: kitchensink
+    path: patch/deployment_patch.yml</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Points to the folder<sup class="footnote" id="_footnote_basic-folder">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> of descriptors you used before</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Namespace to put all descriptors in</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Labels to apply to all resources</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can find the two overlays below:</p>
+</div>
+<div class="listingblock console-input">
+<div class="title">dev</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-console hljs" data-lang="console">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/src/branch/main/kustomize/dev</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="title">test</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-console hljs" data-lang="console">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/src/branch/main/kustomize/test</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -310,7 +376,7 @@ metadata:
     argocd-root-app: "true"
     username: %USERNAME%
 spec:
-  generators:
+  generators: <i class="conum" data-value="1"></i><b>(1)</b>
   - list:
       elements:
       - env: dev
@@ -319,7 +385,7 @@ spec:
       - env: test
         ns: kustomize-test-%USERNAME%
         desc: "Kustomize Test"
-  template:
+  template: <i class="conum" data-value="2"></i><b>(2)</b>
     metadata:
       name: kitchensink-kustomize-app-{{ env }}-%USERNAME%
       namespace: openshift-gitops
@@ -349,6 +415,18 @@ spec:
         targetRevision: main
 EOF</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This generator will create two Applications for both overlays: dev and test</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>This template uses attributes <strong>ns</strong> and <strong>env</strong> to customize the Application object for the two overlays</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>We can check the deployment status in both Argo and OpenShift.</p>
@@ -387,6 +465,23 @@ EOF</code></pre>
 <pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/kustomize-test-%USERNAME%?view=graph</code></pre>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-catch"><a class="anchor" href="#the-catch"></a>The catch</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This approach covers deploying our application in two environments using the same descriptors and adapting them by means of patches, common labels and setting the namespace as well, this is just great.</p>
+</div>
+<div class="paragraph">
+<p>But&#8230;&#8203; What if you have to adapt the descriptors even more, different storage, different cloud vendor, &#8230;&#8203;?</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. Go here <a href="https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/src/branch/main/basic" class="bare">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/src/branch/main/basic</a>
 </div>
 </div>
 <nav class="pagination">

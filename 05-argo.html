@@ -281,7 +281,7 @@
 <h2 id="overview"><a class="anchor" href="#overview"></a>Simplification, git-based automation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We have deployed Kitchensink manually using <strong>S2I</strong>, but &#8230;&#8203;</p>
+<p>We have deployed Kitchensink manually using <strong>S2I</strong>, but&#8230;&#8203;</p>
 </div>
 <div class="ulist">
 <ul>
@@ -289,7 +289,7 @@
 <p>How repeatable is this procedure?</p>
 </li>
 <li>
-<p>Auditable?</p>
+<p>Is it auditable? Who triggered it? Change it?</p>
 </li>
 <li>
 <p>Simple at first, but what about in the long run?</p>
@@ -356,10 +356,22 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="application-keystone-of-argocd"><a class="anchor" href="#application-keystone-of-argocd"></a><code>Application</code>: Keystone of Argo CD</h2>
+<h2 id="application-keystone-of-argocd"><a class="anchor" href="#application-keystone-of-argocd"></a><code>Application</code> object: Keystone of Argo CD</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <code>Application</code> CRD is the Kubernetes resource object representing a deployed application instance in an environment.</p>
+<p>The <code>Application</code> CRD is the Kubernetes resource object representing an Argo CD application instance to be deployed in a certain <strong>destination</strong> given a certain <strong>source</strong> git repository coordinates where Argo CD will be able to get or extract the kubernetes descriptors needed to deploy our application.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Picture yourself scanning a QR code to download the instructions to mount a piece of furniture from IKEA.
+</td>
+</tr>
+</table>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -373,32 +385,52 @@ metadata:
   labels:
     kitchensink-root-app: 'true'
 spec:
-  destination:
+  destination: <i class="conum" data-value="1"></i><b>(1)</b>
     name: in-cluster
     namespace: demo-3
+  source: <i class="conum" data-value="2"></i><b>(2)</b>
+    path: basic/base
+    repoURL: 'https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf'
+    targetRevision: main
+  project: default <i class="conum" data-value="3"></i><b>(3)</b>
+  syncPolicy: <i class="conum" data-value="4"></i><b>(4)</b>
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
   ignoreDifferences:
     - group: apps.openshift.io
       jqPathExpressions:
         - '.spec.template.spec.containers[].image'
-      kind: DeploymentConfig
-  project: default
-  source:
-    path: basic/base
-    repoURL: 'https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf'
-    targetRevision: main
-  syncPolicy:
-    automated:
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true</code></pre>
+      kind: DeploymentConfig</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Destination</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Source</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Project</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Sync Policy</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s explain the key parts:</p>
 </div>
 <div class="sidebarblock">
 <div class="content">
-<div class="title">destination</div>
+<div class="title">1.- Destination</div>
 <div class="paragraph">
 <p>The cluster and the target namespace to deploy the application.</p>
 </div>
@@ -413,7 +445,7 @@ spec:
 </div>
 <div class="sidebarblock">
 <div class="content">
-<div class="title">source</div>
+<div class="title">2.- Source</div>
 <div class="paragraph">
 <p><strong>Source</strong> of truth, from which the deployment descriptors are obtained.</p>
 </div>
@@ -429,7 +461,7 @@ spec:
 </div>
 <div class="sidebarblock">
 <div class="content">
-<div class="title">project</div>
+<div class="title">3.- Project</div>
 <div class="paragraph">
 <p><strong>Project</strong>, allows you to define restrictions</p>
 </div>
@@ -442,7 +474,7 @@ spec:
 </div>
 <div class="sidebarblock">
 <div class="content">
-<div class="title">syncPolicy</div>
+<div class="title">4.- Sync Policy</div>
 <div class="paragraph">
 <p>Synchronization settings</p>
 </div>
@@ -458,13 +490,40 @@ spec:
 </div>
 </div>
 <div class="sect1">
-<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy Kitchensink app with ArgoCD</h2>
+<h2 id="deploy"><a class="anchor" href="#deploy"></a>Deploy Kitchensink with ArgoCD</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The first one from a folder containing some descriptors that we have obtained from the <code>JBoss EAP 7.2</code> template.</p>
+<p>You&#8217;re going to deploy again Kitchensink, in pretty much the same way you did before, that is using S2I. But instead of doing it manually Argo CD is going to do it for you.</p>
 </div>
 <div class="paragraph">
-<p>Now, you have to run the next command that created the <code>ApplicationSet</code> object.</p>
+<p>In order to do so <strong>we have done some pre-work</strong>, <strong>basically we have extracted the descriptors</strong> you have just generated <strong>in project <code>s2i-%USERNAME%</code> and put them in your git repository</strong>. Please have a look at them using the next link:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-console hljs" data-lang="console">https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/%USERNAME%/kitchensink-conf/src/branch/main/basic/base</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There you will find, among others:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>kitchensink-dc.yaml</strong> &#8658; deployment descriptor of kitchensink</p>
+</li>
+<li>
+<p><strong>kitchensink-db-deployment.yaml</strong> &#8658; deployment descriptor of the kitchensink database</p>
+</li>
+<li>
+<p><strong>kitchensink-bc.yaml</strong> &#8658; <code>BuildConfig</code> in charge of building our application image using S2I</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Also you will find <code>Services</code> a <code>Route</code> and an <code>ImageStream</code>.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s time to create the <code>Application</code> object with the instruction to deploy our application, please run this command:</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">
