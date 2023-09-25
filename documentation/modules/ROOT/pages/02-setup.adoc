@@ -42,6 +42,15 @@ Next, *open the following link*, *create a new project* called: `terminal-{usern
 ----
 https://{openshift-console-host}/terminal
 ----
+
+Once inside type this command to avoid the session being terminated before you have had time to finish the lab. This command could involve restarting the terminal so please run it before actually starting the lab.
+
+[.console-input]
+[source,bash,subs="+attributes"]
+----
+wtoctl set timeout 240m
+----
+
 ====
 
 [#download-tutorial]
@@ -50,5 +59,5 @@ https://{openshift-console-host}/terminal
 If you prefer to use #OpenShift Dev Spaces# instead of your laptop (your own shell) or your browser (web-terminal) just go to the xref:03-prepare-devspaces.adoc[next section], otherwise:
 
 :tutorial-url: https://{gitea-host}/{username}/kitchensink.git
-:folder: kitchensink-guides
+:folder: kitchensink-lab
 include::partial$download-sources.adoc[]

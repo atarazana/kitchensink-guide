@@ -4,10 +4,65 @@ include::_attributes.adoc[]
 [#deploy]
 == Deploy Kitchensink app with ArgoCD + Kustomize
 
-Now we are going to deploy the same application in the same way, but instead of using descriptors directly we are going to customize them for the corresponding environment (overlay) with ``kustomize``. You will deploy two environments (overlays in kustomize jargon) `dev` and `test` in two namespaces set by a list generator.
+Now we are going to deploy the same application in the same way, but instead of using descriptors directly we are going to customize them for the corresponding environment (overlay) using link:https://kustomize.io/[kustomize^]. 
+
+In this case, you will deploy your application in two environments (overlays in kustomize jargon): `dev` and `test`. This two environments will map to two namespaces:
 
 . `dev` -> `kustomize-dev-{username}`
 . `test` -> `kustomize-test-{username}`
+
+How does `kustomize` work? In a nutshell, you give kustomize a bunch of descriptors and it will put them in a certain namespace, set labels to all the objects and patch them if necessary. Ideal to deploy an application in a given environment isn't it?
+
+At a lower level `kustomize` requires a `kustomization.yml` that points to the descriptors you want to deploy in a certain namespace (of course and adding labels, patching, etc.). Find below the kustomization.yml file corresponding to the `dev` environment:
+
+:fn-folder: footnote:basic-folder[Go here https://{gitea-host}/{username}/kitchensink-conf/src/branch/main/basic]
+
+
+[.console-input]
+[source,yaml,subs="+attributes"]
+----
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+bases:
+  - ../../basic <1>
+namespace: kustomize-dev-{username} <2>
+commonLabels: <3>
+  app.kubernetes.io/part-of: kitchensink-app
+  app.kubernetes.io/managed-by: argocd
+secretGenerator:
+  - name: kitchensink-database-secret
+    literals:
+      - DB_HOST=events-database
+      - DB_USER=luke
+      - DB_PASSWORD=secret
+      - DB_NAME=EVENTS
+patchesJson6902:
+  - target:
+      group: apps.openshift.io
+      version: v1
+      kind: DeploymentConfig
+      name: kitchensink
+    path: patch/deployment_patch.yml
+----
+<1> Points to the folder{fn-folder} of descriptors you used before
+<2> Namespace to put all descriptors in
+<3> Labels to apply to all resources
+
+You can find the two overlays below:
+
+.dev
+[.console-input]
+[source,console,subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/src/branch/main/kustomize/dev
+----
+
+.test
+[.console-input]
+[source,console,subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/src/branch/main/kustomize/test
+----
 
 [#deploy-app]
 == Deploy Using Kustomize and an ApplicationSet
@@ -25,7 +80,7 @@ metadata:
     argocd-root-app: "true"
     username: {username}
 spec:
-  generators:
+  generators: <1>
   - list:
       elements:
       - env: dev
@@ -34,7 +89,7 @@ spec:
       - env: test
         ns: kustomize-test-{username}
         desc: "Kustomize Test"
-  template:
+  template: <2>
     metadata:
       name: kitchensink-kustomize-app-{{ env }}-{username}
       namespace: openshift-gitops
@@ -64,6 +119,8 @@ spec:
         targetRevision: main
 EOF
 ----
+<1> This generator will create two Applications for both overlays: dev and test
+<2> This template uses attributes *ns* and *env* to customize the Application object for the two overlays
 
 We can check the deployment status in both Argo and OpenShift.
 
@@ -96,3 +153,10 @@ https://{openshift-console-host}/topology/ns/kustomize-dev-{username}?view=graph
 ----
 https://{openshift-console-host}/topology/ns/kustomize-test-{username}?view=graph
 ----
+
+[#the-catch]
+== The catch
+
+This approach covers deploying our application in two environments using the same descriptors and adapting them by means of patches, common labels and setting the namespace as well, this is just great. 
+
+But... What if you have to adapt the descriptors even more, different storage, different cloud vendor, ...?

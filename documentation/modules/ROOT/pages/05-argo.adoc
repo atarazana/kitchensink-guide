@@ -4,10 +4,10 @@ include::_attributes.adoc[]
 [#overview]
 == Simplification, git-based automation
 
-We have deployed Kitchensink manually using *S2I*, but ...
+We have deployed Kitchensink manually using *S2I*, but...
 
 * How repeatable is this procedure? 
-* Auditable? 
+* Is it auditable? Who triggered it? Change it?
 * Simple at first, but what about in the long run?
 
 *No worries GitOps to the rescue !!!*
@@ -42,9 +42,11 @@ There are four main directories, namely:
 => This case is special, it relies both on helm and kustomized so a #*custom plugin* will be needed#
 
 [#application-keystone-of-argocd]
-== `Application`: Keystone of Argo CD
+== `Application` object: Keystone of Argo CD
 
-The ``Application`` CRD is the Kubernetes resource object representing a deployed application instance in an environment.
+The `Application` CRD is the Kubernetes resource object representing an Argo CD application instance to be deployed in a certain *destination* given a certain *source* git repository coordinates where Argo CD will be able to get or extract the kubernetes descriptors needed to deploy our application.
+
+TIP: Picture yourself scanning a QR code to download the instructions to mount a piece of furniture from IKEA.
 
 [source, yaml,subs="+macros,+attributes"]
 ----
@@ -58,30 +60,34 @@ metadata:
   labels:
     kitchensink-root-app: 'true'
 spec:
-  destination:
+  destination: <1>
     name: in-cluster
     namespace: demo-3
+  source: <2>
+    path: basic/base
+    repoURL: 'https://{gitea-host}/{username}/kitchensink-conf'
+    targetRevision: main
+  project: default <3>
+  syncPolicy: <4>
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
   ignoreDifferences:
     - group: apps.openshift.io
       jqPathExpressions:
         - '.spec.template.spec.containers[].image'
       kind: DeploymentConfig
-  project: default
-  source:
-    path: basic/base
-    repoURL: 'https://{gitea-host}/{username}/kitchensink-conf'
-    targetRevision: main
-  syncPolicy:
-    automated:
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
 ----
+<1> Destination
+<2> Source
+<3> Project
+<4> Sync Policy
 
 Let's explain the key parts:
 
 [sidebar]
-.destination
+.1.- Destination
 --
 The cluster and the target namespace to deploy the application.
 
@@ -94,7 +100,7 @@ The cluster and the target namespace to deploy the application.
 --
 
 [sidebar]
-.source
+.2.- Source
 --
 *Source* of truth, from which the deployment descriptors are obtained.
 
@@ -108,7 +114,7 @@ The cluster and the target namespace to deploy the application.
 --
 
 [sidebar]
-.project
+.3.- Project
 --
 *Project*, allows you to define restrictions
 
@@ -119,7 +125,7 @@ The cluster and the target namespace to deploy the application.
 --
 
 [sidebar]
-.syncPolicy
+.4.- Sync Policy
 --
 Synchronization settings
 
@@ -132,11 +138,27 @@ Synchronization settings
 --
 
 [#deploy]
-== Deploy Kitchensink app with ArgoCD
+== Deploy Kitchensink with ArgoCD
 
-The first one from a folder containing some descriptors that we have obtained from the ``JBoss EAP 7.2`` template.
+You're going to deploy again Kitchensink, in pretty much the same way you did before, that is using S2I. But instead of doing it manually Argo CD is going to do it for you.
 
-Now, you have to run the next command that created the ``ApplicationSet`` object.
+In order to do so *we have done some pre-work*, *basically we have extracted the descriptors* you have just generated *in project `s2i-{username}` and put them in your git repository*. Please have a look at them using the next link:
+
+[.console-input]
+[source,console,subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/src/branch/main/basic/base
+----
+
+There you will find, among others:
+
+- *kitchensink-dc.yaml* => deployment descriptor of kitchensink
+- *kitchensink-db-deployment.yaml* => deployment descriptor of the kitchensink database
+- *kitchensink-bc.yaml* => `BuildConfig` in charge of building our application image using S2I
+
+Also you will find `Services` a `Route` and an `ImageStream`.
+
+It's time to create the `Application` object with the instruction to deploy our application, please run this command:
 
 [.console-input]
 [source,bash, subs="+macros,+attributes"]

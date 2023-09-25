@@ -4,7 +4,7 @@ include::_attributes.adoc[]
 [#overview]
 == Overview
 
-Now we are going to deploy the same application in the same way, but in two namespaces at the same time.
+Now you're going to deploy the same application using Argo CD, but this time into two namespaces at the same time.
 
 We will use an ``ApplicationSet`` for this.
 
@@ -25,7 +25,7 @@ spec:
         desc: "Demo 4a"
       - env: demo-4b
         desc: "Demo 4b"
-  template:
+  template: <2>
     metadata:
       name: kitchensink-basic-app-{{ env }}
       namespace: openshift-gitops
@@ -48,7 +48,7 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
-      source: <2>
+      source:
         path: basic/base
         repoURL: "https://{gitea-host}/{username}/kitchensink-conf"
         targetRevision: main
@@ -56,9 +56,9 @@ spec:
 
 [NOTE]
 ====
-<1> We introduce the concept of ``generators``. One Application per element.
+<1> We introduce the concept of *generators*. One Application per element.
 
-<2> Being the source the same, what we will do is to deploy the same application in two different environments (in our case, 2 different projects/namespaces).
+<2> *Template* to create `Application` objects underneath
 ====
 
 The ``ApplicationSet`` controller is a Kubernetes controller that adds support for an ApplicationSet CustomResourceDefinition (CRD). This controller/CRD enables both automation and greater flexibility managing Argo CD Applications across a large number of clusters and within monorepos, plus it makes self-service usage possible on multitenant Kubernetes clusters.
@@ -66,7 +66,7 @@ The ``ApplicationSet`` controller is a Kubernetes controller that adds support f
 Let's explain the key parts:
 
 [sidebar]
-.generators
+.1.- Generators
 --
 https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generators/[*Generators*], definitions that allow you to generate objects defined with the ``template``.
 
@@ -81,7 +81,7 @@ https://argo-cd.readthedocs.io/en/stable/operator-manual/applicationset/Generato
 --
 
 [sidebar]
-.template
+.2.- Template
 --
 *Template* that uses the generator as a model to generate objects of type ``Application``.
 
@@ -107,23 +107,22 @@ You have to run the next command that created the ``ApplicationSet`` object that
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
 ----
-export USERNAME="{username}"
 cat <<EOF | oc apply -n {root-apps-namespace} -f -
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: kitchensink-basic-$\{USERNAME}
+  name: kitchensink-basic-{username}
   namespace: openshift-gitops
   labels:
     argocd-root-app: "true"
-    username: $\{USERNAME}    
+    username: {username}    
 spec:
   generators: <1>
   - list:
       elements:
-      - env: appset-a-$\{USERNAME}
+      - env: appset-a-{username}
         desc: "ApplicationSet A"
-      - env: appset-b-$\{USERNAME}
+      - env: appset-b-{username}
         desc: "ApplicationSet B"
   template:
     metadata:
@@ -131,7 +130,7 @@ spec:
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"
-        username: $\{USERNAME}
+        username: {username}
       finalizers:
       - resources-finalizer.argocd.argoproj.io
     spec:

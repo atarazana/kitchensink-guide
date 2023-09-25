@@ -213,7 +213,7 @@ oc new-project s2i-{username}
 Please open the next link to watch the progress of the chapter. 
 
 [.console-input]
-[source,bash, subs="+attributes"]
+[source,console,subs="+attributes"]
 ----
 https://{openshift-console-host}/topology/ns/s2i-{username}?view=graph
 ----
@@ -222,7 +222,7 @@ https://{openshift-console-host}/topology/ns/s2i-{username}?view=graph
 . Deploy the PostgreSQL database for the kitchensink app:
 +
 [.console-input]
-[source, bash,subs="+macros,+attributes"]
+[source,bash,subs="+macros,+attributes"]
 ----
 oc new-app --name=kitchensink-db \
  -e POSTGRESQL_USER=luke \
@@ -247,14 +247,15 @@ The ``oc label`` commands adds decoration to our deployment (used for the #Topol
 TIP: Run `oc get template -n openshift | grep eap` to find other JBoss EAP related templates 
 +
 [.console-input]
-[source, bash,subs="+macros,+attributes"]
+[source,bash,subs="+macros,+attributes"]
 ----
 oc new-app --template=eap72-basic-s2i \
 -p APPLICATION_NAME=kitchensink \
 -p MAVEN_ARGS_APPEND="-Dcom.redhat.xpaas.repo.jbossorg" \
 -p SOURCE_REPOSITORY_URL="https://{gitea-host}/{username}/kitchensink" \
 -p SOURCE_REPOSITORY_REF=main \
--p CONTEXT_DIR=.
+-p CONTEXT_DIR=. && \
+oc rollout pause dc/kitchensink
 ----
 +
 [NOTE]
@@ -273,7 +274,8 @@ You can create a list of objects from a template using the CLI or, if a template
 ----
 oc set env dc/kitchensink DB_HOST=kitchensink-db DB_PORT=5432 DB_NAME=kitchensink DB_USERNAME=luke DB_PASSWORD=secret && \
 oc set probe dc/kitchensink --readiness --initial-delay-seconds=90 --failure-threshold=5 && \
-oc set probe dc/kitchensink --liveness --initial-delay-seconds=90 --failure-threshold=5
+oc set probe dc/kitchensink --liveness --initial-delay-seconds=90 --failure-threshold=5 && \
+oc rollout resume dc/kitchensink
 
 oc label dc/kitchensink app.kubernetes.io/part-of=kitchensink-app --overwrite=true && \
 oc label dc/kitchensink app.openshift.io/runtime=jboss --overwrite=true
@@ -318,12 +320,12 @@ image::s2i-04.png[Deployed]
 
 You have seen in the traces while building the container image that the `assemble` scripts is executed and in its turn runs our `install.sh` script. Now let's have a look at the traces of the image while running. In this case it is the `run` script which is executed and if everything worked as expected out `postconfigure.sh` script should have been run _before_ JBoss actually runs.
 
-Run this command to have a look to the pod logs.
+Run this command to have a look at the pod logs to find the expected trace including `postconfigure.sh`.
 
 [.console-input]
 [source,bash, subs="+attributes"]
 ----
-oc logs dc/kitchensink -n s2i-{username} | grep A5 B5 -e "postconfigure.sh"
+oc logs dc/kitchensink -n s2i-{username} | grep -A5 -B5 -e "postconfigure.sh"
 ----
 
 Time to check if our application works as expected. Go back to the `Topology View`.
@@ -342,8 +344,8 @@ You should see something like this.
 
 image::s2i-06.png[Result]
 
-[#redeploy]
-== Redeploying a JBOSS EAP application
+[#hot-redeploy]
+== Hot redeploying a JBOSS EAP application
 
 [CAUTION]
 ====
@@ -380,11 +382,6 @@ With:
 
 Then please, run these commands:
 
-[NOTE]
-====
-`oc cp` command doesn't show a progress bar and usually is quite fast, if there are no errors no messages will be surfaced, just proceed with the tests.
-====
-
 [.console-input]
 [source, bash,subs="+macros,+attributes"]
 ----
@@ -394,7 +391,18 @@ POD_NAME=$(oc get pod -l application=kitchensink -o json | jq -r .items[0].metad
 echo "POD_NAME=${POD_NAME}"
 
 mvn package -Popenshift
+----
 
+Finally let's replace `ROOT.war` inside the pod we just located:
+
+[NOTE]
+====
+`oc cp` command doesn't show a progress bar and usually is quite fast, if there are no errors no messages will be surfaced, just proceed with the tests.
+====
+
+[.console-input]
+[source, bash,subs="+macros,+attributes"]
+----
 oc cp ./target/ROOT.war ${POD_NAME}:/deployments/ROOT.war
 ----
 

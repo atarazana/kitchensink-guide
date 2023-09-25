@@ -1,9 +1,25 @@
 = ArgoCD + Kustomize
 include::_attributes.adoc[]
 
-As we have already explained; for GitOps the git repository is the only source of truth with regards to the cluster state, that is, the descriptors deployed in kubernetes.
+In the previous chapter you used link:https://kustomize.io/[kustomize^] to deploy your application to two different environments (or overlays). But there was a catch: What if you have to adapt the descriptors even more, different storage, different cloud vendor, ...?
 
-Argo CD can extract the cluster state directly as files from a folder or by using one plugin. In this chapter you will rely on the `helm` plugin to extract descriptors from the configuration repo.
+In this case link:https://helm.sh/[helm^] could fit the bill. With *helm* you can use templates to adapt the descriptor to almost anything. It's true that with *helm* you can install and upgrade, but you can use it only if you want to use the template engine to generate the descriptors the way you need. This is exactly what Argo CD will do for you it will use the command `helm template` to generate kubernetes descriptors starting from a git repository.
+
+Please have a look at the next link:
+
+[.console-input]
+[source,console,subs="+attributes"]
+----
+https://{gitea-host}/{username}/kitchensink-conf/src/branch/main/advanced/helm_base/templates
+----
+
+There you will find basically the same descriptors you should be already used to, like:
+
+- *kitchensink-deployment.yaml* => deployment descriptor of kitchensink
+- *kitchensink-db-deployment.yaml* => deployment descriptor of the kitchensink database
+- *kitchensink-bc.yaml* => `BuildConfig` in charge of building our application image using S2I
+
+The only difference is that labels, namespace, etc. are not set all in the same way, *there's a greater degree of freedom because* the *helm template language is richer than the kustomize yaml directives*.
 
 [#deploy]
 == Deploy Kitchensink app with ArgoCD + Helm
@@ -91,3 +107,10 @@ To see the progress of deployment you should go to namespace `helm-{username}` i
 ----
 https://{openshift-console-host}/topology/ns/helm-{username}?view=graph
 ----
+
+[#the-catch]
+== The catch
+
+This approach allows you to adjust descriptors with a greater degree of freedom at the expense of making it difficult to deploy in different environments which kustomize can do easily...
+
+Wouldn't if be perfect to use helm to generate the base descriptors for kustomize to put them into the right namespace with the right common labels, etc?
