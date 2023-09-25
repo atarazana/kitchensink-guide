@@ -37,11 +37,8 @@ endif::[]
 * xref:08-helm.adoc[8. ArgoCD + Helm]
 
 * xref:09-cicd.adoc[9. CI/CD Pipelines]
-** xref:09-cicd.adoc#create-root-account-in-quay[Create Quay Robot Acc.]
 ** xref:09-cicd.adoc#deploying-cicd-pipelines[Deploying CICD Pipelines]
 ** xref:09-cicd.adoc#create-git-secret[Create Git Secret]
-** xref:09-cicd.adoc#create-registry-secret[Create Registry Secret]
-** xref:09-cicd.adoc#grant-pull-permissions[Granting Pull Permissions] 
 
 * xref:10-helm-kustomized.adoc[10. ArgoCD + Helm + Kustomize]
 ** xref:10-helm-kustomized.adoc#overview[Overview]

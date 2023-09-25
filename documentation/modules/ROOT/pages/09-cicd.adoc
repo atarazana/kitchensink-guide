@@ -1,7 +1,7 @@
 = CI/CD pipelines to close the circle
 include::_attributes.adoc[]
 
-In this chapter you're going to deploy CI and CD pipelines that will help to automate the processes of continuos integration and delivery. It's made of three sections, the first one deploys an ArgoCD Application that will create not only the pipelines but all the necessary elements the other two will guide you to generate the secrets necessary to connect to the git repos and the container image registry.
+In this chapter you're going to deploy CI and CD pipelines based on link:https://tekton.dev/[tekton^] that will help to automate the processes of continuos integration and delivery. It's made of three sections, the first one deploys an ArgoCD Application that will create not only the pipelines but all the necessary elements the other two will guide you to generate the secrets necessary to connect to the git repos and the container image registry.
 
 IMPORTANT: It's a best practice avoid storing secrets in a git repository even if it's private. There are several ways to deal with secrets in this kind of scenarios but in this case we're going to manage them manually for the sake of simplicity.
 
@@ -84,7 +84,7 @@ Let's go to ArgoCD console and see how it's going on. Please copy the next link 
 [.console-input]
 [source,bash, subs="+attributes"]
 ----
-https://{argocd-server}/applications?proj=&sync=&health=&namespace=&cluster=&labels=kitchensink-cicd-app
+https://{argocd-server}/applications?proj=&sync=&health=&namespace=&cluster=&labels=kitchensink-cicd-app&search={username}
 ----
 
 image::argocd-kitchensink-appset-cicd.png[Apps]

@@ -1,13 +1,13 @@
 
-[#create-ci-webhooks]
-== Create CI Webhooks
+[#crate-git-pat]
+== Create Git PAT
 
 Before you can create the webhooks you need a *Personal Access Token* (PAT), which probably has been lost... no problem following this instruction to generate another one.
 
 include::partial$gitea-create-pat.adoc[]
 
 [#kitchensink-ci-webhook]
-=== Kitchensink CI Webhook
+== Kitchensink CI Webhook
 
 [.console-input]
 [source,bash, subs="+macros,+attributes"]
@@ -41,11 +41,8 @@ Expected output:
 {"id":1,"type":"gitea","config":{"content_type":"json","url":"http://"},"events":["push"],"active":true,"updated_at":"2021-11-12T10:14:15Z","created_at":"2021-11-12T10:14:15Z"}
 ----
 
-[#create-cd-webhooks]
-== Create CD Webhooks
-
 [#kitchensink-cd-webhook]
-=== Kitchensink CD Webhook
+== Kitchensink CD Webhook
 
 [.console-input]
 [source,bash, subs="+macros,+attributes"]

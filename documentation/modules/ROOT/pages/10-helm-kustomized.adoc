@@ -4,12 +4,16 @@ include::_attributes.adoc[]
 [#overview]
 == Overview
 
-Key points:
+In the chapter devoted to xref:08-helm.adoc#the-catch[helm] we discussed the possibility of using helm to generate the base descriptors for kustomize instead of using static descriptors. Well, this is what you're going to do here.
+
+Let's recap here the key points of what we want to achieve:
 
 * #Git# is the #source of truth#
-* We want to deploy on #different platforms and different environments#
+* We want to deploy on #different platforms *and* different environments#
 
-To accomplish this, we need to use ``helm`` and ``Kustomize``.
+:fn-custom-plugin: footnote:custom-plugin[How it is defined is out of the scope of this lab but if you want to know more you can have a look link:https://github.com/atarazana/kitchensink/blob/09a9fd1ee642b7cda17d4a2e63ee11c5d1a61cc6/util/bootstrap/3.adapt-operators/gitops-patch.yaml#L35[here^] and link:https://argocd-vault-plugin.readthedocs.io/en/stable/installation/#custom-image-and-configuration-via-sidecar[here^]]
+
+To accomplish this, we need to use `helm` and `kustomize` together. This is possible because Argo CD plugin framework allows to define custom plugins. In this exercise you will use one custom plugin called `kustomized-helm`{fn-custom-plugin}. 
 
 .Difference between Template/Helm and Overlay/Kustomize
 [#img-helm_kustomize,link=https://jfrog.com/blog/power-up-helm-charts-using-kustomize-to-manage-kubernetes-deployments/]
@@ -17,7 +21,7 @@ image::helm_kustomize.png[]
 
 [NOTE]
 ====
-If you want to know more in detail the difference between ``Helm`` and ``Kustomize``, click on the image.
+If you want to know more in detail the difference between `Helm` and `Kustomize`, click on the image.
 ====
 
 [#deploy]
@@ -37,6 +41,7 @@ metadata:
   labels:
     argocd-root-app: "true"
     username: {username}
+
 spec:
   generators:
   - list:
@@ -53,6 +58,7 @@ spec:
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"
+        kustomized-helm: "true"
         username: {username}
       finalizers:
       - resources-finalizer.argocd.argoproj.io
@@ -106,16 +112,12 @@ Custom plugin, variables are passed to it as environment variables.
 * Includes the concept of a generator that simplifies complex deployments: multiple departments, business units, etc.
 * Not only deploys, but also fixes (un)voluntary modifications in the deployment environments.
 
-// [#grant-pull-permissions]
-// == Granting Pull Permissions
+Let's go to ArgoCD console and see how it's going on. Please copy the next link and open it in a new tab.
 
-// Both projects `helm-kustomize-dev-{username}` and `helm-kustomize-test-{username}` need permissions to pull the image from the cicd namespace (cicd-tekton-{username}) created in the previous chapter when deploying the pipelines.
+[.console-input]
+[source,bash, subs="+attributes"]
+----
+https://{argocd-server}/applications?proj=&sync=&health=&namespace=&cluster=&labels=kustomized-helm%2Cusername%253D{username}
+----
 
-// We have to give pull permissions to the `default` service account in each namespace. Please run this command:
-
-// [.console-input]
-// [source,bash, subs="+macros,+attributes"]
-// ----
-// oc policy add-role-to-user system:image-puller system:serviceaccount:helm-kustomize-dev-{username}:default -n cicd-tekton-{username}
-// oc policy add-role-to-user system:image-puller system:serviceaccount:helm-kustomize-test-{username}:default -n cicd-tekton-{username}
-// ----
+Well, it's time to set up webhooks to automate pipelines run.
