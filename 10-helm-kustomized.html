@@ -166,19 +166,10 @@
     <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="09-cicd.html#create-root-account-in-quay">Create Quay Robot Acc.</a>
-  </li>
-  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="09-cicd.html#deploying-cicd-pipelines">Deploying CICD Pipelines</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="09-cicd.html#create-git-secret">Create Git Secret</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="09-cicd.html#create-registry-secret">Create Registry Secret</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="09-cicd.html#grant-pull-permissions">Granting Pull Permissions</a>
   </li>
 </ul>
   </li>
@@ -281,7 +272,10 @@
 <h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Key points:</p>
+<p>In the chapter devoted to <a href="08-helm.html#the-catch" class="xref page">helm</a> we discussed the possibility of using helm to generate the base descriptors for kustomize instead of using static descriptors. Well, this is what you&#8217;re going to do here.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s recap here the key points of what we want to achieve:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -289,12 +283,12 @@
 <p><mark>Git</mark> is the <mark>source of truth</mark></p>
 </li>
 <li>
-<p>We want to deploy on <mark>different platforms and different environments</mark></p>
+<p>We want to deploy on <mark>different platforms <strong>and</strong> different environments</mark></p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>To accomplish this, we need to use <code>helm</code> and <code>Kustomize</code>.</p>
+<p>To accomplish this, we need to use <code>helm</code> and <code>kustomize</code> together. This is possible because Argo CD plugin framework allows to define custom plugins. In this exercise you will use one custom plugin called <code>kustomized-helm</code><sup class="footnote" id="_footnote_custom-plugin">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.</p>
 </div>
 <div id="img-helm_kustomize" class="imageblock">
 <div class="content">
@@ -335,6 +329,7 @@ metadata:
   labels:
     argocd-root-app: "true"
     username: %USERNAME%
+
 spec:
   generators:
   - list:
@@ -351,6 +346,7 @@ spec:
       namespace: openshift-gitops
       labels:
         kitchensink-root-app: "true"
+        kustomized-helm: "true"
         username: %USERNAME%
       finalizers:
       - resources-finalizer.argocd.argoproj.io
@@ -421,6 +417,23 @@ EOF</code></pre>
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>Let&#8217;s go to ArgoCD console and see how it&#8217;s going on. Please copy the next link and open it in a new tab.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications?proj=&amp;sync=&amp;health=&amp;namespace=&amp;cluster=&amp;labels=kustomized-helm%2Cusername%253D%USERNAME%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Well, it&#8217;s time to set up webhooks to automate pipelines run.</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. How it is defined is out of the scope of this lab but if you want to know more you can have a look <a href="https://github.com/atarazana/kitchensink/blob/09a9fd1ee642b7cda17d4a2e63ee11c5d1a61cc6/util/bootstrap/3.adapt-operators/gitops-patch.yaml#L35" target="_blank" rel="noopener">here</a> and <a href="https://argocd-vault-plugin.readthedocs.io/en/stable/installation/#custom-image-and-configuration-via-sidecar" target="_blank" rel="noopener">here</a>
 </div>
 </div>
 <nav class="pagination">

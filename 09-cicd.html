@@ -166,19 +166,10 @@
     <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#create-root-account-in-quay">Create Quay Robot Acc.</a>
-  </li>
-  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="#deploying-cicd-pipelines">Deploying CICD Pipelines</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="#create-git-secret">Create Git Secret</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#create-registry-secret">Create Registry Secret</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="#grant-pull-permissions">Granting Pull Permissions</a>
   </li>
 </ul>
   </li>
@@ -280,7 +271,7 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>In this chapter you&#8217;re going to deploy CI and CD pipelines that will help to automate the processes of continuos integration and delivery. It&#8217;s made of three sections, the first one deploys an ArgoCD Application that will create not only the pipelines but all the necessary elements the other two will guide you to generate the secrets necessary to connect to the git repos and the container image registry.</p>
+<p>In this chapter you&#8217;re going to deploy CI and CD pipelines based on <a href="https://tekton.dev/" target="_blank" rel="noopener">tekton</a> that will help to automate the processes of continuos integration and delivery. It&#8217;s made of three sections, the first one deploys an ArgoCD Application that will create not only the pipelines but all the necessary elements the other two will guide you to generate the secrets necessary to connect to the git repos and the container image registry.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -370,7 +361,7 @@ EOF</code></pre>
 </div>
 <div class="listingblock console-input">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications?proj=&amp;sync=&amp;health=&amp;namespace=&amp;cluster=&amp;labels=kitchensink-cicd-app</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications?proj=&amp;sync=&amp;health=&amp;namespace=&amp;cluster=&amp;labels=kitchensink-cicd-app&amp;search=%USERNAME%</code></pre>
 </div>
 </div>
 <div class="imageblock">

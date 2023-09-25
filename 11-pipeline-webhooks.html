@@ -166,19 +166,10 @@
     <a class="nav-link" href="09-cicd.html">9. CI/CD Pipelines</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="09-cicd.html#create-root-account-in-quay">Create Quay Robot Acc.</a>
-  </li>
-  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="09-cicd.html#deploying-cicd-pipelines">Deploying CICD Pipelines</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="09-cicd.html#create-git-secret">Create Git Secret</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="09-cicd.html#create-registry-secret">Create Registry Secret</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="09-cicd.html#grant-pull-permissions">Granting Pull Permissions</a>
   </li>
 </ul>
   </li>
@@ -299,7 +290,7 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="create-ci-webhooks"><a class="anchor" href="#create-ci-webhooks"></a>Create CI Webhooks</h2>
+<h2 id="crate-git-pat"><a class="anchor" href="#crate-git-pat"></a>Create Git PAT</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Before you can create the webhooks you need a <strong>Personal Access Token</strong> (PAT), which probably has been lost&#8230;&#8203; no problem following this instruction to generate another one.</p>
@@ -327,8 +318,11 @@
 echo "GIT_PAT=${GIT_PAT}"</code></pre>
 </div>
 </div>
-<div class="sect2">
-<h3 id="kitchensink-ci-webhook"><a class="anchor" href="#kitchensink-ci-webhook"></a>Kitchensink CI Webhook</h3>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kitchensink-ci-webhook"><a class="anchor" href="#kitchensink-ci-webhook"></a>Kitchensink CI Webhook</h2>
+<div class="sectionbody">
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">KITCHENSINK_CI_EL_LISTENER_HOST=$(oc get route/el-kitchensink-ci-pl-push-gitea-listener -n cicd-tekton-%USERNAME% -o jsonpath='{.status.ingress[0].host}')
@@ -369,12 +363,9 @@ curl -k -X 'POST' "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/
 </div>
 </div>
 </div>
-</div>
 <div class="sect1">
-<h2 id="create-cd-webhooks"><a class="anchor" href="#create-cd-webhooks"></a>Create CD Webhooks</h2>
+<h2 id="kitchensink-cd-webhook"><a class="anchor" href="#kitchensink-cd-webhook"></a>Kitchensink CD Webhook</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="kitchensink-cd-webhook"><a class="anchor" href="#kitchensink-cd-webhook"></a>Kitchensink CD Webhook</h3>
 <div class="listingblock console-input">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">KITCHENSINK_CD_EL_LISTENER_HOST=$(oc get route/el-kitchensink-cd-pl-pr-gitea-listener -n cicd-tekton-%USERNAME% -o jsonpath='{.status.ingress[0].host}')
@@ -411,7 +402,6 @@ curl -k -X 'POST' "https://repository-gitea-system.apps.%BASE_SUBDOMAIN%/api/v1/
 <div class="listingblock console-output">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"id":2,"type":"gitea","config":{"content_type":"json","url":"<a href="http://"},"events":">"pull_request","pull_request_assign","pull_request_label","pull_request_milestone","pull_request_comment","pull_request_review_approved","pull_request_review_rejected","pull_request_review_comment","pull_request_sync"</a>,"active":true,"updated_at":"2021-11-12T10:16:31Z","created_at":"2021-11-12T10:16:31Z"}</code></pre>
-</div>
 </div>
 </div>
 </div>
