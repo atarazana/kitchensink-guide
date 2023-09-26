@@ -103,6 +103,38 @@ Custom plugin, variables are passed to it as environment variables.
 ----
 --
 
+Check the deployment status in both Argo and OpenShift.
+
+**Argo**
+
+Open the following link to see the new Application objects you just created through the ApplicationSet in ArgoCD UI.
+
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{argocd-server}/applications?labels=username%253D{username}%2Ckustomized-helm%253Dtrue
+----
+
+image::argocd-kitchensink-helm.png[Apps]
+
+**OpenShift**
+
+To see the progress of deployment you should go to namespace `helm-{username}` in the OpenShift web console or just copy the following link.
+
+.dev
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{openshift-console-host}/topology/ns/helm-kustomize-dev-{username}?view=graph
+----
+
+.test
+[.console-input]
+[source,url, subs="+attributes"]
+----
+https://{openshift-console-host}/topology/ns/helm-kustomize-test-{username}?view=graph
+----
+
 [#benefits]
 == Benefits of the GitOps/ArgoCD model
 
@@ -112,12 +144,4 @@ Custom plugin, variables are passed to it as environment variables.
 * Includes the concept of a generator that simplifies complex deployments: multiple departments, business units, etc.
 * Not only deploys, but also fixes (un)voluntary modifications in the deployment environments.
 
-Let's go to ArgoCD console and see how it's going on. Please copy the next link and open it in a new tab.
-
-[.console-input]
-[source,bash, subs="+attributes"]
-----
-https://{argocd-server}/applications?proj=&sync=&health=&namespace=&cluster=&labels=kustomized-helm%2Cusername%253D{username}
-----
-
-Well, it's time to set up webhooks to automate pipelines run.
+*Well, it's time to set up webhooks to automate pipelines run.*

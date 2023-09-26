@@ -39,6 +39,7 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
   labels:
     kitchensink-root-app: 'true'
+    helm: 'true'
     username: {username}    
 spec:
   destination:
@@ -93,10 +94,10 @@ Open the following link to see the new Application objects you just created thro
 [.console-input]
 [source,url, subs="+attributes"]
 ----
-https://{argocd-server}
+https://{argocd-server}/applications?labels=username%253D{username}%2Chelm%253Dtrue
 ----
 
-image::argocd-kitchensink-appset-helm.png[Apps]
+image::argocd-kitchensink-helm.png[Apps]
 
 **OpenShift**
 

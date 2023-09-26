@@ -3,6 +3,22 @@ include::_attributes.adoc[]
 
 This chapter only applies if you choose DevSpaces as the IDE to use throughout this guide.
 
+[CAUTION]
+====
+Red Hat Dev Spaces workspaces are by definition already logged in, this means that if you run `oc whoami` in a terminal window you will get `{username}`.
+
+But if for whatever reason the security token expires then running the same command would give us something like:
+
+[.console-output]
+[source,sh, subs="+macros,+attributes"]
+----
+$ oc whoami
+system:serviceaccount:{username}-devspaces:workspace2e2d939ada0d4cec-sa
+----
+
+Should this happened to you, please restart the workspace, the token will be there once it is up and running.
+====
+
 [#create-workspace]
 == Create Workspace
 

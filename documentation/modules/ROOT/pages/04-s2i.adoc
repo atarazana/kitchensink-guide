@@ -350,8 +350,6 @@ image::s2i-06.png[Result]
 [CAUTION]
 ====
 You have to wait until the application has been deployed, in the previous item, in order to redeploy it!
-
-
 ====
 
 Let's explore a quick way to test _minor_ changes in our application. In this case you will package your JBoss EAP application locally and later you will use ``oc cp`` to copy the WAR file directly to the deployment folder of JBoss EAP already running in OCP.

@@ -42,3 +42,6 @@ include::partial$versions.adoc[]
 
 :git-pat-secret-name: git-pat-secret
 :container-registry-secret-name: container-registry-secret
+
+:kitchensink-kustomized-helm-dev-host: https://kitchensink-helm-kustomize-dev-{username}.{cluster-subdomain}/index.jsf
+:kitchensink-kustomized-helm-test-host: https://kitchensink-helm-kustomize-test-{username}.{cluster-subdomain}/index.jsf

@@ -22,7 +22,7 @@ endif::[]
 * xref:04-s2i.adoc[4. Deploy JBoss EAP Application with S2I]
 ** xref:04-s2i.adoc#overview[Overview]
 ** xref:04-s2i.adoc#deploy[Deploying a JBOSS EAP 7.2 application manually]
-** xref:04-s2i.adoc#redeploy[Redeploying a JBOSS EAP application]
+** xref:04-s2i.adoc#hot-redeploy[Redeploying a JBOSS EAP application]
 
 * xref:05-argo.adoc[5. Deploy JBoss EAP Application with ArgoCD]
 ** xref:05-argo.adoc#overview[Simplification, git-based automation]
