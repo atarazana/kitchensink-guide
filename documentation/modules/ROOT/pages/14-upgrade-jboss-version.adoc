@@ -200,3 +200,13 @@ Then do the same with the new *Pull Request* and wait until the new image has be
 POD_NAME=$(oc get pod -n helm-kustomize-test-{username} --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}')
 oc logs ${POD_NAME} -n helm-kustomize-test-{username} | grep -e "JBoss EAP 7"
 ----
+
+[#recap]
+== Recap
+
+Good job! You started manually deploying a JBoss EAP application using S2I and ended up deploying it in multiple environments using GitOps to finally upgrade JBoss EAP from 7.2 to 7.4. That was quite a trip!
+
+We hope you have enjoyed it and remember you can access all the code and conf here:
+
+- *CODE:* https://github.com/atarzana/kitchensink
+- *CONF:* https://github.com/atarzana/kitchensink-conf
