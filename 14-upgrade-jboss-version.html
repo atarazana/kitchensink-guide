@@ -126,7 +126,7 @@
     <a class="nav-link" href="04-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="04-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
+    <a class="nav-link" href="04-s2i.html#hot-redeploy">Redeploying a JBOSS EAP application</a>
   </li>
 </ul>
   </li>
@@ -281,7 +281,7 @@
 <h2 id="whats-different"><a class="anchor" href="#whats-different"></a>What&#8217;s Different</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Well there are a number of things different in 7.4 with regards to 7.2 but we only care about one for this lab. The PostgreSQL driver definition is missing.</p>
+<p>The most prominent thing you will have to deal with is the version of the builder image itself which changes from 7.2 to 7.4! But not only that, in fact there are a number of things different in 7.4 with regards to 7.2 but in this lab we only need to care about one; the PostgreSQL driver definition which is missing in 7.4.</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -290,7 +290,7 @@
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-You should always consult the <a href="https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.4/html/7.4.0_release_notes/index">release notes</a> for a deeper understanding of changes between versions.
+You should always consult the <a href="https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.4/html/7.4.0_release_notes/index" target="_blank" rel="noopener">release notes</a> for a deeper understanding of changes between versions.
 </td>
 </tr>
 </table>
@@ -299,7 +299,31 @@ You should always consult the <a href="https://access.redhat.com/documentation/e
 <p>This means that you have to make a change in your <code>extension/install.sh</code> script in order to install the needed driver. You will do this later, but before you do.</p>
 </div>
 <div class="paragraph">
-<p><strong>Let&#8217;s upgrade the builder image from 7.2 to 7.4 BUT only helm-kustomize-dev and helm-kustomize-test for simplicity</strong>.</p>
+<p><strong>Let&#8217;s start upgrading the builder image from 7.2 to 7.4 BUT only helm-kustomize-dev and helm-kustomize-test for simplicity</strong>. Fixing the other deployments could be a nice job to be done once you finish this lab.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You will have to make these changes in the corresponding git repos. To do so, please use these credentials:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Username:</strong> %USERNAME%</p>
+</li>
+<li>
+<p><strong>Password:</strong> openshift</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -378,17 +402,7 @@ The following link has a query parameter <code>search</code> which will show onl
 <h2 id="update-install-script"><a class="anchor" href="#update-install-script"></a>Update <code>install.sh</code></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Please copy and paste the following link and open it in a browser. It will take you to file <code>kitchensink/extensions/install.sh</code> where you have to uncomment the line where the script configures the PostgreSQL driver. As usual, in case you forgot, use this credentials to log in.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Username:</strong> %USERNAME%</p>
-</li>
-<li>
-<p><strong>Password:</strong> openshift</p>
-</li>
-</ul>
+<p>Please copy and paste the following link and open it in a browser. It will take you to file <code>kitchensink/extensions/install.sh</code> where you have to uncomment the line where the script configures the PostgreSQL driver.</p>
 </div>
 <div class="listingblock console-input">
 <div class="content">

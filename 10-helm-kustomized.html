@@ -127,7 +127,7 @@
     <a class="nav-link" href="04-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="04-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
+    <a class="nav-link" href="04-s2i.html#hot-redeploy">Redeploying a JBOSS EAP application</a>
   </li>
 </ul>
   </li>
@@ -393,6 +393,43 @@ EOF</code></pre>
 </div>
 </div>
 </div>
+<div class="paragraph">
+<p>Check the deployment status in both Argo and OpenShift.</p>
+</div>
+<div class="paragraph">
+<p><strong>Argo</strong></p>
+</div>
+<div class="paragraph">
+<p>Open the following link to see the new Application objects you just created through the ApplicationSet in ArgoCD UI.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications?labels=username%253D%USERNAME%%2Ckustomized-helm%253Dtrue</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/argocd-kitchensink-helm.png" alt="Apps">
+</div>
+</div>
+<div class="paragraph">
+<p><strong>OpenShift</strong></p>
+</div>
+<div class="paragraph">
+<p>To see the progress of deployment you should go to namespace <code>helm-%USERNAME%</code> in the OpenShift web console or just copy the following link.</p>
+</div>
+<div class="listingblock console-input">
+<div class="title">dev</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/helm-kustomize-dev-%USERNAME%?view=graph</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="title">test</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-url hljs" data-lang="url">https://console-openshift-console.apps.%BASE_SUBDOMAIN%/topology/ns/helm-kustomize-test-%USERNAME%?view=graph</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -418,15 +455,7 @@ EOF</code></pre>
 </ul>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s go to ArgoCD console and see how it&#8217;s going on. Please copy the next link and open it in a new tab.</p>
-</div>
-<div class="listingblock console-input">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">https://openshift-gitops-server-openshift-gitops.apps.%BASE_SUBDOMAIN%/applications?proj=&amp;sync=&amp;health=&amp;namespace=&amp;cluster=&amp;labels=kustomized-helm%2Cusername%253D%USERNAME%</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Well, it&#8217;s time to set up webhooks to automate pipelines run.</p>
+<p><strong>Well, it&#8217;s time to set up webhooks to automate pipelines run.</strong></p>
 </div>
 </div>
 </div>

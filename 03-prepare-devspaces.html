@@ -127,7 +127,7 @@
     <a class="nav-link" href="04-s2i.html#deploy">Deploying a JBOSS EAP 7.2 application manually</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="04-s2i.html#redeploy">Redeploying a JBOSS EAP application</a>
+    <a class="nav-link" href="04-s2i.html#hot-redeploy">Redeploying a JBOSS EAP application</a>
   </li>
 </ul>
   </li>
@@ -272,6 +272,32 @@
 <div class="sectionbody">
 <div class="paragraph">
 <p>This chapter only applies if you choose DevSpaces as the IDE to use throughout this guide.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Red Hat Dev Spaces workspaces are by definition already logged in, this means that if you run <code>oc whoami</code> in a terminal window you will get <code>%USERNAME%</code>.</p>
+</div>
+<div class="paragraph">
+<p>But if for whatever reason the security token expires then running the same command would give us something like:</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">$ oc whoami
+system:serviceaccount:%USERNAME%-devspaces:workspace2e2d939ada0d4cec-sa</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Should this happened to you, please restart the workspace, the token will be there once it is up and running.</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
