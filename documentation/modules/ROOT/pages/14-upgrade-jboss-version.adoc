@@ -208,5 +208,5 @@ Good job! You started manually deploying a JBoss EAP application using S2I and e
 
 We hope you have enjoyed it and remember you can access all the code and conf here:
 
-- *CODE:* https://github.com/atarzana/kitchensink
-- *CONF:* https://github.com/atarzana/kitchensink-conf
+- *CODE:* https://github.com/atarazana/kitchensink
+- *CONF:* https://github.com/atarazana/kitchensink-conf
