@@ -18,8 +18,7 @@ At a lower level `kustomize` requires a `kustomization.yml` that points to the d
 :fn-folder: footnote:basic-folder[Go here https://{gitea-host}/{username}/kitchensink-conf/src/branch/main/basic]
 
 
-[.console-input]
-[source,yaml,subs="+attributes"]
+[source, yaml,subs="+macros,+attributes"]
 ----
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
