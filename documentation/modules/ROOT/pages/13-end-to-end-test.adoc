@@ -156,7 +156,7 @@ Let's check all that out, let's start with the image. Copy the following link an
 [.console-input]
 [source,bash, subs="+attributes"]
 ----
-https://{openshift-console-host}/k8s/ns/cicd-tekton-user30//imagestreamtags/kitchensink:latest/history
+https://{openshift-console-host}/k8s/ns/cicd-tekton-{username}/imagestreamtags/kitchensink:latest/history
 ----
 
 You should see an image recently pushed as in the next picture.
