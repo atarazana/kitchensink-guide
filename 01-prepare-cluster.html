@@ -273,6 +273,34 @@
 <div class="paragraph">
 <p>This section is devoted to prepare the OpenShift cluster, hence something to be done before actually run the proper GitOps lab.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="openshift"><a class="anchor" href="#openshift"></a>Setup OpenShift 4</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to run this guide <strong>you need to have access to one OpenShift cluster and be cluster admin on it</strong>. For instance using <a href="https://try.openshift.com">try.openshift.com</a>, or can use any existing OpenShift4 cluster. Once you have your cluster, you can download the latest OpenShift client <code>oc</code> from <a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/">here</a> and add it to your path.</p>
+</div>
+<div class="paragraph">
+<p>You can check the OpenShift version using:</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc version</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output should show oc version 4.12+:</p>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">Client Version: 4.12
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then log in executing <code>oc login</code>.</p>
+</div>
 <div class="paragraph">
 <p>Everything we do in this section requires that you have fulfilled the <a href="02-setup.html#prerequisite" class="xref page">prerequisites</a> section, that you&#8217;re logged in your OpenShift cluster and you have <code>cluster-admin</code> permissions on it.</p>
 </div>
