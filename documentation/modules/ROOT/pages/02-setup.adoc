@@ -6,15 +6,6 @@ include::_attributes.adoc[]
 
 include::partial$prerequisites.adoc[]
 
-
-[#openshift]
-== Setup OpenShift 4
-
-:profile: my_profile
-
-include::partial$openshift-setup.adoc[]
-
-
 ifeval::["{use-quay-io}" == "true"]
 [#container-registry-account]
 == Container Registry Account

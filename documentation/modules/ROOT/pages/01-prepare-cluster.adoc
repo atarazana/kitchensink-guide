@@ -3,6 +3,11 @@ include::_attributes.adoc[]
 
 This section is devoted to prepare the OpenShift cluster, hence something to be done before actually run the proper GitOps lab.
 
+[#openshift]
+== Setup OpenShift 4
+
+include::partial$openshift-setup.adoc[]
+
 Everything we do in this section requires that you have fulfilled the xref:02-setup.adoc#prerequisite[prerequisites] section, that you're logged in your OpenShift cluster and you have `cluster-admin` permissions on it.
 
 If you don't have an OpenShift cluster and/or you don't have `cluster-admin` permissions on it you could for instance using https://try.openshift.com[try.openshift.com].	

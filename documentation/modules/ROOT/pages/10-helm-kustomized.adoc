@@ -82,7 +82,7 @@ spec:
               value: 'false'
             - name: BASE_NAMESPACE
               value: '{cicd-namespace}-{username}'
-          name: kustomized-helm
+          name: kustomized-helm-v1.0
 EOF
 ----
 
